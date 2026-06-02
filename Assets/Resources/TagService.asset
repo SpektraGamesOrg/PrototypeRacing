@@ -20,4 +20,10 @@ MonoBehaviour:
   - MainCamera
   - Player
   - GameController
-  - RuntimeInspector
+  - Trailer
+  - Vehicle
+  - Wheel
+  - EnterExitPoint
+  - IgnoreDamage
+  - Road
+  - DirtRoad
