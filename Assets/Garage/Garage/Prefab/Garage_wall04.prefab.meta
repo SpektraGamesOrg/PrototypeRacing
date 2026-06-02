@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: e67e372ec7b792c42bbad815c4440bfa
+timeCreated: 1534435642
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 162976
+  packageName: PBR Garage Environment
+  packageVersion: 1.0
+  assetPath: Assets/Garage/Garage/Prefab/Garage_wall04.prefab
+  uploadId: 352753
