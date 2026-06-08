@@ -1,1 +1,0 @@
-With the update v1.7.6 Monza was moved to the SteeringWheelInput package as a SteeringWheel/FFB demo scene.

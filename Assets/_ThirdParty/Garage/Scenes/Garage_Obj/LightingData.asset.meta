@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 194c210f09c725c4eadce437a524dd76
+timeCreated: 1581650579
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 25800000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 162976
+  packageName: PBR Garage Environment
+  packageVersion: 1.0
+  assetPath: Assets/Garage/Scenes/Garage_Obj/LightingData.asset
+  uploadId: 352753

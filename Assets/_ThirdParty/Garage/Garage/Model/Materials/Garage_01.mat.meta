@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 43fbaaa6816a4384ebcdcfcd9974e4ae
+timeCreated: 1534434762
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 162976
+  packageName: PBR Garage Environment
+  packageVersion: 1.0
+  assetPath: Assets/Garage/Garage/Model/Materials/Garage_01.mat
+  uploadId: 352753
