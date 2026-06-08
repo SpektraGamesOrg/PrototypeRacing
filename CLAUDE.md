@@ -8,6 +8,14 @@ alwaysApply: true
 
 This is a Unity C# mobile car simulation project.
 
+## Game Design Document (GDD)
+
+- The authoritative game design reference lives at the repo root: **`DRIVE01_GDD.pdf`** (36 pages). Read it for general game context and design intent before making gameplay or feature decisions.
+- It covers the full product design: executive summary and strategy, target player, the three design pillars, core loop, driving model and physics feel, skill/scoring system, damage/repair, car roster and unlock economy, customization, environment and traffic, UI/HUD, audio, economy and monetization, technical spec and performance budgets, analytics, ASO, and the production plan.
+- DRIVE01 in a nutshell (per the GDD): a casual, single-scene open-world driving game for Android / Google Play, monetized entirely through ads, built on Unity 2022 LTS + URP. The player picks one of ~10 cars and earns soft currency by going fast, drifting, and jumping. No missions, no narrative, no IAP, no multiplayer. "Feel over fidelity," icon-only UI, and low-end mobile performance are first-class constraints.
+- Treat the GDD as **design intent, not a description of the current code**. When the document and the actual codebase disagree, follow the code and flag the discrepancy.
+- Reading the PDF: the `Read` tool may fail to render it in some environments. If so, extract the text instead (e.g. `pip install pypdf`, then a short `PdfReader('DRIVE01_GDD.pdf')` page loop) and write the output as UTF-8.
+
 ## Technology Stack and Documentation
 
 - Unity for client runtime, gameplay, UI, and platform integration

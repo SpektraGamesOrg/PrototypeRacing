@@ -5,10 +5,13 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
+  - enabled: 1
+    path: Assets/_Game/Scenes/MainMenu.unity
+    guid: 3f989f6cef7a3c74c829c7805a1d3ff2
+  - enabled: 1
     path: Assets/_Game/Scenes/Game.unity
     guid: e50ce4d8dee3f50478b8e2fa9f9bf5ff
-  - enabled: 1
+  - enabled: 0
     path: Assets/_ThirdParty/Garage/Scenes/Garage_Baked.unity
     guid: 6f0a48efaa6501c4e9b11dadf1fcdcfd
   m_configObjects:
