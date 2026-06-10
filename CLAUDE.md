@@ -83,7 +83,8 @@ This project has **UnityMCP** available as an MCP server. It exposes live Unity 
 ## Error Handling and Debugging
 
 - Use try-catch where appropriate, especially for file I/O and network operations
-- Use Debug.Log, Debug.LogWarning, and Debug.LogError for useful diagnostics
+- Use Debug.Log and Debug.LogError for useful diagnostics
+- NEVER use `Debug.LogWarning` or `Debug.LogWarningFormat`. Always prefer `Debug.LogError` (or `Debug.LogErrorFormat`) instead
 - Use Debug.Assert to catch logical errors during development
 - Add clear custom error messages where they improve debugging speed
 - Use profiler tools and frame debugging to investigate performance issues
