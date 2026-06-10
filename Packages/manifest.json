@@ -8,7 +8,7 @@
     "com.esotericsoftware.spine.spine-unity": "https://github.com/EsotericSoftware/spine-runtimes.git?path=spine-unity/Assets/Spine#4.2",
     "com.esotericsoftware.spine.urp-shaders": "https://github.com/EsotericSoftware/spine-runtimes.git?path=spine-unity/Modules/com.esotericsoftware.spine.urp-shaders#4.2",
     "com.unity.ai.navigation": "2.0.13",
-    "com.unity.cinemachine": "3.1.6",
+    "com.unity.cinemachine": "3.1.7",
     "com.unity.ide.rider": "3.0.40",
     "com.unity.ide.visualstudio": "2.0.27",
     "com.unity.inputsystem": "1.17.0",
@@ -56,6 +56,15 @@
     "com.unity.modules.video": "1.0.0",
     "com.unity.modules.vr": "1.0.0",
     "com.unity.modules.wind": "1.0.0",
-    "com.unity.modules.xr": "1.0.0"
+    "com.unity.modules.xr": "1.0.0",
+	"com.spektragames.addressableloader": "git+https://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:x-oauth-basic@github.com/SpektraGamesOrg/SpektraUnityPackagesProject?path=/Packages/AddressableLoader",
+    "com.spektragames.buildautomation": "git+https://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:x-oauth-basic@github.com/SpektraGamesOrg/SpektraUnityPackagesProject?path=/Packages/BuildAutomation",
+    "com.spektragames.fsmsystem": "git+https://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:x-oauth-basic@github.com/SpektraGamesOrg/SpektraUnityPackagesProject?path=/Packages/FSMSystem",
+    "com.spektragames.nativeplugins": "git+https://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:x-oauth-basic@github.com/SpektraGamesOrg/SpektraUnityPackagesProject?path=/Packages/NativePlugins",
+    "com.spektragames.runtimeui": "git+https://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:x-oauth-basic@github.com/SpektraGamesOrg/SpektraUnityPackagesProject?path=/Packages/RuntimeUI",
+    "com.spektragames.scriptablesystem": "git+https://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:x-oauth-basic@github.com/SpektraGamesOrg/SpektraUnityPackagesProject?path=/Packages/ScriptableSystem",
+    "com.spektragames.spektrautilities": "git+https://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:x-oauth-basic@github.com/SpektraGamesOrg/SpektraUnityPackagesProject?path=/Packages/SpektraUtilities",
+	"com.spektragames.customtoolbar": "git+https://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:x-oauth-basic@github.com/SpektraGamesOrg/SpektraUnityPackagesProject?path=/Packages/CustomToolbar",
+	"com.spektragames.objectpooling": "git+https://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:x-oauth-basic@github.com/SpektraGamesOrg/SpektraUnityPackagesProject?path=/Packages/ObjectPooling"
   }
 }

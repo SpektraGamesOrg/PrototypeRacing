@@ -23,7 +23,7 @@ namespace Utils.Editor.QuickOptionsToolbarMenu
             return new MainToolbarButton(content, () =>
             {
                 EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo();
-                Helpers.Editor.SaveProject();
+                SpektraHelpers.Editor.SaveProject();
             });
         }
 

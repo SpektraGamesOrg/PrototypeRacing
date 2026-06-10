@@ -63,37 +63,84 @@
       "hash": "ad8f19632a14f1cc187f1f9db05d9191fa0f5d9b"
     },
     "com.spektragames.addressableloader": {
-      "version": "file:com.spektragames.addressableloader@d3724e51c5dc",
+      "version": "git+https://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:x-oauth-basic@github.com/SpektraGamesOrg/SpektraUnityPackagesProject?path=/Packages/AddressableLoader",
       "depth": 0,
-      "source": "embedded",
+      "source": "git",
       "dependencies": {
         "com.unity.nuget.newtonsoft-json": "3.0.1"
-      }
+      },
+      "hash": "987cd48231eef325b2e3fe3b0ac03a8f8fe06a36"
+    },
+    "com.spektragames.buildautomation": {
+      "version": "git+https://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:x-oauth-basic@github.com/SpektraGamesOrg/SpektraUnityPackagesProject?path=/Packages/BuildAutomation",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.nuget.newtonsoft-json": "3.0.1"
+      },
+      "hash": "987cd48231eef325b2e3fe3b0ac03a8f8fe06a36"
+    },
+    "com.spektragames.customtoolbar": {
+      "version": "git+https://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:x-oauth-basic@github.com/SpektraGamesOrg/SpektraUnityPackagesProject?path=/Packages/CustomToolbar",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.nuget.newtonsoft-json": "3.0.1"
+      },
+      "hash": "987cd48231eef325b2e3fe3b0ac03a8f8fe06a36"
+    },
+    "com.spektragames.fsmsystem": {
+      "version": "git+https://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:x-oauth-basic@github.com/SpektraGamesOrg/SpektraUnityPackagesProject?path=/Packages/FSMSystem",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.nuget.newtonsoft-json": "3.0.1"
+      },
+      "hash": "987cd48231eef325b2e3fe3b0ac03a8f8fe06a36"
+    },
+    "com.spektragames.nativeplugins": {
+      "version": "git+https://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:x-oauth-basic@github.com/SpektraGamesOrg/SpektraUnityPackagesProject?path=/Packages/NativePlugins",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "987cd48231eef325b2e3fe3b0ac03a8f8fe06a36"
     },
     "com.spektragames.objectpooling": {
-      "version": "file:com.spektragames.objectpooling@d2e0ff9f3485",
+      "version": "git+https://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:x-oauth-basic@github.com/SpektraGamesOrg/SpektraUnityPackagesProject?path=/Packages/ObjectPooling",
       "depth": 0,
-      "source": "embedded",
+      "source": "git",
       "dependencies": {
         "com.unity.nuget.newtonsoft-json": "3.0.1"
-      }
+      },
+      "hash": "987cd48231eef325b2e3fe3b0ac03a8f8fe06a36"
     },
     "com.spektragames.runtimeui": {
-      "version": "file:com.spektragames.runtimeui@a5a2320ff5df",
+      "version": "git+https://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:x-oauth-basic@github.com/SpektraGamesOrg/SpektraUnityPackagesProject?path=/Packages/RuntimeUI",
       "depth": 0,
-      "source": "embedded",
+      "source": "git",
       "dependencies": {
         "com.unity.nuget.newtonsoft-json": "3.0.1"
-      }
+      },
+      "hash": "987cd48231eef325b2e3fe3b0ac03a8f8fe06a36"
+    },
+    "com.spektragames.scriptablesystem": {
+      "version": "git+https://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:x-oauth-basic@github.com/SpektraGamesOrg/SpektraUnityPackagesProject?path=/Packages/ScriptableSystem",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.nuget.newtonsoft-json": "3.0.1"
+      },
+      "hash": "987cd48231eef325b2e3fe3b0ac03a8f8fe06a36"
     },
     "com.spektragames.spektrautilities": {
-      "version": "file:com.spektragames.spektrautilities@50d72e28f477",
+      "version": "git+https://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:x-oauth-basic@github.com/SpektraGamesOrg/SpektraUnityPackagesProject?path=/Packages/SpektraUtilities",
       "depth": 0,
-      "source": "embedded",
+      "source": "git",
       "dependencies": {
         "com.unity.nuget.newtonsoft-json": "3.0.1",
         "com.unity.editorcoroutines": "1.0.0"
-      }
+      },
+      "hash": "987cd48231eef325b2e3fe3b0ac03a8f8fe06a36"
     },
     "com.unity.addressables": {
       "version": "2.8.0",
@@ -131,7 +178,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.cinemachine": {
-      "version": "3.1.6",
+      "version": "3.1.7",
       "depth": 0,
       "source": "registry",
       "dependencies": {

@@ -49,7 +49,7 @@ namespace Core
                 GraphicsSettings.defaultRenderPipeline = _assetInstance;
                 string assetGuid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(_assetInstance));
                 string graphicsSettingsPath = "ProjectSettings/GraphicsSettings.asset";
-                graphicsSettingsPath = Helpers.File.RelativePathToNormalPath(graphicsSettingsPath);
+                graphicsSettingsPath = SpektraHelpers.File.RelativePathToNormalPath(graphicsSettingsPath);
                 if (File.Exists(graphicsSettingsPath))
                 {
                     var allLines = File.ReadAllLines(graphicsSettingsPath).ToList();
