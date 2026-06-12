@@ -63,84 +63,84 @@
       "hash": "ad8f19632a14f1cc187f1f9db05d9191fa0f5d9b"
     },
     "com.spektragames.addressableloader": {
-      "version": "https://github.com/SpektraGamesOrg/SpektraUnityPackagesProject.git?path=/Packages/AddressableLoader",
+      "version": "1.0.16",
       "depth": 0,
-      "source": "git",
+      "source": "registry",
       "dependencies": {
         "com.unity.nuget.newtonsoft-json": "3.0.1"
       },
-      "hash": "987cd48231eef325b2e3fe3b0ac03a8f8fe06a36"
+      "url": "https://upm.spektragames.com"
     },
     "com.spektragames.buildautomation": {
-      "version": "https://github.com/SpektraGamesOrg/SpektraUnityPackagesProject.git?path=/Packages/BuildAutomation",
+      "version": "1.0.18",
       "depth": 0,
-      "source": "git",
+      "source": "registry",
       "dependencies": {
         "com.unity.nuget.newtonsoft-json": "3.0.1"
       },
-      "hash": "987cd48231eef325b2e3fe3b0ac03a8f8fe06a36"
+      "url": "https://upm.spektragames.com"
     },
     "com.spektragames.customtoolbar": {
-      "version": "https://github.com/SpektraGamesOrg/SpektraUnityPackagesProject.git?path=/Packages/CustomToolbar",
+      "version": "1.0.6",
       "depth": 0,
-      "source": "git",
+      "source": "registry",
       "dependencies": {
         "com.unity.nuget.newtonsoft-json": "3.0.1"
       },
-      "hash": "987cd48231eef325b2e3fe3b0ac03a8f8fe06a36"
+      "url": "https://upm.spektragames.com"
     },
     "com.spektragames.fsmsystem": {
-      "version": "https://github.com/SpektraGamesOrg/SpektraUnityPackagesProject.git?path=/Packages/FSMSystem",
+      "version": "1.2.2",
       "depth": 0,
-      "source": "git",
+      "source": "registry",
       "dependencies": {
         "com.unity.nuget.newtonsoft-json": "3.0.1"
       },
-      "hash": "987cd48231eef325b2e3fe3b0ac03a8f8fe06a36"
+      "url": "https://upm.spektragames.com"
     },
     "com.spektragames.nativeplugins": {
-      "version": "https://github.com/SpektraGamesOrg/SpektraUnityPackagesProject.git?path=/Packages/NativePlugins",
+      "version": "1.3.2",
       "depth": 0,
-      "source": "git",
+      "source": "registry",
       "dependencies": {},
-      "hash": "987cd48231eef325b2e3fe3b0ac03a8f8fe06a36"
+      "url": "https://upm.spektragames.com"
     },
     "com.spektragames.objectpooling": {
-      "version": "https://github.com/SpektraGamesOrg/SpektraUnityPackagesProject.git?path=/Packages/ObjectPooling",
+      "version": "1.0.9",
       "depth": 0,
-      "source": "git",
+      "source": "registry",
       "dependencies": {
         "com.unity.nuget.newtonsoft-json": "3.0.1"
       },
-      "hash": "987cd48231eef325b2e3fe3b0ac03a8f8fe06a36"
+      "url": "https://upm.spektragames.com"
     },
     "com.spektragames.runtimeui": {
-      "version": "https://github.com/SpektraGamesOrg/SpektraUnityPackagesProject.git?path=/Packages/RuntimeUI",
+      "version": "1.0.7",
       "depth": 0,
-      "source": "git",
+      "source": "registry",
       "dependencies": {
         "com.unity.nuget.newtonsoft-json": "3.0.1"
       },
-      "hash": "987cd48231eef325b2e3fe3b0ac03a8f8fe06a36"
+      "url": "https://upm.spektragames.com"
     },
     "com.spektragames.scriptablesystem": {
-      "version": "https://github.com/SpektraGamesOrg/SpektraUnityPackagesProject.git?path=/Packages/ScriptableSystem",
+      "version": "1.0.10",
       "depth": 0,
-      "source": "git",
+      "source": "registry",
       "dependencies": {
         "com.unity.nuget.newtonsoft-json": "3.0.1"
       },
-      "hash": "987cd48231eef325b2e3fe3b0ac03a8f8fe06a36"
+      "url": "https://upm.spektragames.com"
     },
     "com.spektragames.spektrautilities": {
-      "version": "https://github.com/SpektraGamesOrg/SpektraUnityPackagesProject.git?path=/Packages/SpektraUtilities",
+      "version": "1.1.11",
       "depth": 0,
-      "source": "git",
+      "source": "registry",
       "dependencies": {
         "com.unity.nuget.newtonsoft-json": "3.0.1",
         "com.unity.editorcoroutines": "1.0.0"
       },
-      "hash": "987cd48231eef325b2e3fe3b0ac03a8f8fe06a36"
+      "url": "https://upm.spektragames.com"
     },
     "com.unity.addressables": {
       "version": "2.8.0",

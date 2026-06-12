@@ -57,14 +57,40 @@
     "com.unity.modules.vr": "1.0.0",
     "com.unity.modules.wind": "1.0.0",
     "com.unity.modules.xr": "1.0.0",
-	"com.spektragames.addressableloader": "https://github.com/SpektraGamesOrg/SpektraUnityPackagesProject.git?path=/Packages/AddressableLoader",
-    "com.spektragames.buildautomation": "https://github.com/SpektraGamesOrg/SpektraUnityPackagesProject.git?path=/Packages/BuildAutomation",
-    "com.spektragames.fsmsystem": "https://github.com/SpektraGamesOrg/SpektraUnityPackagesProject.git?path=/Packages/FSMSystem",
-    "com.spektragames.nativeplugins": "https://github.com/SpektraGamesOrg/SpektraUnityPackagesProject.git?path=/Packages/NativePlugins",
-    "com.spektragames.runtimeui": "https://github.com/SpektraGamesOrg/SpektraUnityPackagesProject.git?path=/Packages/RuntimeUI",
-    "com.spektragames.scriptablesystem": "https://github.com/SpektraGamesOrg/SpektraUnityPackagesProject.git?path=/Packages/ScriptableSystem",
-    "com.spektragames.spektrautilities": "https://github.com/SpektraGamesOrg/SpektraUnityPackagesProject.git?path=/Packages/SpektraUtilities",
-	"com.spektragames.customtoolbar": "https://github.com/SpektraGamesOrg/SpektraUnityPackagesProject.git?path=/Packages/CustomToolbar",
-	"com.spektragames.objectpooling": "https://github.com/SpektraGamesOrg/SpektraUnityPackagesProject.git?path=/Packages/ObjectPooling"
-  }
+	"com.spektragames.addressableloader": "1.0.16",
+    "com.spektragames.buildautomation": "1.0.18",
+    "com.spektragames.customtoolbar": "1.0.6",
+    "com.spektragames.fsmsystem": "1.2.2",
+    "com.spektragames.nativeplugins": "1.3.2",
+    "com.spektragames.objectpooling": "1.0.9",
+    "com.spektragames.runtimeui": "1.0.7",
+    "com.spektragames.scriptablesystem": "1.0.10",
+    "com.spektragames.spektrautilities": "1.1.11"
+  },
+  "scopedRegistries": [
+    {
+      "name": "Unity NuGet",
+      "url": "https://unitynuget-registry.openupm.com",
+      "scopes": [
+        "org.nuget"
+      ],
+      "overrideBuiltIns": false
+    },
+    {
+      "name": "OpenUPM",
+      "url": "https://package.openupm.com",
+      "scopes": [
+        "com.google"
+      ],
+      "overrideBuiltIns": false
+    },
+    {
+      "name": "Spektra",
+      "url": "https://upm.spektragames.com",
+      "scopes": [
+        "com.spektragames"
+      ],
+      "overrideBuiltIns": true
+    }
+  ]
 }
