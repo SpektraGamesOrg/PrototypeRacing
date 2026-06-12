@@ -9,7 +9,7 @@ namespace Vehicles
     /// <summary>
     /// Singleton ScriptableObject catalog of every vehicle in the game (prefab + id enum).
     /// This is static design-time data - the player's owned/selected state lives in the
-    /// save system (SaveManager, in the Save namespace), keyed by the same <see cref="VehicleNameType"/>.
+    /// save system (SaveManager, in the Save namespace), keyed by the same <see cref="VehicleID"/>.
     ///
     /// Loaded automatically via <see cref="SingletonScriptableObject{T}"/>, which calls
     /// Resources.Load("VehicleContainer"). The asset MUST be named "VehicleContainer" and live
@@ -31,11 +31,11 @@ namespace Vehicles
         /// <summary>
         /// Returns the entry for a vehicle, or null (with an error) if it isn't registered.
         /// </summary>
-        public VehicleEntry GetVehicle(VehicleNameType nameType)
+        public VehicleEntry GetVehicle(VehicleID id)
         {
-            VehicleEntry entry = FindEntry(nameType);
+            VehicleEntry entry = FindEntry(id);
             if (entry == null)
-                Debug.LogError($"[VehicleContainer] No vehicle registered for {nameType}.");
+                Debug.LogError($"[VehicleContainer] No vehicle registered for {id}.");
 
             return entry;
         }
@@ -44,9 +44,9 @@ namespace Vehicles
         /// Returns the prefab resource handle for a vehicle, or null if it isn't registered.
         /// Call Load()/LoadAsync() on the result to get the actual prefab.
         /// </summary>
-        public ResourceObject<GameObject> GetPrefab(VehicleNameType nameType)
+        public ResourceObject<GameObject> GetPrefab(VehicleID id)
         {
-            VehicleEntry entry = GetVehicle(nameType);
+            VehicleEntry entry = GetVehicle(id);
             return entry?.Prefab;
         }
 
@@ -54,9 +54,9 @@ namespace Vehicles
         /// Loads and returns the prefab for a vehicle asynchronously,
         /// or null if it isn't registered.
         /// </summary>
-        public async UniTask<GameObject> LoadPrefabAsync(VehicleNameType nameType)
+        public async UniTask<GameObject> LoadPrefabAsync(VehicleID id)
         {
-            ResourceObject<GameObject> resource = GetPrefab(nameType);
+            ResourceObject<GameObject> resource = GetPrefab(id);
             if (resource == null)
                 return null;
 
@@ -66,17 +66,17 @@ namespace Vehicles
         /// <summary>
         /// True if the vehicle is registered in this container.
         /// </summary>
-        public bool Contains(VehicleNameType nameType)
+        public bool Contains(VehicleID id)
         {
-            return FindEntry(nameType) != null;
+            return FindEntry(id) != null;
         }
 
         // Linear scan is fine for the small roster (~10 cars) and avoids LINQ allocations.
-        private VehicleEntry FindEntry(VehicleNameType nameType)
+        private VehicleEntry FindEntry(VehicleID id)
         {
             for (int i = 0; i < vehicles.Count; i++)
             {
-                if (vehicles[i].NameType == nameType)
+                if (vehicles[i].ID == id)
                     return vehicles[i];
             }
 

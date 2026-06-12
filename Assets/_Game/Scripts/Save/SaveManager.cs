@@ -14,7 +14,7 @@ namespace Save
     ///
     /// To add a new saved property: add a key in <see cref="SaveKeys"/>, a default const below,
     /// and a property. Simple values are stored one key per field. Vehicles are kept in a single
-    /// <see cref="VehicleList"/> stored as JSON, keyed by <see cref="VehicleNameType"/>.
+    /// <see cref="VehicleList"/> stored as JSON, keyed by <see cref="VehicleID"/>.
     ///
     /// Note: PlayerPrefs.Set* only stages values in memory. Call <see cref="Save"/> to flush
     /// to disk (the auto-save helper also flushes on quit/pause).
@@ -28,7 +28,7 @@ namespace Save
         private const float           DefaultMasterVolume    = 1f;
         private const float           DefaultSfxVolume       = 1f;
         private const bool            DefaultVibration       = true;
-        private const VehicleNameType DefaultSelectedVehicle = VehicleNameType.None;
+        private const VehicleID DefaultSelectedVehicle = VehicleID.None;
 
         // ---------------------------------------------------------------------
         // Currency
@@ -68,9 +68,9 @@ namespace Save
         /// The currently selected vehicle. Set it through <see cref="SelectVehicle"/> so the
         /// choice is validated against owned vehicles.
         /// </summary>
-        public static VehicleNameType SelectedVehicle
+        public static VehicleID SelectedVehicle
         {
-            get => (VehicleNameType)PlayerPrefs.GetInt(SaveKeys.SelectedVehicle, (int)DefaultSelectedVehicle);
+            get => (VehicleID)PlayerPrefs.GetInt(SaveKeys.SelectedVehicle, (int)DefaultSelectedVehicle);
             private set => PlayerPrefs.SetInt(SaveKeys.SelectedVehicle, (int)value);
         }
 
@@ -78,15 +78,15 @@ namespace Save
         /// Selects a vehicle, but only if the player owns it. Returns false (and changes nothing)
         /// if the vehicle is not owned.
         /// </summary>
-        public static bool SelectVehicle(VehicleNameType nameType)
+        public static bool SelectVehicle(VehicleID id)
         {
-            if (!IsOwned(nameType))
+            if (!IsOwned(id))
             {
-                Debug.LogError($"[SaveManager] Cannot select {nameType} - vehicle is not owned.");
+                Debug.LogError($"[SaveManager] Cannot select {id} - vehicle is not owned.");
                 return false;
             }
 
-            SelectedVehicle = nameType;
+            SelectedVehicle = id;
             return true;
         }
 
@@ -117,10 +117,10 @@ namespace Save
         /// <summary>
         /// Returns the saved data for a vehicle, or a fresh default if it isn't in the list yet.
         /// </summary>
-        public static VehicleSaveData GetVehicle(VehicleNameType nameType)
+        public static VehicleSaveData GetVehicle(VehicleID id)
         {
-            VehicleSaveData vehicle = GetVehicleList().vehicles.Find(v => v.nameType == nameType);
-            return vehicle ?? new VehicleSaveData(nameType);
+            VehicleSaveData vehicle = GetVehicleList().vehicles.Find(v => v.id == id);
+            return vehicle ?? new VehicleSaveData(id);
         }
 
         /// <summary>
@@ -128,14 +128,14 @@ namespace Save
         /// </summary>
         public static void SetVehicle(VehicleSaveData vehicle)
         {
-            if (vehicle == null || vehicle.nameType == VehicleNameType.None)
+            if (vehicle == null || vehicle.id == VehicleID.None)
             {
                 Debug.LogError("[SaveManager] SetVehicle called with null vehicle or None type.");
                 return;
             }
 
             VehicleList list = GetVehicleList();
-            int index = list.vehicles.FindIndex(v => v.nameType == vehicle.nameType);
+            int index = list.vehicles.FindIndex(v => v.id == vehicle.id);
             if (index >= 0)
                 list.vehicles[index] = vehicle;
             else
@@ -147,18 +147,18 @@ namespace Save
         /// <summary>
         /// True if the vehicle exists in the list and is owned.
         /// </summary>
-        public static bool IsOwned(VehicleNameType nameType)
+        public static bool IsOwned(VehicleID id)
         {
-            VehicleSaveData vehicle = GetVehicleList().vehicles.Find(v => v.nameType == nameType);
+            VehicleSaveData vehicle = GetVehicleList().vehicles.Find(v => v.id == id);
             return vehicle != null && vehicle.owned;
         }
 
         /// <summary>
         /// Marks a vehicle as owned, creating its entry if needed.
         /// </summary>
-        public static void AddOwned(VehicleNameType nameType)
+        public static void AddOwned(VehicleID id)
         {
-            VehicleSaveData vehicle = GetVehicle(nameType);
+            VehicleSaveData vehicle = GetVehicle(id);
             vehicle.owned = true;
             SetVehicle(vehicle);
         }

@@ -17,7 +17,7 @@ namespace Save
         // Default values
         public const string DefaultPaintColorHex = "#FFFFFF";
 
-        public VehicleNameType nameType;
+        public VehicleID id;
         public bool owned;
 
         // --- Customization (extend freely) ---
@@ -26,9 +26,9 @@ namespace Save
 
         public VehicleSaveData() { }
         
-        public VehicleSaveData(VehicleNameType nameType)
+        public VehicleSaveData(VehicleID id)
         {
-            this.nameType = nameType;
+            this.id = id;
         }
     }
 }

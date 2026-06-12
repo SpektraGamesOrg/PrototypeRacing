@@ -13,10 +13,10 @@ namespace Vehicles
     [Serializable]
     public class VehicleEntry
     {
-        [SerializeField] private VehicleNameType nameType;
+        [SerializeField] private VehicleID id;
         [SerializeField] private ResourceObject<GameObject> prefab = new ResourceObject<GameObject>();
 
-        public VehicleNameType NameType => nameType;
+        public VehicleID ID => id;
         public ResourceObject<GameObject> Prefab => prefab;
     }
 }
