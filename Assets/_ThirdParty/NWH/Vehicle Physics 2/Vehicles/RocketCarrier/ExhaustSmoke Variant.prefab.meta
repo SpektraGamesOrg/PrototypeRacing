@@ -10,5 +10,6 @@ AssetOrigin:
   productId: 166252
   packageName: NWH Vehicle Physics 2
   packageVersion: 13.6
-  assetPath: Assets/NWH/Vehicle Physics 2/Vehicles/RocketCarrier/ExhaustSmoke Variant.prefab
+  assetPath: Assets/_ThirdParty/NWH/Vehicle Physics 2/Vehicles/RocketCarrier/ExhaustSmoke
+    Variant.prefab
   uploadId: 762324

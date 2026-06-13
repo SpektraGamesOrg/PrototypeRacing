@@ -11,5 +11,5 @@ AssetOrigin:
   productId: 166252
   packageName: NWH Vehicle Physics 2
   packageVersion: 13.6
-  assetPath: Assets/NWH/WheelController/Resources/Wheel Controller 3D/Defaults/DefaultFrictionPreset.asset
+  assetPath: Assets/_ThirdParty/NWH/WheelController/Resources/Wheel Controller 3D/Defaults/DefaultFrictionPreset.asset
   uploadId: 762324

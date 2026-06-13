@@ -14,5 +14,5 @@ AssetOrigin:
   productId: 166252
   packageName: NWH Vehicle Physics 2
   packageVersion: 13.6
-  assetPath: Assets/NWH/WheelController/Scripts/WheelController.Debug.cs
+  assetPath: Assets/_ThirdParty/NWH/WheelController/Scripts/WheelController.Debug.cs
   uploadId: 762324

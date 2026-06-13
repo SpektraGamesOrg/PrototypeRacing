@@ -14,5 +14,5 @@ AssetOrigin:
   productId: 166252
   packageName: NWH Vehicle Physics 2
   packageVersion: 13.6
-  assetPath: Assets/NWH/Vehicle Physics 2/Scripts/VehicleController/Modules/AirSteer/AirSteerModuleWrapper.cs
+  assetPath: Assets/_ThirdParty/NWH/Vehicle Physics 2/Scripts/VehicleController/Modules/AirSteer/AirSteerModuleWrapper.cs
   uploadId: 762324

@@ -10,5 +10,5 @@ AssetOrigin:
   productId: 166252
   packageName: NWH Vehicle Physics 2
   packageVersion: 13.6
-  assetPath: Assets/NWH/Vehicle Physics 2/Scripts/VehicleController/Modules/Motorcycle/Prefabs/DualSportMotorcycle.prefab
+  assetPath: Assets/_ThirdParty/NWH/Vehicle Physics 2/Scripts/VehicleController/Modules/Motorcycle/Prefabs/DualSportMotorcycle.prefab
   uploadId: 762324

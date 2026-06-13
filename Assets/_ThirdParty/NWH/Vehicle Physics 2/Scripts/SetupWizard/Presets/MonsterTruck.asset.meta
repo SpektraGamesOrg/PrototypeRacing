@@ -11,5 +11,5 @@ AssetOrigin:
   productId: 166252
   packageName: NWH Vehicle Physics 2
   packageVersion: 13.6
-  assetPath: Assets/NWH/Vehicle Physics 2/Scripts/SetupWizard/Presets/MonsterTruck.asset
+  assetPath: Assets/_ThirdParty/NWH/Vehicle Physics 2/Scripts/SetupWizard/Presets/MonsterTruck.asset
   uploadId: 762324

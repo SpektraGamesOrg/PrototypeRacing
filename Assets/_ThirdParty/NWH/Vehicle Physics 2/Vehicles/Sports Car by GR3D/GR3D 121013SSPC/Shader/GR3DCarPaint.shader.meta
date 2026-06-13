@@ -12,5 +12,6 @@ AssetOrigin:
   productId: 166252
   packageName: NWH Vehicle Physics 2
   packageVersion: 13.6
-  assetPath: Assets/NWH/Vehicle Physics 2/Vehicles/Sports Car by GR3D/GR3D 121013SSPC/Shader/GR3DCarPaint.shader
+  assetPath: Assets/_ThirdParty/NWH/Vehicle Physics 2/Vehicles/Sports Car by GR3D/GR3D
+    121013SSPC/Shader/GR3DCarPaint.shader
   uploadId: 762324

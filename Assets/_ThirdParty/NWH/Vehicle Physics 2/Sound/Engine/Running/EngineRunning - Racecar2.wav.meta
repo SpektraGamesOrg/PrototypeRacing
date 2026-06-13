@@ -25,5 +25,6 @@ AssetOrigin:
   productId: 166252
   packageName: NWH Vehicle Physics 2
   packageVersion: 13.6
-  assetPath: Assets/NWH/Vehicle Physics 2/Sound/Engine/Running/EngineRunning - Racecar2.wav
+  assetPath: Assets/_ThirdParty/NWH/Vehicle Physics 2/Sound/Engine/Running/EngineRunning
+    - Racecar2.wav
   uploadId: 762324

@@ -11,5 +11,6 @@ AssetOrigin:
   productId: 166252
   packageName: NWH Vehicle Physics 2
   packageVersion: 13.6
-  assetPath: Assets/NWH/Vehicle Physics 2/Vehicles/Sports Car by GR3D/GR3D 121013SSPC/Prefab/121013SSPC_LDWheels_NoInterior.prefab
+  assetPath: Assets/_ThirdParty/NWH/Vehicle Physics 2/Vehicles/Sports Car by GR3D/GR3D
+    121013SSPC/Prefab/121013SSPC_LDWheels_NoInterior.prefab
   uploadId: 762324

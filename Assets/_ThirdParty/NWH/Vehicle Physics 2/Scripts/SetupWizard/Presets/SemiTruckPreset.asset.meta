@@ -11,5 +11,5 @@ AssetOrigin:
   productId: 166252
   packageName: NWH Vehicle Physics 2
   packageVersion: 13.6
-  assetPath: Assets/NWH/Vehicle Physics 2/Scripts/SetupWizard/Presets/SemiTruckPreset.asset
+  assetPath: Assets/_ThirdParty/NWH/Vehicle Physics 2/Scripts/SetupWizard/Presets/SemiTruckPreset.asset
   uploadId: 762324

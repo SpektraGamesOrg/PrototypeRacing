@@ -135,5 +135,5 @@ AssetOrigin:
   productId: 166252
   packageName: NWH Vehicle Physics 2
   packageVersion: 13.6
-  assetPath: Assets/NWH/Vehicle Physics 2/Vehicles/LowPolyCar/Textures/LicensePlate.png
+  assetPath: Assets/_ThirdParty/NWH/Vehicle Physics 2/Vehicles/LowPolyCar/Textures/LicensePlate.png
   uploadId: 762324

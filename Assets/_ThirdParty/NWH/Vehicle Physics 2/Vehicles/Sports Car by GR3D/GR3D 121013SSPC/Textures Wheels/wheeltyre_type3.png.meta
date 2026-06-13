@@ -136,6 +136,6 @@ AssetOrigin:
   productId: 166252
   packageName: NWH Vehicle Physics 2
   packageVersion: 13.6
-  assetPath: Assets/NWH/Vehicle Physics 2/Vehicles/Sports Car by GR3D/GR3D 121013SSPC/Textures
-    Wheels/wheeltyre_type3.png
+  assetPath: Assets/_ThirdParty/NWH/Vehicle Physics 2/Vehicles/Sports Car by GR3D/GR3D
+    121013SSPC/Textures Wheels/wheeltyre_type3.png
   uploadId: 762324

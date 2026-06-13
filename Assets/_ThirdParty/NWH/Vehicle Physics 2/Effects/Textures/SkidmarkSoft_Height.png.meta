@@ -143,5 +143,5 @@ AssetOrigin:
   productId: 166252
   packageName: NWH Vehicle Physics 2
   packageVersion: 13.6
-  assetPath: Assets/NWH/Vehicle Physics 2/Effects/Textures/SkidmarkSoft_Height.png
+  assetPath: Assets/_ThirdParty/NWH/Vehicle Physics 2/Effects/Textures/SkidmarkSoft_Height.png
   uploadId: 762324

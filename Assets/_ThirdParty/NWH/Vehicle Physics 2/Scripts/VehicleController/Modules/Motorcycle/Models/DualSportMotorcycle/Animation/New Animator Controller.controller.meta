@@ -11,6 +11,6 @@ AssetOrigin:
   productId: 166252
   packageName: NWH Vehicle Physics 2
   packageVersion: 13.6
-  assetPath: Assets/NWH/Vehicle Physics 2/Scripts/VehicleController/Modules/Motorcycle/Models/DualSportMotorcycle/Animation/New
+  assetPath: Assets/_ThirdParty/NWH/Vehicle Physics 2/Scripts/VehicleController/Modules/Motorcycle/Models/DualSportMotorcycle/Animation/New
     Animator Controller.controller
   uploadId: 762324

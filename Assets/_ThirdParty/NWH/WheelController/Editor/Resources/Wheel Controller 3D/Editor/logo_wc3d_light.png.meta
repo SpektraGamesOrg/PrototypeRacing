@@ -107,5 +107,6 @@ AssetOrigin:
   productId: 166252
   packageName: NWH Vehicle Physics 2
   packageVersion: 13.6
-  assetPath: Assets/NWH/WheelController/Editor/Resources/Wheel Controller 3D/Editor/logo_wc3d_light.png
+  assetPath: Assets/_ThirdParty/NWH/WheelController/Editor/Resources/Wheel Controller
+    3D/Editor/logo_wc3d_light.png
   uploadId: 762324
