@@ -33,9 +33,9 @@ namespace SpektraGames.ResourceObject.Editor
                         if (path.Contains("PerformanceTestRunSettings"))
                             break;
 
-                        Debug.LogError(
-                            $"[ResourceObject] A Resources asset was deleted: '{path}'. " +
-                            "Any ResourceObject referencing it will now show as missing - reassign or clear it.");
+                        // Debug.LogError(
+                        //     $"[ResourceObject] A Resources asset was deleted: '{path}'. " +
+                        //     "Any ResourceObject referencing it will now show as missing - reassign or clear it.");
                     }
                 }
             }
