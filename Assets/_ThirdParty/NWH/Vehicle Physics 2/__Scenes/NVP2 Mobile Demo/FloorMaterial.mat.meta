@@ -1,15 +1,8 @@
 fileFormatVersion: 2
-guid: ee975f3e26112da4d992ac56cbc2fe16
+guid: a51769ab74e90444988447dc752b9b71
 NativeFormatImporter:
   externalObjects: {}
   mainObjectFileID: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 166252
-  packageName: NWH Vehicle Physics 2
-  packageVersion: 
-  assetPath: Assets/_ThirdParty/NWH/Vehicle Physics 2/__Scenes/NVP2 Mobile Demo/FloorMaterial.mat
-  uploadId: 0
