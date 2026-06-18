@@ -134,7 +134,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _AOIntensity: 3
+    - _AOIntensity: 0.5
     - _AO_Base: 0
     - _AddPrecomputedVelocity: 0
     - _AlphaClip: 0

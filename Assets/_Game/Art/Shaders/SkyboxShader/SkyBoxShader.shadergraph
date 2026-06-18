@@ -2292,6 +2292,22 @@
 }
 
 {
+    "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId": "c912915691554292bfdce753dd30d77c",
+    "m_Id": 417901590,
+    "m_DisplayName": "Exposure",
+    "m_SlotType": 0,
+    "m_Hidden": false,
+    "m_ShaderOutputName": "_Exposure",
+    "m_StageCapability": 3,
+    "m_Value": 1.100000023841858,
+    "m_DefaultValue": 0.0,
+    "m_Labels": [],
+    "m_LiteralMode": false
+}
+
+{
     "m_SGVersion": 1,
     "m_Type": "UnityEditor.ShaderGraph.Internal.Vector1ShaderProperty",
     "m_ObjectId": "c9eb59c3eec54d5583355ca3ae3712ba",
@@ -2609,6 +2625,9 @@
             "m_Id": "27135ab17d2246159e9c07d03e9d0b6c"
         },
         {
+            "m_Id": "c912915691554292bfdce753dd30d77c"
+        },
+        {
             "m_Id": "2d4ce976ff7543e2a9921909dba44129"
         }
     ],
@@ -2622,10 +2641,12 @@
     },
     "m_SerializedSubGraph": "{\n    \"subGraph\": {\n        \"fileID\": -5475051401550479605,\n        \"guid\": \"3060de18ea4ac8748a01feb1a00dae27\",\n        \"type\": 3\n    }\n}",
     "m_PropertyGuids": [
-        "962b94b3-3dab-42eb-a839-9b6d4e35f54d"
+        "962b94b3-3dab-42eb-a839-9b6d4e35f54d",
+        "0ed2a1dd-be1b-4845-ad3e-28df7d8d5781"
     ],
     "m_PropertyIds": [
-        -189880834
+        -189880834,
+        417901590
     ],
     "m_Dropdowns": [],
     "m_DropdownSelectedEntries": []

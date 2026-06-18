@@ -121,14 +121,15 @@ Material:
     - _Glossiness: 0.84
     - _GlossyReflections: 1
     - _MAIN_LIGHT_SHADOWS: 1
-    - _Metallic: 0.434
+    - _MaxLight: 1
+    - _Metallic: 0.31
     - _Mode: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.02
     - _QueueControl: 0
     - _QueueOffset: 0
     - _ReceiveShadows: 1
-    - _Smoothness: 0.823
+    - _Smoothness: 0.85
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
@@ -141,7 +142,7 @@ Material:
     - _ZWrite: 1
     - _ZWriteControl: 0
     m_Colors:
-    - _BaseColor: {r: 0.10377359, g: 0.10377359, b: 0.10377359, a: 1}
+    - _BaseColor: {r: 0.14150941, g: 0.14150941, b: 0.14150941, a: 1}
     - _Color: {r: 0.10377356, g: 0.10377356, b: 0.10377356, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
