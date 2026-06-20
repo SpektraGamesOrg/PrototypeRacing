@@ -59,7 +59,7 @@ namespace UI
                 case LoadingArgs args:
                     SetDescription(string.IsNullOrEmpty(args.Description) ? DefaultDescription : args.Description);
                     if (loadingBar)
-                        loadingBar.SetProgress(args.InitialProgress, true);
+                        loadingBar.SetProgress(args.InitialProgress);
                     break;
 
                 case string description:

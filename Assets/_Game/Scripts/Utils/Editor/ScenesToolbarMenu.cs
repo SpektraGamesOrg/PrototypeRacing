@@ -42,6 +42,7 @@ namespace Utils.Editor
             scenes.Add(new ValueTuple<string, string>("Starter", "Assets/_Game/Scenes/Starter.unity"));
             scenes.Add(new ValueTuple<string, string>("Main Menu", "Assets/_Game/Scenes/MainMenu.unity"));
             scenes.Add(new ValueTuple<string, string>("Game", "Assets/_Game/Scenes/Game.unity"));
+            scenes.Add(new ValueTuple<string, string>("~ Empty Scene For Loading", "Assets/_Game/Scenes/EmptySceneForLoading.unity"));
 
             // Sort scenes by name
             //scenes.Sort((a, b) => string.Compare(a.sceneName, b.sceneName, StringComparison.Ordinal));

@@ -5,6 +5,8 @@ using Cysharp.Threading.Tasks;
 using Save;
 using SpektraGames.RuntimeUI.Runtime;
 using SpektraGames.SpektraUtilities.Runtime;
+using UI;
+using UIManager;
 using Unity.Services.Core;
 using Unity.Services.Core.Environments;
 using UnityEngine;
@@ -14,9 +16,14 @@ namespace Core
     [DefaultExecutionOrder(-1000)]
     public class GameInitializer : SingletonComponent<GameInitializer>
     {
+        // Bootstrap owns the first slice of the loading bar: [0, InitializationProgressEnd]. Inside
+        // InitializeAsync we report *logical* 0..1 progress; the RangedProgress wrapper scales it onto this
+        // slice, so changing this value rescales the whole bootstrap phase without touching any Report call.
+        private const float InitializationProgressEnd = 0.3f;
+
         public static bool Initialized { get; private set; } = false;
         private static bool Initializing { get; set; } = false;
-        
+
         protected override void Awake()
         {
             bool willDestroy = Exists();
@@ -26,14 +33,18 @@ namespace Core
             if (willDestroy)
                 return;
 
-            InitializeAsync().Forget();
+            LoadingScreen loadingScreen = GameUIManager.Instance.GetScreen<LoadingScreen>();
+            IProgress<float> bootstrapProgress = loadingScreen == null
+                ? null
+                : new RangedProgress(loadingScreen.Progress, 0f, InitializationProgressEnd);
+            InitializeAsync(bootstrapProgress).Forget();
         }
 
         private void Start()
         {
         }
         
-        private async UniTask InitializeAsync(IProgress<float> progress = null)
+        private async UniTask InitializeAsync(IProgress<float> progress)
         {
 #if DISABLE_SRDEBUGGER && !UNITY_SERVER
             Debug.developerConsoleEnabled = false;
@@ -44,7 +55,7 @@ namespace Core
             
             if (Initialized)
             {
-                progress?.Report(1f);
+                progress?.Report(1f); // Logical end of the bootstrap slice.
                 return;
             }
             
@@ -55,7 +66,7 @@ namespace Core
                 // and read uninitialized state such as TutorialAPI). Mirrors WaitForInitialize() above.
                 await UniTask.WaitUntil(() => Initialized);
 
-                progress?.Report(1f);
+                progress?.Report(1f); // Logical end of the bootstrap slice.
                 return;
             }
             
@@ -72,7 +83,8 @@ namespace Core
 #endif
 
             await UniTask.Yield();
-            
+            progress?.Report(0.2f); // Logical 0..1 within the bootstrap slice (scaled by RangedProgress).
+
             // Set time scale
             Time.timeScale = 1f;
 
@@ -87,6 +99,7 @@ namespace Core
             
             // Core UI
             RuntimeUI.Init();
+            progress?.Report(0.6f); // Logical 0..1 within the bootstrap slice (scaled by RangedProgress).
 
             // Unity services
             try
@@ -122,6 +135,28 @@ namespace Core
             // Completed
             Initializing = false;
             Initialized = true;
+            progress?.Report(1f); // Logical end of the bootstrap slice.
+
+            // Bootstrap is done: load the main menu scene asynchronously. The SceneManager drives its bar from
+            // here (InitializationProgressEnd), streams the scene, then the MainMenu scene loader loads the
+            // garage car and switches to the menu screen.
+            await LoadMainMenuSceneAsync();
+        }
+
+        // Loads the main menu scene through the SceneManager singleton once bootstrap completes.
+        private static async UniTask LoadMainMenuSceneAsync()
+        {
+            if (!CustomSceneManager.Exists())
+            {
+                Debug.LogError("[GameInitializer] No SceneManager in the scene; cannot load the main menu.");
+                return;
+            }
+
+            // Hand the rest of the bar to the SceneManager, picking up where bootstrap left off.
+            await CustomSceneManager.Instance.LoadSceneAsync(
+                SceneType.MainMenu,
+                "Loading menu...",
+                InitializationProgressEnd);
         }
     }
 }

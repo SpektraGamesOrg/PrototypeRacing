@@ -1,9 +1,9 @@
 using System;
+using Core;
 using Save;
 using TMPro;
 using UIManager;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Vehicles;
 
@@ -40,9 +40,6 @@ namespace UI
         [SerializeField] private TMP_Text buyPriceText;
         [SerializeField] private GameObject buyCoinIcon;
 
-        [Header("Config")]
-        [SerializeField] private string gameSceneName = "Game";
-
         /// <summary>Raised when the player taps Customize (no customization screen exists yet).</summary>
         public event Action CustomizeRequested;
         /// <summary>Raised when the player taps Settings (no settings screen exists yet).</summary>
@@ -59,8 +56,35 @@ namespace UI
             if (buyButton) buyButton.onClick.AddListener(OnBuyClicked);
             if (settingsButton) settingsButton.onClick.AddListener(OnSettingsClicked);
 
+            // NOTE: garageManager is bound at runtime via Bind(), not in the inspector. This screen is a
+            // persistent (DontDestroyOnLoad) view owned by GameUIManager, while the garage lives in the
+            // MainMenu scene, so the cross-scene reference can't be serialized.
             if (garageManager)
                 garageManager.DisplayedVehicleChanged += OnDisplayedVehicleChanged;
+        }
+
+        /// <summary>
+        /// Wires the in-scene <see cref="GarageManager"/> to this persistent screen at runtime, since the
+        /// cross-scene reference can't be set in the inspector. Called by the MainMenu scene controller
+        /// before the screen is opened. Safe to call repeatedly; re-binding swaps the subscription.
+        /// </summary>
+        public void Bind(GarageManager manager)
+        {
+            if (garageManager == manager)
+            {
+                Refresh(CurrentVehicle);
+                return;
+            }
+
+            if (garageManager)
+                garageManager.DisplayedVehicleChanged -= OnDisplayedVehicleChanged;
+
+            garageManager = manager;
+
+            if (garageManager)
+                garageManager.DisplayedVehicleChanged += OnDisplayedVehicleChanged;
+
+            Refresh(CurrentVehicle);
         }
 
         private void OnDestroy()
@@ -125,13 +149,13 @@ namespace UI
         {
             SaveManager.Save();
 
-            if (string.IsNullOrEmpty(gameSceneName))
+            if (!CustomSceneManager.Exists())
             {
-                Debug.LogError("[MainMenu] No game scene configured on the Play button.");
+                Debug.LogError("[MainMenu] No SceneManager available to load the game scene.");
                 return;
             }
 
-            SceneManager.LoadScene(gameSceneName);
+            CustomSceneManager.Instance.LoadGameScene();
         }
 
         private void OnCustomizeClicked()

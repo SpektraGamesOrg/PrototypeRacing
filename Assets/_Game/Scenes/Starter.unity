@@ -924,6 +924,7 @@ Transform:
   m_Children:
   - {fileID: 2124450931}
   - {fileID: 1283075974}
+  - {fileID: 1478763813}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &550423871
@@ -2607,7 +2608,6 @@ MonoBehaviour:
   buyButton: {fileID: 1111725545}
   buyPriceText: {fileID: 1800243646}
   buyCoinIcon: {fileID: 1214540588}
-  gameSceneName: Game
 --- !u!1 &1256260815
 GameObject:
   m_ObjectHideFlags: 0
@@ -3047,6 +3047,58 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1443798354}
   m_CullTransparentMesh: 1
+--- !u!1 &1478763812
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1478763813}
+  - component: {fileID: 1478763814}
+  m_Layer: 0
+  m_Name: CustomSceneManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1478763813
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1478763812}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 527740441}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1478763814
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1478763812}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d5e0d860969c42829c2dec9675641f4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Core.SceneManager
+  isDontDestroyOnLoad: 1
+  mainMenuSceneName: MainMenu
+  gameSceneName: Game
+  loadingBufferSceneName: EmptySceneForLoading
+  bufferFrameDelay: 3
+  gameLoadingDescription: Loading...
+  menuLoadingDescription: Loading...
+  minLoadingDuration: 0.4
 --- !u!1 &1505583809
 GameObject:
   m_ObjectHideFlags: 0

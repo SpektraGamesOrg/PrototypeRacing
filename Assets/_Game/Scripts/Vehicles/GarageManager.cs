@@ -4,6 +4,7 @@ using Cysharp.Threading.Tasks;
 using Save;
 using SpektraGames.ResourceObject.Runtime;
 using SpektraGames.RuntimeUI.Runtime;
+using SpektraGames.SpektraUtilities.Runtime;
 using UnityEngine;
 
 namespace Vehicles
@@ -21,7 +22,7 @@ namespace Vehicles
     /// If the player browses faster than a prefab can load, <see cref="RuntimeUI.ShowLoading"/> covers the
     /// gap and the older, superseded request quietly bails so only the final selection is ever spawned.
     /// </summary>
-    public class GarageManager : MonoBehaviour
+    public class GarageManager : SingletonComponent<GarageManager>
     {
         [Tooltip("Empty transform where the showroom car is parented. Its pose defines how the car is framed.")]
         [SerializeField] private Transform spawnPoint;
@@ -31,6 +32,17 @@ namespace Vehicles
 
         /// <summary>Raised whenever the browsed vehicle changes (fires immediately on a switch, before the 3D car finishes loading).</summary>
         public event Action<VehicleID> DisplayedVehicleChanged;
+
+        // Completes once the initial showroom car has finished loading/spawning (or the roster is empty / the
+        // first display bailed). The MainMenu scene controller awaits this so the loading screen can stay up
+        // until the garage is actually ready before the menu is revealed.
+        private readonly UniTaskCompletionSource _readySource = new();
+
+        /// <summary>True once the garage has finished its first display.</summary>
+        public bool IsReady { get; private set; }
+
+        /// <summary>Awaitable that completes when the first showroom car is ready. Returns immediately if already ready.</summary>
+        public UniTask WaitUntilReadyAsync() => _readySource.Task;
 
         // The browsed index into the container roster.
         private int _index = -1;
@@ -65,6 +77,7 @@ namespace Vehicles
             if (Count == 0)
             {
                 Debug.LogError("[GarageManager] No vehicles registered in the VehicleContainer.");
+                MarkReady();
                 return;
             }
 
@@ -74,8 +87,10 @@ namespace Vehicles
             DisplayCurrentAsync().Forget();
         }
 
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
+
             if (_currentInstance != null)
                 Destroy(_currentInstance);
 
@@ -102,6 +117,16 @@ namespace Vehicles
         }
 
         private void RaiseChanged() => DisplayedVehicleChanged?.Invoke(CurrentVehicleId);
+
+        // Marks the garage ready exactly once so awaiters (the MainMenu scene controller) wake up.
+        private void MarkReady()
+        {
+            if (IsReady)
+                return;
+
+            IsReady = true;
+            _readySource.TrySetResult();
+        }
 
         // ---------------------------------------------------------------------
         // Display + load/unload
@@ -159,7 +184,12 @@ namespace Vehicles
                 // prefab, load failure, or a thrown spawn). Superseded requests leave it to the newer one,
                 // so the overlay can never be orphaned and never hidden out from under a pending load.
                 if (requestId == _requestId)
+                {
                     RuntimeUI.HideLoading();
+
+                    // The first settled display means the garage is ready; let the scene controller reveal the menu.
+                    MarkReady();
+                }
             }
         }
 

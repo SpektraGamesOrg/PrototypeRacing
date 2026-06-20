@@ -2,7 +2,7 @@
 alwaysApply: true
 ---
 
-# CLAUDE.md
+# AGENTS.md
 
 ## Project Overview
 
@@ -46,7 +46,7 @@ This is a Unity C# mobile car simulation project.
 
 This project has **UnityMCP** available as an MCP server. It exposes live Unity Editor tooling (`mcp__UnityMCP__*`) that lets you interact with the running Editor instance directly.
 
-**Who can use it:** Any agent or workflow in this repo (main Claude Code session, GSD subagents, etc.) is permitted — and encouraged — to use UnityMCP whenever it would produce a better outcome than editing files blindly. This includes GSD commands (`/gsd-plan-phase`, `/gsd-execute-phase`, `/gsd-debug`, etc.) and their spawned agents.
+**Who can use it:** Any agent or workflow in this repo (main Codex session, GSD subagents, etc.) is permitted — and encouraged — to use UnityMCP whenever it would produce a better outcome than editing files blindly. This includes GSD commands (`/gsd-plan-phase`, `/gsd-execute-phase`, `/gsd-debug`, etc.) and their spawned agents.
 
 **When to prefer UnityMCP over plain file edits:**
 - **Verifying compilation** after creating/modifying C# scripts — use `read_console` to catch errors before proceeding. Poll `editor_state.isCompiling` to wait for domain reload.
@@ -105,7 +105,6 @@ These rules are MANDATORY whenever you create or modify in-game UI.
 - Prefer allocation-safe and GC-conscious solutions
 - Avoid per-frame allocations in hot paths
 - Avoid LINQ in hot paths in runtime, but you can use linq for editor scripts and editor tools
-- NEVER use scene-scanning lookup methods in runtime code — `FindAnyObjectByType`, `FindFirstObjectByType`, `FindObjectsByType`, `FindObjectOfType`, `FindObjectsOfType`, `GameObject.Find`, `GameObject.FindWithTag`, etc. They are slow at runtime. Instead wire references via the Inspector, dependency injection, or the project's existing singleton/service accessors. These methods are acceptable ONLY in editor-only code (editor scripts and editor tools)
 - Avoid excessive async task churn
 - Use object pooling for frequently spawned and destroyed objects
 - Optimize draw calls with batching and atlases where appropriate
