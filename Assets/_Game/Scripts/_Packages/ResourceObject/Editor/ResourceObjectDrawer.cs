@@ -34,9 +34,16 @@ namespace SpektraGames.ResourceObject.Editor
 
             bool missing = value.EditorIsMissing();
             Object current = missing ? null : value.GetEditorAsset();
+            
+            // Build a fresh GUIContent every repaint instead of mutating the passed-in label: Odin reuses the same
+            // label instance across repaints, so appending to it would accumulate (" [R][R][R]...").
+            string baseText = label != null ? label.text : "No Name";
+            GUIContent labelGUIContent = new GUIContent(baseText + " [R]",
+                label != null ? label.image : null,
+                label != null ? label.tooltip : null);
 
             EditorGUI.BeginChangeCheck();
-            Object next = SirenixEditorFields.UnityObjectField(label, current, typeof(T), allowSceneObjects: false);
+            Object next = SirenixEditorFields.UnityObjectField(labelGUIContent, current, typeof(T), allowSceneObjects: false);
             if (EditorGUI.EndChangeCheck())
             {
                 if (next == null)

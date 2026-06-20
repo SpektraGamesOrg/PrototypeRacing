@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using Sirenix.OdinInspector;
 using SpektraGames.ResourceObject.Runtime;
 using SpektraGames.SpektraUtilities.Runtime;
 using UnityEngine;
@@ -44,19 +46,53 @@ namespace Vehicles
         /// Returns the prefab resource handle for a vehicle, or null if it isn't registered.
         /// Call Load()/LoadAsync() on the result to get the actual prefab.
         /// </summary>
-        public ResourceObject<GameObject> GetPrefab(VehicleID id)
+        public ResourceObject<MainVehicleBehaviour> GetPrefab(VehicleID id)
         {
             VehicleEntry entry = GetVehicle(id);
-            return entry?.Prefab;
+            return entry?.MainBehaviour;
+        }
+
+        private void OnValidate()
+        {
+            UpdateVehicles();
+        }
+
+        [Button]
+        private void UpdateVehicles()
+        {
+#if UNITY_EDITOR
+            for (var i = 0; i < vehicles.Count; i++)
+            {
+                if (vehicles[i].ID == VehicleID.None)
+                {
+                    Debug.LogError($"vehicles[{i}].ID is is None");
+                    continue;
+                }
+
+                if (!vehicles[i].MainBehaviour.IsValidForEditor)
+                {
+                    Debug.LogError($"vehicles[{i}] with id  {vehicles[i].ID} has invalid prefab");
+                    continue;
+                }
+
+                MainVehicleBehaviour mainBehaviour = vehicles[i].MainBehaviour.GetEditorAsset();
+                if (mainBehaviour.VehicleID != vehicles[i].ID)
+                {
+                    mainBehaviour.VehicleID = vehicles[i].ID;
+                    UnityEditor.EditorUtility.SetDirty(mainBehaviour);
+                }
+                mainBehaviour.Validate();
+            }
+#endif
         }
 
         /// <summary>
         /// Loads and returns the prefab for a vehicle asynchronously,
         /// or null if it isn't registered.
         /// </summary>
-        public async UniTask<GameObject> LoadPrefabAsync(VehicleID id)
+        public async UniTask<MainVehicleBehaviour> LoadPrefabAsync(VehicleID id)
         {
-            ResourceObject<GameObject> resource = GetPrefab(id);
+            ResourceObject<MainVehicleBehaviour> resource = GetPrefab(id);
             if (resource == null)
                 return null;
 

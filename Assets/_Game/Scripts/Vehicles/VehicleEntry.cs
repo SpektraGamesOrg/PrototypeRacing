@@ -14,9 +14,9 @@ namespace Vehicles
     public class VehicleEntry
     {
         [SerializeField] private VehicleID id;
-        [SerializeField] private ResourceObject<GameObject> prefab = new ResourceObject<GameObject>();
+        [SerializeField] private ResourceObject<MainVehicleBehaviour> mainBehaviour = new();
 
         public VehicleID ID => id;
-        public ResourceObject<GameObject> Prefab => prefab;
+        public ResourceObject<MainVehicleBehaviour> MainBehaviour => mainBehaviour;
     }
 }

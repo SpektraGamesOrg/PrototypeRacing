@@ -6,6 +6,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEditor.Toolbars;
 using UnityEngine;
+using Vehicles;
 
 namespace Utils.Editor.QuickOptionsToolbarMenu
 {
@@ -26,7 +27,7 @@ namespace Utils.Editor.QuickOptionsToolbarMenu
         {
             GenericMenu menu = new GenericMenu();
 
-            //menu.AddItem(new GUIContent("Scriptable Object Browser"), false, ScriptableObjectBrowserWindow.OpenWindow);
+            menu.AddItem(new GUIContent("Vehicle Container"), false, () => { Selection.activeObject = VehicleContainer.Instance; });
 
             menu.AddItem(new GUIContent("Run Custom Odin Validator"), false, RunOdinCustomValidator);
 

@@ -80,6 +80,15 @@ This project has **UnityMCP** available as an MCP server. It exposes live Unity 
 - Avoid hidden side effects in MonoBehaviours; prefer explicit flow through services and controllers
 - Do not introduce unnecessary singletons, reflection-heavy systems, or editor-only dependencies into runtime code
 
+## UI Development (uGUI + GameUIManager)
+
+These rules are MANDATORY whenever you create or modify in-game UI.
+
+- **Always use the existing `GameUIManager` and UI system.** Never build a parallel canvas/menu system. New views extend the existing base classes (`ScreenBase`, `PopupBase`, `OverlayBase`, `TabBase`) and are shown/hidden through `GameUIManager` (`SwitchScreen`, `ShowPopup`, `Open`, `Back`, etc.). Use the project's `EnhancedButton` for buttons (not raw `Button`). Extend the existing system instead of duplicating it.
+- **`Content` is the UI root — do NOT create a `UIRoot` object inside it.** Every `UIViewBase` already has a `Content` child (with its `CanvasGroup`) that serves as the view's root. Build the UI directly as children of `Content`. Never wrap the layout in an extra container like `UIRoot` inside `Content`.
+- **Always prefix UI GameObject names by their type.** Format is `Type_Name`. Examples: `Button_Play`, `Text_Price`, `Image_BuyCoin`, `Panel_TopBar`, `Toggle_Vibration`, `Slider_Master`, `ScrollView_Garage`. This keeps the hierarchy readable and searchable.
+- **Responsive design is critical — this is a landscape car game.** The Canvas reference resolution is **1920×1080** (`CanvasScaler` = Scale With Screen Size). Anchor every element to the nearest screen edge/corner (top-right, bottom-left, side-center, etc.) with margins in canvas units — do not lay things out from the center with absolute offsets. Verify the layout holds across landscape aspect ratios (16:9, 19.5:9, 4:3) with no overlap or off-screen elements. Prefer anchored corners over fixed positions.
+
 ## Error Handling and Debugging
 
 - Use try-catch where appropriate, especially for file I/O and network operations

@@ -44,7 +44,9 @@ namespace SpektraGames.ResourceObject.Runtime
         [NonSerialized] private Object loadedResource; // the underlying loaded asset, kept for correct unloading
         [NonSerialized] private bool isLoaded;
 
-        public ResourceObject() { }
+        public ResourceObject()
+        {
+        }
 
         /// <summary>Construct directly from a stored guid + Resources path (e.g. when restoring from your own save).</summary>
         public ResourceObject(string guid, string resourcesPath)
@@ -61,6 +63,42 @@ namespace SpektraGames.ResourceObject.Runtime
 
         /// <summary>True when a load path is set (i.e. something is assigned and loadable).</summary>
         public bool IsValid => !string.IsNullOrEmpty(resourcesPath);
+
+        /// <summary>
+        /// Like <see cref="IsValid"/>, but in the editor it also confirms the asset actually exists, still lives under a
+        /// Resources folder at the stored path, and is the right type - without loading it into memory. In a build there is
+        /// no AssetDatabase, so it falls back to <see cref="IsValid"/>.
+        /// </summary>
+        public bool IsValidForEditor
+        {
+            get
+            {
+#if UNITY_EDITOR
+                if (!IsValid || string.IsNullOrEmpty(guid))
+                    return false;
+
+                // Resolve the asset from its guid. None of these AssetDatabase calls load the asset object into memory;
+                // they only read import metadata.
+                string path = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
+                if (string.IsNullOrEmpty(path))
+                    return false; // asset was deleted
+
+                // It must still be under a Resources folder and its load key must match what we have stored.
+                if (ToResourcesPath(path) != resourcesPath)
+                    return false;
+
+                // Verify the asset type matches T (a GameObject when T is a prefab component) without loading it.
+                System.Type mainType = UnityEditor.AssetDatabase.GetMainAssetTypeAtPath(path);
+                if (mainType == null)
+                    return false;
+
+                System.Type requiredType = IsComponentType ? typeof(GameObject) : typeof(T);
+                return requiredType.IsAssignableFrom(mainType);
+#else
+                return IsValid;
+#endif
+            }
+        }
 
         /// <summary>True when the asset is currently loaded in memory.</summary>
         public bool IsLoaded => isLoaded && cachedAsset != null;
@@ -208,14 +246,23 @@ namespace SpektraGames.ResourceObject.Runtime
         // Compiled out of player builds - none of this ships in the game.
         // =====================================================================
 
-        /// <summary>Resolve the assigned asset for inspector display. Null when unassigned or missing.</summary>
-        public Object GetEditorAsset()
+        /// <summary>Resolve the assigned asset as <typeparamref name="T"/> for inspector display. Null when unassigned or missing.</summary>
+        public T GetEditorAsset()
         {
             if (string.IsNullOrEmpty(guid))
                 return null;
             var path = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
             if (string.IsNullOrEmpty(path))
                 return null;
+
+            // Mirror runtime Load(): for a component T the asset on disk is the prefab GameObject, so resolve the
+            // component off it (LoadAssetAtPath<Component> on a prefab path is unreliable).
+            if (IsComponentType)
+            {
+                var prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(path);
+                return prefab != null ? prefab.GetComponent<T>() : null;
+            }
+
             return UnityEditor.AssetDatabase.LoadAssetAtPath<T>(path);
         }
 
