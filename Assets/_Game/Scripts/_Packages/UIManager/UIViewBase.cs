@@ -75,9 +75,6 @@ namespace UIManager
         public CanvasGroup CanvasGroup => canvasGroup;
 
         [SerializeField, BoxGroup("UI Base")]
-        private GameObject autoSelectThisButtonOnEventSystem = null;
-
-        [SerializeField, BoxGroup("UI Base")]
         protected bool hasTransitionAnimations = false;
 
         [SerializeField, BoxGroup("UI Base")]
@@ -226,9 +223,6 @@ namespace UIManager
                     {
                         Debug.LogError("Error happened when call OnShowed: " + System.Environment.NewLine + e.ParseException());
                     }
-
-                    if (autoSelectThisButtonOnEventSystem)
-                        SetSelectedGameObjectOnEventSystemAsync().Forget();
                 }
 
 #if UNITY_EDITOR
@@ -286,9 +280,6 @@ namespace UIManager
                         {
                             Debug.LogError("Error happened when call OnShowed: " + System.Environment.NewLine + e.ParseException());
                         }
-
-                        if (autoSelectThisButtonOnEventSystem)
-                            SetSelectedGameObjectOnEventSystemAsync().Forget();
                     }
                 }
             }
@@ -401,12 +392,6 @@ namespace UIManager
                     }
                 }
             }
-        }
-
-        internal async UniTaskVoid SetSelectedGameObjectOnEventSystemAsync()
-        {
-            await UniTask.NextFrame();
-            EventSystem.current.SetSelectedGameObject(autoSelectThisButtonOnEventSystem);
         }
 
 #if UNITY_EDITOR
