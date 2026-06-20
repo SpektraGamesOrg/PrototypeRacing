@@ -27,7 +27,7 @@ namespace SpektraGames.ResourceObject.Runtime
     /// The asset MUST live under a <c>Resources/</c> folder, otherwise it cannot be loaded in a build.
     /// </summary>
     [Serializable]
-    public class ResourceObject<T> where T : Object
+    public class ResourceObject<T> : IResourceObjectCache where T : Object
     {
         // Whether T is (or derives from) Component. Prefab components are loaded by loading the prefab GameObject and
         // then GetComponent<T>(). Computed once per closed generic type, so there is no per-call cost.
@@ -199,6 +199,9 @@ namespace SpektraGames.ResourceObject.Runtime
             if (cachedAsset == null)
                 Debug.LogError($"[ResourceObject] Failed to load '{resourcesPath}'. Make sure the asset is inside a 'Resources' folder.");
             isLoaded = cachedAsset != null;
+
+            if (isLoaded)
+                ResourceObjectCleaner.Register(this);
         }
 
         // ---------------------------------------------------------------------
@@ -212,6 +215,7 @@ namespace SpektraGames.ResourceObject.Runtime
         /// </summary>
         public void Unload()
         {
+            ResourceObjectCleaner.Unregister(this);
             cachedAsset = null;
             isLoaded = false;
 

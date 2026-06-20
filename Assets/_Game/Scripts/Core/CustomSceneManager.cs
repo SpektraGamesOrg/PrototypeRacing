@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using SpektraGames.ResourceObject.Runtime;
 using SpektraGames.SpektraUtilities.Runtime;
 using UI;
 using UIManager;
@@ -152,6 +153,7 @@ namespace Core
 
                 // Clean memory
                 await UniTask.NextFrame();
+                ResourceObjectCleaner.UnloadAll();
                 System.GC.Collect();
                 System.GC.WaitForPendingFinalizers();
                 System.GC.Collect();

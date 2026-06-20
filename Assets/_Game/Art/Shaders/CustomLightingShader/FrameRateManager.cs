@@ -1,13 +1,16 @@
 using UnityEngine;
 
-public class FrameRateManager : MonoBehaviour
+namespace Art.Shaders.CustomLightingShader
 {
-    [SerializeField] private int targetFPS = 60;
-
-    void Awake()
+    public class FrameRateManager : MonoBehaviour
     {
-        // VSync kapalý olmalý, yoksa targetFrameRate çalýþmaz
-        QualitySettings.vSyncCount = 0;
-        Application.targetFrameRate = targetFPS;
+        [SerializeField] private int targetFPS = 60;
+
+        private void Awake()
+        {
+            Debug.LogError("This script(FrameRateManager) should remove later !!!", gameObject);
+            QualitySettings.vSyncCount = 0;
+            Application.targetFrameRate = targetFPS;
+        }
     }
 }
