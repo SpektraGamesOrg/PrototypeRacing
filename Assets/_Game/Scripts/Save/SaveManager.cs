@@ -24,10 +24,10 @@ namespace Save
         // ---------------------------------------------------------------------
         // Default values
         // ---------------------------------------------------------------------
-        private const int             DefaultCoins           = 0;
-        private const float           DefaultMasterVolume    = 1f;
-        private const float           DefaultSfxVolume       = 1f;
-        private const bool            DefaultVibration       = true;
+        private const int DefaultCoins = 150;
+        private const float DefaultMasterVolume = 1f;
+        private const float DefaultSfxVolume = 1f;
+        private const bool DefaultVibration = true;
         private const VehicleID DefaultSelectedVehicle = VehicleID.None;
 
         // ---------------------------------------------------------------------

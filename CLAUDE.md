@@ -27,6 +27,7 @@ This is a Unity C# mobile car simulation project.
 - Before creating or editing any file, check sibling files in the same folder for namespace, style, and structural conventions. Match them.
 - The project structure is so important! When you create new scripts/assets, always create it inside "Assets/_Game/*" folders. For example, if you create a editor script, then you can create it in Assets/_Game/Scripts/Editor folder
 - When you put comments inside scripts, do not use Turkish or something different language, ALWAYS PREFER ENGLISH EVEN IF YOU CHATTING IN TURKISH LANGUAGE!!!
+- **NEVER add `[SerializeField]` to a variable just to make it visible in the Inspector if it is runtime-only and does not need to be serialized.** Keep it non-serialized (`private`, a `get`/`set` property, or `[System.NonSerialized]`) and use Odin's `[ShowInInspector, ReadOnly]` attributes to expose it for debugging. `[SerializeField]` is only for fields that must be set in the Inspector or persisted in the scene/prefab.
 
 ## Core Principles
 

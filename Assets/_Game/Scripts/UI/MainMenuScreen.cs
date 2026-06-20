@@ -147,6 +147,13 @@ namespace UI
 
         private void OnPlayClicked()
         {
+            VehicleID id = CurrentVehicle;
+            if (id == VehicleID.None || !SaveManager.SelectVehicle(id))
+            {
+                Debug.LogError($"[MainMenu] Cannot start gameplay with vehicle '{id}'.");
+                return;
+            }
+
             SaveManager.Save();
 
             if (!CustomSceneManager.Exists())
@@ -218,6 +225,18 @@ namespace UI
                 if (buyCoinIcon) buyCoinIcon.SetActive(true);
                 if (buyPriceText) buyPriceText.text = price.ToString("N0");
             }
+        }
+
+        // ---------------------------------------------------------------------
+        // Debug helpers
+        // ---------------------------------------------------------------------
+
+        /// <summary>
+        /// Refreshes coin display and vehicle action buttons. Call after modifying SaveManager.Coins externally.
+        /// </summary>
+        public void RefreshCoinDisplay()
+        {
+            Refresh(CurrentVehicle);
         }
 
         // ---------------------------------------------------------------------

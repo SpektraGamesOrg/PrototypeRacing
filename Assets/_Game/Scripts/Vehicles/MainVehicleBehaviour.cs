@@ -19,6 +19,10 @@ namespace Vehicles
         private VehicleController vehicleController = null;
         public VehicleController VehicleController => vehicleController;
 
+        [SerializeField]
+        private new Rigidbody rigidbody = null;
+        public Rigidbody Rigidbody => rigidbody;
+
         private void OnValidate()
         {
             Validate();
@@ -36,6 +40,12 @@ namespace Vehicles
             if (vehicleController != GetComponent<VehicleController>())
             {
                 vehicleController = GetComponent<VehicleController>();
+                anyChange = true;
+            }
+
+            if (rigidbody != GetComponent<Rigidbody>())
+            {
+                rigidbody = GetComponent<Rigidbody>();
                 anyChange = true;
             }
 

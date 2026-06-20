@@ -81,10 +81,30 @@ namespace Vehicles
                 return;
             }
 
-            // Start on the saved selection (falls back to the first roster entry).
-            _index = Mathf.Max(0, IndexOf(SaveManager.SelectedVehicle));
+            // Start on the saved selection, then fall back to the first owned vehicle, then roster index 0.
+            _index = FindStartIndex();
             RaiseChanged();
             DisplayCurrentAsync().Forget();
+        }
+
+        // Returns the roster index to start on: saved selection → first owned vehicle → 0.
+        private int FindStartIndex()
+        {
+            int selected = IndexOf(SaveManager.SelectedVehicle);
+            if (selected >= 0)
+                return selected;
+
+            IReadOnlyList<VehicleEntry> entries = Entries;
+            if (entries != null)
+            {
+                for (int i = 0; i < entries.Count; i++)
+                {
+                    if (SaveManager.IsOwned(entries[i].ID))
+                        return i;
+                }
+            }
+
+            return 0;
         }
 
         protected override void OnDestroy()
@@ -310,11 +330,11 @@ namespace Vehicles
                 _currentInstance = null;
             }
 
-            GameObject instance = Instantiate(prefab.gameObject, spawnPoint);
+            MainVehicleBehaviour instance = Instantiate(prefab, spawnPoint);
 
             // Track the instance immediately, BEFORE any further setup. If something below throws, the
             // car is still owned by us and will be destroyed on the next swap instead of leaking.
-            _currentInstance = instance;
+            _currentInstance = instance.gameObject;
             _spawnedId = id;
 
             Transform t = instance.transform;
@@ -322,7 +342,11 @@ namespace Vehicles
             t.localRotation = Quaternion.identity;
             t.localScale = Vector3.one;
 
-            MakeStaticDisplay(instance);
+            instance.Rigidbody.position = t.position;
+            instance.Rigidbody.rotation = t.rotation;
+            Physics.SyncTransforms();
+
+            //MakeStaticDisplay(instance);
         }
 
         // The roster prefabs are full driving vehicles; freeze them so they sit still in the showroom.

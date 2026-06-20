@@ -1,28 +1,46 @@
 using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using UI;
+using UIManager;
+using UnityEngine;
 
 namespace Core
 {
     /// <summary>
-    /// Post-load step for the Game scene. There is no gameplay screen yet, so this only completes the bar.
-    ///
-    /// Per the "a screen is always active" rule, this deliberately does NOT clear the screen layer - the
-    /// loading screen stays up until a real game screen exists. When one is added, mirror
-    /// <see cref="MainMenuSceneLoader"/>: prepare the scene here, then
-    /// <c>GameUIManager.Instance.SwitchScreen&lt;GameScreen&gt;()</c> to replace the loading screen.
+    /// Post-load step for the Game scene. Waits for the selected vehicle to load and spawn, then replaces
+    /// the loading screen with the persistent gameplay screen.
     /// </summary>
     public sealed class GameSceneLoader : SceneLoaderBase
     {
         public override SceneType SceneType => SceneType.Game;
 
-        public override UniTask LoadAsync(IProgress<float> progress, CancellationToken token)
+        public override async UniTask LoadAsync(IProgress<float> progress, CancellationToken token)
         {
+            progress?.Report(0f);
+
+            GameManager gameManager = GameManager.Instance;
+            GameplayScreen gameplayScreen = GameUIManager.Instance != null
+                ? GameUIManager.Instance.GetScreen<GameplayScreen>()
+                : null;
+
+            if (gameManager == null)
+            {
+                Debug.LogError("[GameSceneLoader] No GameManager found in the Game scene.");
+            }
+            else
+            {
+                var spawnProgress = progress == null ? null : new RangedProgress(progress, 0f, 0.9f);
+                if (await gameManager.SpawnCurrentVehicleAsync(spawnProgress, token) == null)
+                    Debug.LogError("[GameSceneLoader] Gameplay vehicle could not be spawned.");
+            }
+
             progress?.Report(1f);
 
-            // TODO: when a gameplay screen exists, prepare it and SwitchScreen<GameScreen>() here so the
-            // loading screen is replaced by a real screen instead of staying up.
-            return UniTask.CompletedTask;
+            if (gameplayScreen != null)
+                await GameUIManager.Instance.SwitchScreenAsync(gameplayScreen).AttachExternalCancellation(token);
+            else
+                Debug.LogError("[GameSceneLoader] No GameplayScreen available to open.");
         }
     }
 }
