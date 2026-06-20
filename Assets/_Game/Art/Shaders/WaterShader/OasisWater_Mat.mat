@@ -83,7 +83,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     - _NormalMap:
         m_Texture: {fileID: 2800000, guid: cb3fcd0d2ac563642b9d2b7e6c0d9c15, type: 3}
-        m_Scale: {x: 50, y: 50}
+        m_Scale: {x: 100, y: 100}
         m_Offset: {x: 0, y: 0}
     - _Normal_Map:
         m_Texture: {fileID: 2800000, guid: cb3fcd0d2ac563642b9d2b7e6c0d9c15, type: 3}
@@ -198,7 +198,7 @@ Material:
     - _ZWrite: 0
     - _ZWriteControl: 0
     m_Colors:
-    - _BaseColor: {r: 0.4830456, g: 0.52616584, b: 0.6132076, a: 0.7529412}
+    - _BaseColor: {r: 0.509434, g: 0.509434, b: 0.509434, a: 0.7529412}
     - _BlendOffsetSpeed: {r: 0.1, g: 0.1, b: 0, a: 0}
     - _Color: {r: 0.12637946, g: 0.22796622, b: 0.37735847, a: 0.7529412}
     - _Color2: {r: 0.09545211, g: 0.31132078, b: 0.25649697, a: 0}

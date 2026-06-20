@@ -43,6 +43,7 @@ GameObject:
   - component: {fileID: 6786164469773426324}
   - component: {fileID: 6080816982965484090}
   - component: {fileID: 2426864491398906554}
+  - component: {fileID: 2305434324478067037}
   m_Layer: 19
   m_Name: Fire_Hydrant_02_Destructed_1
   m_TagString: Untagged
@@ -93,6 +94,8 @@ MeshRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -114,10 +117,39 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!54 &2305434324478067037
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4157870903131856135}
+  serializedVersion: 5
+  m_Mass: 150
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &5377872781300056964
 GameObject:
   m_ObjectHideFlags: 0
@@ -129,14 +161,14 @@ GameObject:
   - component: {fileID: 928701791966698059}
   - component: {fileID: 3586172896170985251}
   - component: {fileID: -8191318872452545367}
-  - component: {fileID: -6148273711910348444}
+  - component: {fileID: 5885420084318789232}
   m_Layer: 19
   m_Name: Destructible_Fire_Hydrant_02
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &928701791966698059
 Transform:
   m_ObjectHideFlags: 0
@@ -145,7 +177,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5377872781300056964}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -163,18 +195,13 @@ LODGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5377872781300056964}
   serializedVersion: 2
-  m_LocalReferencePoint: {x: 0.00090016425, y: 0.38138714, z: 0}
-  m_Size: 0.7627743
+  m_LocalReferencePoint: {x: 0.00090016425, y: 0.38138717, z: 0}
+  m_Size: 0.76280344
   m_FadeMode: 0
   m_AnimateCrossFading: 0
   m_LastLODIsBillboard: 0
   m_LODs:
-  - screenRelativeHeight: 0.20472005
-    fadeTransitionWidth: 0
-    renderers:
-    - renderer: {fileID: 6865230938487681449}
-    - renderer: {fileID: 2426864491398906554}
-  - screenRelativeHeight: 0.0076486953
+  - screenRelativeHeight: 0.02581406
     fadeTransitionWidth: 0
     renderers:
     - renderer: {fileID: 1196308562026032773}
@@ -200,7 +227,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.21918613, y: 0.76158345, z: 0.22315958}
   m_Center: {x: -0.0009934902, y: 0.38146645, z: -0.0009935088}
---- !u!114 &-6148273711910348444
+--- !u!114 &5885420084318789232
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -209,13 +236,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 5377872781300056964}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2f97f3ecb6634756a7c39aca0a5d562b, type: 3}
+  m_Script: {fileID: 11500000, guid: 30d80c1595ef09344bda1fd69c46c720, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
-  baseVisual: {fileID: 0}
-  destructedVisual: {fileID: 0}
-  stayDuration: 5
-  destructedRigidbodies: []
+  m_EditorClassIdentifier: Assembly-CSharp::_Game.Scripts.RaceSystem.DestructibleLevelProp
+  baseVisual: {fileID: 7321796629843559367}
+  destructedVisual: {fileID: 2764950042229098950}
+  destructedRigidbodies:
+  - {fileID: 2305434324478067037}
+  debrisHideDelay: 10
+  respawnDelay: 30
+  vehicleTag: Vehicle
+  speedMultiplierOnHit: 0.7
 --- !u!1 &6398985403631137371
 GameObject:
   m_ObjectHideFlags: 0
@@ -233,7 +264,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &871209755509029122
 Transform:
   m_ObjectHideFlags: 0
@@ -277,6 +308,8 @@ MeshRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -298,9 +331,11 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1 &7321796629843559367
 GameObject:
@@ -363,6 +398,8 @@ MeshRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -384,7 +421,9 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
