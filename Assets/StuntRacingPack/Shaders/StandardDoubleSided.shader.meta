@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 0a24687d4eb7d4a97a764bdff4c9147b
+timeCreated: 1484506328
+licenseType: Store
+ShaderImporter:
+  defaultTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 76133
+  packageName: Stunt Race Track Ramp Pack
+  packageVersion: 1.0
+  assetPath: Assets/StuntRacingPack/Shaders/StandardDoubleSided.shader
+  uploadId: 156437
