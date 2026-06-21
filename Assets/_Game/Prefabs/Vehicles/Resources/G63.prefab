@@ -344,7 +344,7 @@ MonoBehaviour:
   otherBodyForceScale: 1
   layerMask:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 1025
   meshColliderLayer: 2
   useContactModification: 1
   frictionSubsteps: 20
@@ -1110,6 +1110,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Vehicles.VehicleMainBehaviour
   vehicleID: 6
+  vehicleController: {fileID: 4038726231375368569}
+  rigidbody: {fileID: 2912316076002546}
 --- !u!114 &4002678945772325537
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1990,7 +1992,7 @@ MonoBehaviour:
   otherBodyForceScale: 1
   layerMask:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 1025
   meshColliderLayer: 2
   useContactModification: 1
   frictionSubsteps: 20
@@ -2126,7 +2128,7 @@ MonoBehaviour:
   otherBodyForceScale: 1
   layerMask:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 1025
   meshColliderLayer: 2
   useContactModification: 1
   frictionSubsteps: 20
@@ -2293,7 +2295,7 @@ MonoBehaviour:
   otherBodyForceScale: 1
   layerMask:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 1025
   meshColliderLayer: 2
   useContactModification: 1
   frictionSubsteps: 20
@@ -3149,6 +3151,22 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: fa726f7475e68ae4096e904fb1e2b4d7, type: 2}
+    - target: {fileID: 488006730645102590, guid: 05c597f3c0557a6418327a3827abd55e, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 488006730645102590, guid: 05c597f3c0557a6418327a3827abd55e, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 488006730645102590, guid: 05c597f3c0557a6418327a3827abd55e, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 488006730645102590, guid: 05c597f3c0557a6418327a3827abd55e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 180
+      objectReference: {fileID: 0}
     - target: {fileID: 1844121206731433976, guid: 05c597f3c0557a6418327a3827abd55e, type: 3}
       propertyPath: m_IsActive
       value: 1
@@ -3236,6 +3254,22 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: fa726f7475e68ae4096e904fb1e2b4d7, type: 2}
+    - target: {fileID: 488006730645102590, guid: 05c597f3c0557a6418327a3827abd55e, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 488006730645102590, guid: 05c597f3c0557a6418327a3827abd55e, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 488006730645102590, guid: 05c597f3c0557a6418327a3827abd55e, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 488006730645102590, guid: 05c597f3c0557a6418327a3827abd55e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 180
+      objectReference: {fileID: 0}
     - target: {fileID: 1844121206731433976, guid: 05c597f3c0557a6418327a3827abd55e, type: 3}
       propertyPath: m_IsActive
       value: 1

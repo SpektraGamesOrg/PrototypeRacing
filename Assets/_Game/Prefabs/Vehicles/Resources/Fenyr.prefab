@@ -672,7 +672,7 @@ MonoBehaviour:
   otherBodyForceScale: 1
   layerMask:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 1025
   meshColliderLayer: 2
   useContactModification: 1
   frictionSubsteps: 20
@@ -866,6 +866,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Vehicles.VehicleMainBehaviour
   vehicleID: 15
+  vehicleController: {fileID: 259231059344367537}
+  rigidbody: {fileID: 6733275700978053910}
 --- !u!114 &440166886838033255
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1746,7 +1748,7 @@ MonoBehaviour:
   otherBodyForceScale: 1
   layerMask:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 1025
   meshColliderLayer: 2
   useContactModification: 1
   frictionSubsteps: 20
@@ -1882,7 +1884,7 @@ MonoBehaviour:
   otherBodyForceScale: 1
   layerMask:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 1025
   meshColliderLayer: 2
   useContactModification: 1
   frictionSubsteps: 20
@@ -2199,7 +2201,7 @@ MonoBehaviour:
   otherBodyForceScale: 1
   layerMask:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 1025
   meshColliderLayer: 2
   useContactModification: 1
   frictionSubsteps: 20

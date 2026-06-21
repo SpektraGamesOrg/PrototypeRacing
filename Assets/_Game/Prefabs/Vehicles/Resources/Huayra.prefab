@@ -86,6 +86,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Vehicles.VehicleMainBehaviour
   vehicleID: 14
+  vehicleController: {fileID: 7366658352249489209}
+  rigidbody: {fileID: 117691036309011480}
 --- !u!114 &7644298187750073120
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -908,7 +910,7 @@ MonoBehaviour:
   otherBodyForceScale: 1
   layerMask:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 1025
   meshColliderLayer: 2
   useContactModification: 1
   frictionSubsteps: 20
@@ -1388,7 +1390,7 @@ MonoBehaviour:
   otherBodyForceScale: 1
   layerMask:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 1025
   meshColliderLayer: 2
   useContactModification: 1
   frictionSubsteps: 20
@@ -1524,7 +1526,7 @@ MonoBehaviour:
   otherBodyForceScale: 1
   layerMask:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 1025
   meshColliderLayer: 2
   useContactModification: 1
   frictionSubsteps: 20
@@ -1966,7 +1968,7 @@ MonoBehaviour:
   otherBodyForceScale: 1
   layerMask:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 1025
   meshColliderLayer: 2
   useContactModification: 1
   frictionSubsteps: 20
@@ -2774,6 +2776,22 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 5144016051302553138, guid: 5ef91a71fa807354facf0d064301c4e8, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5144016051302553138, guid: 5ef91a71fa807354facf0d064301c4e8, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5144016051302553138, guid: 5ef91a71fa807354facf0d064301c4e8, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5144016051302553138, guid: 5ef91a71fa807354facf0d064301c4e8, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 180
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2860,6 +2878,22 @@ PrefabInstance:
     - target: {fileID: 4081744362609995166, guid: 5ef91a71fa807354facf0d064301c4e8, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5144016051302553138, guid: 5ef91a71fa807354facf0d064301c4e8, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5144016051302553138, guid: 5ef91a71fa807354facf0d064301c4e8, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5144016051302553138, guid: 5ef91a71fa807354facf0d064301c4e8, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5144016051302553138, guid: 5ef91a71fa807354facf0d064301c4e8, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 180
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
