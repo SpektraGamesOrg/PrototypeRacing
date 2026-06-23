@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: e4c2bad844c3a4c458d317c9a1bedc1f
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 16296
+  packageName: Realistic Car Controller
+  packageVersion: 5.0.0
+  assetPath: Assets/RealisticCarControllerV4/Documentation/HTML/08_VehicleInspectorReference.html
+  uploadId: 920646

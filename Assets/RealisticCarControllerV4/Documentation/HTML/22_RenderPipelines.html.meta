@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: e16ac1a7035c5854baf95a7be2f4cc30
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 16296
+  packageName: Realistic Car Controller
+  packageVersion: 5.0.0
+  assetPath: Assets/RealisticCarControllerV4/Documentation/HTML/22_RenderPipelines.html
+  uploadId: 920646

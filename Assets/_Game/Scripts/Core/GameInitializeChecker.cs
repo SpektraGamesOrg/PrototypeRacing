@@ -19,7 +19,7 @@ namespace Scripts.Core
             if (currentScene.name != nameof(SceneType.Starter))
             {
                 Debug.LogError("The game was not started from Starter scene.");
-                SceneManager.LoadScene(nameof(SceneType.Starter));
+                //SceneManager.LoadScene(nameof(SceneType.Starter));
             }
         }
 #endif

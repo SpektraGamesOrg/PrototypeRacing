@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 5dc1784cffe181e4b94c158a60d81bfa
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 16296
+  packageName: Realistic Car Controller
+  packageVersion: 5.0.0
+  assetPath: Assets/RealisticCarControllerV4/Scripts/UI/RCC_UI_LevelButton.cs
+  uploadId: 920646

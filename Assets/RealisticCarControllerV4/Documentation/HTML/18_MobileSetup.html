@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Mobile Setup</title>
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    background: #f8f9fa;
+}
+.content {
+    background: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+h1 { color: #2c3e50; margin-top: 0; padding-bottom: 0.3em; border-bottom: 2px solid #eee; }
+h2 { color: #34495e; margin-top: 1.5em; padding-bottom: 0.2em; border-bottom: 1px solid #eee; }
+h3, h4 { color: #34495e; margin-top: 1.2em; }
+h5, h6 { color: #34495e; margin-top: 1.0em; }
+code {
+    background: #f4f4f4;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.9em;
+}
+pre {
+    background: #2d2d2d;
+    color: #f8f8f2;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
+    margin: 1em 0;
+    font-size: 0.9em;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+    color: #f8f8f2;
+    white-space: pre;
+}
+blockquote {
+    border-left: 4px solid #3498db;
+    margin: 1em 0;
+    padding: 0.5em 0 0.5em 20px;
+    color: #555;
+    background: #f9f9f9;
+}
+blockquote p { margin: 0.4em 0; }
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px 12px;
+    text-align: left;
+    vertical-align: top;
+}
+th {
+    background: #f4f4f4;
+    font-weight: bold;
+}
+tr:nth-child(even) { background: #f9f9f9; }
+a { color: #3498db; text-decoration: none; transition: color 0.2s; }
+a:hover { color: #2980b9; text-decoration: underline; }
+ul, ol { margin: 1em 0; padding-left: 30px; }
+li { margin: 0.4em 0; }
+li > ul, li > ol { margin: 0.3em 0; }
+hr { border: none; border-top: 2px solid #eee; margin: 2em 0; }
+p { margin: 1em 0; }
+.footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    color: #999;
+    font-size: 0.9em;
+    text-align: center;
+}
+
+</style>
+</head>
+<body>
+<div class="content">
+<h1 id="mobile-setup">Mobile Setup</h1>
+<p>This document covers RCC's mobile input system: on-screen buttons for throttle / brake, on-screen steering wheel, joystick, or gyroscope steering, plus the tooling and UI prefabs you need to ship a vehicle game on iOS or Android.</p>
+<p>If you've already installed RCC on desktop and got the demo scenes working, mobile setup is mostly about flipping a few switches and adding the right UI canvas.</p>
+<h2 id="enabling-mobile-mode">Enabling Mobile Mode</h2>
+<p>Open <code>RCC_Settings.asset</code>. Find <strong>Mobile Controller Enabled</strong> and check it. This single setting flips the input source from the Input Manager to RCC's mobile input pipeline.</p>
+<p>When mobile is on:</p>
+<ul>
+<li><code>RCC_InputManager</code> reads inputs from <code>RCC_MobileButtons</code> (a static class) instead of from the Input System.</li>
+<li>The mobile UI canvas auto-shows its touch widgets (which are hidden on desktop).</li>
+<li>Keyboard / gamepad input is ignored on mobile platforms.</li>
+</ul>
+<p>You can leave mobile enabled in the editor as well — the on-screen buttons will appear and work with mouse clicks, useful for testing the mobile UI without deploying to a device.</p>
+<h2 id="picking-a-steering-style">Picking a Steering Style</h2>
+<p><code>RCC_Settings</code> has a <strong>Mobile Controller</strong> enum with four options:</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>What the Player Does</th>
+<th>Best For</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Touch Screen</strong></td>
+<td>Press buttons on the left and right of the screen for steering.</td>
+<td>Casual / arcade games.</td>
+</tr>
+<tr>
+<td><strong>Gyro</strong></td>
+<td>Tilts the device left/right to steer.</td>
+<td>Immersive racing on phones.</td>
+</tr>
+<tr>
+<td><strong>Steering Wheel</strong></td>
+<td>Rotates an on-screen wheel by touching and dragging.</td>
+<td>Realistic feel without external hardware.</td>
+</tr>
+<tr>
+<td><strong>Joystick</strong></td>
+<td>Drags a virtual joystick to steer (also handles throttle/brake direction).</td>
+<td>Open-world / GTA-style games.</td>
+</tr>
+</tbody>
+</table>
+<p>You can change the option live in code:</p>
+<pre><code class="language-csharp">RCC.SetMobileController(RCC_Settings.MobileController.Gyro);
+</code></pre>
+<p>Or set the default in <code>RCC_Settings.asset</code>. Players can switch between styles via your settings menu by exposing the option in your UI.</p>
+<h2 id="adding-the-mobile-ui-canvas">Adding the Mobile UI Canvas</h2>
+<p>Drop the <strong><code>RCC_Canvas (AIO).prefab</code></strong> into your scene. It lives at:</p>
+<pre><code>Assets/RealisticCarControllerV4/Prefabs/UI/RCC_Canvas (AIO).prefab
+</code></pre>
+<p>This canvas contains every mobile widget RCC provides:</p>
+<ul>
+<li>Left side: throttle button.</li>
+<li>Right side: brake button.</li>
+<li>Lower middle: handbrake button.</li>
+<li>Upper right: gear shift up / down buttons.</li>
+<li>Upper left: HUD (speedometer, RPM gauge, gear indicator).</li>
+<li>Center steering (configurable): wheel / joystick / or hidden if using gyro / touch buttons.</li>
+<li>Bottom edge: extra buttons (camera, lights, indicators, reset).</li>
+</ul>
+<p>The canvas auto-detects platform via <code>Application.isMobilePlatform</code>. On desktop, the touch widgets stay hidden so you can see the HUD without the buttons cluttering the screen. On mobile (or in the editor with mobile enabled), the buttons appear.</p>
+<p>If you only want certain widgets — e.g., you've built your own HUD but want to use RCC's joystick — you can copy individual widget prefabs from inside the AIO canvas.</p>
+<h2 id="tuning-sensitivity">Tuning Sensitivity</h2>
+<p>In <code>RCC_Settings.asset</code>, three fields control mobile input feel:</p>
+<h3 id="ui-button-sensitivity">UI Button Sensitivity</h3>
+<p>How quickly the throttle / brake ramps to full when you press the button. Higher = faster ramp. Default 10. Lower if your game wants gradual acceleration (cruising / scenic driving). Higher if you want instant response (arcade).</p>
+<h3 id="ui-button-gravity">UI Button Gravity</h3>
+<p>How quickly throttle / brake returns to zero when you release. Default 10. Same logic — higher = snappier release.</p>
+<h3 id="gyro-sensitivity">Gyro Sensitivity</h3>
+<p>Multiplier on gyroscope steering. Default 2. Higher = a smaller tilt produces a bigger steering input. Set based on your target audience — kids might want lower (less twitchy), arcade players might want higher.</p>
+<p>You can tune these live in code at runtime:</p>
+<pre><code class="language-csharp">RCC_Settings.Instance.UIButtonSensitivity = 15f;
+RCC_Settings.Instance.gyroSensitivity = 1.5f;
+</code></pre>
+<p>These changes persist for the current Play session only (because <code>RCC_Settings</code> clones itself in Play mode).</p>
+<h2 id="per-widget-configuration">Per-Widget Configuration</h2>
+<p>Each widget on the mobile canvas has its own component you can configure. The most useful ones:</p>
+<h3 id="touch-buttons-rcc_ui_controller">Touch Buttons (RCC_UI_Controller)</h3>
+<p>The throttle and brake buttons use <code>RCC_UI_Controller</code>. Each has:</p>
+<ul>
+<li><strong>Sensitivity</strong> — overrides the global UI Button Sensitivity for this button.</li>
+<li><strong>Gravity</strong> — overrides the global gravity.</li>
+<li><strong>Pressed Color / Highlight Color</strong> — visual feedback colors.</li>
+</ul>
+<h3 id="joystick-rcc_ui_joystick">Joystick (RCC_UI_Joystick)</h3>
+<p>If you're using the joystick mode, the <code>RCC_UI_Joystick</code> component on the joystick widget has:</p>
+<ul>
+<li><strong>Drag Sensitivity</strong> — multiplier on drag distance.</li>
+<li><strong>Snap Back</strong> — whether the joystick returns to center on release.</li>
+</ul>
+<h3 id="steering-wheel-rcc_ui_steeringwheelcontroller">Steering Wheel (RCC_UI_SteeringWheelController)</h3>
+<p>The on-screen wheel widget:</p>
+<ul>
+<li><strong>Max Steer Angle</strong> — maximum rotation (in degrees) the wheel can be turned to.</li>
+<li><strong>Snap Back Speed</strong> — how fast the wheel returns to center when released.</li>
+<li><strong>Snap Back Threshold</strong> — minimum rotation that holds before snap-back kicks in.</li>
+</ul>
+<h2 id="gyroscope-steering">Gyroscope Steering</h2>
+<p>Gyro mode uses <code>Input.gyro.attitude</code> (or the new Input System equivalent on supported devices). The user holds the phone landscape and tilts it left/right to steer.</p>
+<p>For a good gyro experience:</p>
+<ul>
+<li>Calibrate the resting position on game start (have a "Calibrate" button in your settings).</li>
+<li>Don't enforce a maximum tilt — let the player tilt as much as they want.</li>
+<li>Dead-zone the center — small tilts shouldn't move the steering, only larger tilts should. This is what makes the gyro feel "snappy."</li>
+</ul>
+<p>If gyro steering feels too sensitive or laggy, adjust <code>RCC_Settings.gyroSensitivity</code>.</p>
+<h2 id="hiding-specific-widgets">Hiding Specific Widgets</h2>
+<p>If you don't want, say, the gear shift buttons (because your game is automatic-only):</p>
+<ol>
+<li>Expand <code>RCC_Canvas (AIO).prefab</code> in the Hierarchy.</li>
+<li>Find the gear shift up / down buttons in the canvas.</li>
+<li>Disable them (uncheck the GameObject's active state).</li>
+</ol>
+<p>Don't delete them — disabling is reversible if you later decide to enable manual transmissions. Deleting means re-adding from the original prefab.</p>
+<h2 id="performance-on-mobile">Performance on Mobile</h2>
+<p>Mobile performance matters more than desktop. A few RCC-specific tips:</p>
+<h3 id="disable-particle-effects">Disable Particle Effects</h3>
+<p><code>RCC_Settings.dontUseAnyParticleEffects = true</code> disables exhaust smoke, dust particles, sparks. The biggest performance win on low-end mobile.</p>
+<h3 id="disable-skidmarks">Disable Skidmarks</h3>
+<p><code>RCC_Settings.dontUseSkidmarks = true</code> disables skidmark rendering. Skidmarks accumulate over time and the mesh can get large in long sessions.</p>
+<h3 id="vertex-lights-instead-of-pixel-lights">Vertex Lights Instead of Pixel Lights</h3>
+<p>In <code>RCC_Settings</code>, enable:</p>
+<ul>
+<li><code>useHeadLightsAsVertexLights = true</code></li>
+<li><code>useBrakeLightsAsVertexLights = true</code></li>
+<li><code>useReverseLightsAsVertexLights = true</code></li>
+<li><code>useIndicatorLightsAsVertexLights = true</code></li>
+</ul>
+<p>Vertex lighting is much cheaper than pixel lighting. The headlights will look less crisp, but on a phone screen the difference is minor.</p>
+<h3 id="reduce-wheel-count">Reduce Wheel Count</h3>
+<p>If your vehicles use more than 4 wheels (trucks, 6-wheelers), each extra wheel costs a raycast and friction computation per frame. Stick to 4 wheels per vehicle when possible.</p>
+<h3 id="lod-vehicles">LOD Vehicles</h3>
+<p>Use <code>RCC_LOD</code> to disable wheel updates on far-away vehicles. The visible mesh stays, but the physics simplifies.</p>
+<h3 id="lower-fixed-timestep">Lower Fixed Timestep</h3>
+<p><code>RCC_Settings.fixedTimeStep = 0.04</code> (25 Hz) instead of the default 0.02 (50 Hz) cuts physics work in half. The vehicle won't be as crisp at high speed, but on mobile the trade is usually worth it.</p>
+<h2 id="touch-input-gotchas">Touch Input Gotchas</h2>
+<h3 id="multitouch">Multitouch</h3>
+<p>The mobile UI handles multitouch correctly — the player can press throttle + brake + handbrake simultaneously. If you've added your own touch widgets, use <code>EventSystem.current.IsPointerOverGameObject()</code> to check if a touch is over UI before treating it as a world-space touch.</p>
+<h3 id="touch-coordinate-space">Touch Coordinate Space</h3>
+<p>Mobile touch coordinates are in screen pixels (origin bottom-left, X right, Y up). If you query touches yourself (e.g., for a "tap to honk" gesture), remember to convert via <code>Camera.ScreenToWorldPoint</code>.</p>
+<h3 id="notch--safe-areas">Notch / Safe Areas</h3>
+<p>Modern phones have notches and rounded corners. Use Unity's <code>Screen.safeArea</code> API to lay out the mobile UI so buttons don't end up under the notch. The shipped AIO canvas uses anchor-based layout that mostly handles this, but custom UIs need explicit safe-area handling.</p>
+<h2 id="building-for-ios--android">Building for iOS / Android</h2>
+<p>Standard Unity build pipeline. A few RCC-specific things:</p>
+<ul>
+<li>Make sure <strong>Active Input Handling</strong> is set to <strong>Both</strong> or <strong>Input System Package (New)</strong>.</li>
+<li>Make sure the <strong>Build Target</strong> is iOS or Android (Player Settings → Platform).</li>
+<li>For Android, ensure the minimum API level supports your gyroscope / device features (API 21 / Android 5.0 covers most modern phones).</li>
+<li>For iOS, set the Camera Usage description if your game uses AR features (RCC itself doesn't).</li>
+</ul>
+<p>After building, deploy to a real device for testing — the editor's mouse-emulation of touch doesn't catch every issue (multitouch behavior, accelerometer values, etc.).</p>
+<h2 id="testing-the-mobile-ui-in-the-editor">Testing the Mobile UI in the Editor</h2>
+<p>The mobile UI works in the editor with mouse clicks if <strong>Mobile Controller Enabled</strong> is on in <code>RCC_Settings</code>. The throttle and brake buttons respond to left-mouse-press, the joystick responds to drag, the wheel responds to drag.</p>
+<p>For gyroscope testing, you need a real device — the editor doesn't simulate accelerometer input by default. (You can install Unity Remote on a phone to forward gyro data to the editor, but it's flaky.)</p>
+<h2 id="common-mobile-issues">Common Mobile Issues</h2>
+<h3 id="touch-buttons-dont-appear">"Touch buttons don't appear"</h3>
+<p>Either Mobile Controller Enabled is off, or the <code>RCC_Canvas (AIO)</code> prefab isn't in the scene. Add both.</p>
+<h3 id="buttons-appear-but-dont-respond">"Buttons appear but don't respond"</h3>
+<p>The scene needs an <code>EventSystem</code>. Unity auto-adds one when you create a UI canvas, but if you've deleted it, add it back: <strong>GameObject → UI → Event System</strong>.</p>
+<h3 id="steering-is-reversed-in-gyro-mode">"Steering is reversed in gyro mode"</h3>
+<p>The device's natural orientation is interpreted differently on iOS vs Android. Some games expose a "Invert Steering" toggle to handle this. You can implement it by negating <code>inputs.steerInput</code> before passing it to the controller.</p>
+<h3 id="steering-wheel-rotation-is-jittery">"Steering wheel rotation is jittery"</h3>
+<p>The wheel widget reads touch deltas every frame — if the device's frame rate is unstable, the wheel can jitter. Lower <strong>Drag Sensitivity</strong> to smooth it out.</p>
+<h3 id="the-hud-is-too-small--too-big-on-my-phone">"The HUD is too small / too big on my phone"</h3>
+<p>The canvas uses <strong>Canvas Scaler</strong> in <strong>Scale With Screen Size</strong> mode. Open the canvas's <code>Canvas Scaler</code> component and adjust the <strong>Reference Resolution</strong> and <strong>Match</strong> values for your target device.</p>
+<h2 id="building-your-own-mobile-ui">Building Your Own Mobile UI</h2>
+<p>If RCC's mobile UI doesn't fit your art style, you can replace it entirely. The contract is simple — your UI must write into <code>RCC_MobileButtons.mobileInputs</code> each frame:</p>
+<pre><code class="language-csharp">RCC_MobileButtons.mobileInputs.throttleInput = myButton.value;
+RCC_MobileButtons.mobileInputs.brakeInput = myBrakeButton.value;
+RCC_MobileButtons.mobileInputs.steerInput = myJoystick.horizontalValue;
+// etc.
+</code></pre>
+<p>As long as Mobile Controller Enabled is on in <code>RCC_Settings</code>, RCC will read these values. Your custom UI is just another writer to the same static struct.</p>
+<h2 id="next-steps">Next Steps</h2>
+<ul>
+<li><strong><a href="16_InputSystem.html">16 — Input System</a></strong> — the desktop input pipeline.</li>
+<li><strong><a href="21_RCC_Settings.html">21 — RCC Settings Deep Dive</a></strong> — all mobile settings.</li>
+<li><strong><a href="15_AudioSystem.html">15 — Audio System</a></strong> — audio performance tips for mobile.</li>
+</ul>
+</div>
+<div class="footer">
+Generated from: 18_MobileSetup.md<br>
+Date: 2026-05-22 00:32<br>
+© 2014 - 2026 BoneCracker Games — Realistic Car Controller V5.0.0
+</div>
+</body>
+</html>

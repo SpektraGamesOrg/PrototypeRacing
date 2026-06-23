@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Troubleshooting</title>
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    background: #f8f9fa;
+}
+.content {
+    background: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+h1 { color: #2c3e50; margin-top: 0; padding-bottom: 0.3em; border-bottom: 2px solid #eee; }
+h2 { color: #34495e; margin-top: 1.5em; padding-bottom: 0.2em; border-bottom: 1px solid #eee; }
+h3, h4 { color: #34495e; margin-top: 1.2em; }
+h5, h6 { color: #34495e; margin-top: 1.0em; }
+code {
+    background: #f4f4f4;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.9em;
+}
+pre {
+    background: #2d2d2d;
+    color: #f8f8f2;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
+    margin: 1em 0;
+    font-size: 0.9em;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+    color: #f8f8f2;
+    white-space: pre;
+}
+blockquote {
+    border-left: 4px solid #3498db;
+    margin: 1em 0;
+    padding: 0.5em 0 0.5em 20px;
+    color: #555;
+    background: #f9f9f9;
+}
+blockquote p { margin: 0.4em 0; }
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px 12px;
+    text-align: left;
+    vertical-align: top;
+}
+th {
+    background: #f4f4f4;
+    font-weight: bold;
+}
+tr:nth-child(even) { background: #f9f9f9; }
+a { color: #3498db; text-decoration: none; transition: color 0.2s; }
+a:hover { color: #2980b9; text-decoration: underline; }
+ul, ol { margin: 1em 0; padding-left: 30px; }
+li { margin: 0.4em 0; }
+li > ul, li > ol { margin: 0.3em 0; }
+hr { border: none; border-top: 2px solid #eee; margin: 2em 0; }
+p { margin: 1em 0; }
+.footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    color: #999;
+    font-size: 0.9em;
+    text-align: center;
+}
+
+</style>
+</head>
+<body>
+<div class="content">
+<h1 id="troubleshooting">Troubleshooting</h1>
+<p>This document covers the most common problems people hit with RCC and how to fix them. If your specific issue isn't listed, also check <strong><a href="29_FAQ.html">29 — FAQ</a></strong>, the inline Console errors in Unity, or contact support at <strong>bonecrackergames@gmail.com</strong>.</p>
+<h2 id="installation-issues">Installation Issues</h2>
+<h3 id="i-get-hundreds-of-compile-errors-right-after-importing">"I get hundreds of compile errors right after importing"</h3>
+<p>The most common cause is missing the <strong>Input System</strong> package. RCC requires it.</p>
+<p><strong>Fix:</strong>
+1. Open <strong>Window → Package Manager → Unity Registry</strong>.
+2. Search for <strong>Input System</strong>.
+3. Install it. Click Yes when prompted to enable the new backends.
+4. Restart Unity.</p>
+<p>If that doesn't fix it, also check:</p>
+<ul>
+<li><strong>Active Input Handling</strong> is set to "Input System Package (New)" or "Both" in Project Settings → Player.</li>
+<li>You're on Unity 2022.3 LTS or newer.</li>
+<li>There are no leftover scripts from removed addons. Delete any <code>Photon</code>, <code>EnterExit</code>, or <code>BCG Shared Assets</code> folders if they exist.</li>
+</ul>
+<h3 id="welcome-window-keeps-appearing-every-time-i-open-unity">"Welcome window keeps appearing every time I open Unity"</h3>
+<p>The welcome window is only supposed to appear on first install. If it persists, the dismiss flag isn't being saved. Try:</p>
+<ol>
+<li>Click the <strong>"Don't show again"</strong> checkbox if visible.</li>
+<li>Manually close it via <strong>Tools → BoneCracker Games → Realistic Car Controller → Welcome Window</strong> and dismiss it.</li>
+<li>If that doesn't work, clear Unity's <code>Library/</code> cache (close Unity, delete <code>Library/</code>, reopen).</li>
+</ol>
+<h3 id="all-materials-are-pink-after-import">"All materials are pink after import"</h3>
+<p>You're on URP or HDRP. Run the converter:</p>
+<p><strong>Tools → BoneCracker Games → Realistic Car Controller → Render Pipeline Converter</strong></p>
+<p>See <strong><a href="22_RenderPipelines.html">22 — URP &amp; HDRP Conversion</a></strong> for the full procedure.</p>
+<h3 id="layer-rcc_vehicle-is-missing">"Layer 'RCC_Vehicle' is missing"</h3>
+<p>RCC adds custom layers on import. If the import was interrupted or partial, the layers may not have been created.</p>
+<p><strong>Fix:</strong>
+1. Open <strong>Edit → Project Settings → Tags and Layers</strong>.
+2. Add user layers named <code>RCC_Vehicle</code>, <code>RCC_WheelCollider</code>, <code>RCC_DetachablePart</code>, <code>RCC_Prop</code>.
+3. Save.</p>
+<p>Alternatively, re-import the package — RCC's init script runs again on import.</p>
+<h2 id="driving--physics-issues">Driving / Physics Issues</h2>
+<h3 id="the-car-spawned-but-i-cant-control-it">"The car spawned but I can't control it"</h3>
+<p>Most likely the vehicle isn't registered as the player. Three checks:</p>
+<ol>
+<li><strong>Tag is "Player"</strong> — the Scene Manager auto-registers tagged vehicles.</li>
+<li><strong>Scene has an RCC_SceneManager</strong> — without it, no input flows.</li>
+<li><strong><code>canControl</code> is true</strong> on the vehicle's RCC_CarControllerV4.</li>
+</ol>
+<p>Also verify the Input System is enabled (see installation section above).</p>
+<h3 id="throttle-works-but-the-car-barely-moves">"Throttle works but the car barely moves"</h3>
+<p>Usually one of:</p>
+<ul>
+<li><strong>Brake is stuck on.</strong> Check <code>brakeInput</code> in the controller's Inspector during Play mode.</li>
+<li><strong>Handbrake is on.</strong> Check <code>handbrakeInput</code>.</li>
+<li><strong>Engine isn't running.</strong> Check <code>engineRunning</code>.</li>
+<li><strong>Mass is way too high.</strong> A car with 50000 kg mass barely moves at default torque.</li>
+</ul>
+<h3 id="the-car-flips-over-for-no-reason">"The car flips over for no reason"</h3>
+<p>Center of mass (COM) is too high, OR the car is upside-down at spawn.</p>
+<p><strong>Fix:</strong></p>
+<ul>
+<li>Click the <code>COM</code> child transform on the vehicle.</li>
+<li>Move it lower (closer to the ground, slightly forward of center).</li>
+<li>For a sports car: COM Y around 0.2–0.4 m above ground.</li>
+<li>For an SUV: 0.5–0.7 m.</li>
+</ul>
+<p>If the car flips at spawn, check that the vehicle prefab's rotation is <code>(0, 0, 0)</code> and Y position is positive.</p>
+<h3 id="the-wheels-look-sunken-into-the-ground">"The wheels look sunken into the ground"</h3>
+<p>The wheel collider radius is wrong, or the suspension distance is wrong.</p>
+<p><strong>Fix:</strong></p>
+<ul>
+<li>Click each wheel collider GameObject (under <code>Wheel Colliders/</code>).</li>
+<li>Set the <code>WheelCollider.Radius</code> to the actual visible wheel radius.</li>
+<li>Increase <code>Suspension Distance</code> if needed.</li>
+</ul>
+<h3 id="the-wheels-look-detached-from-the-vehicle-gap-visible">"The wheels look detached from the vehicle (gap visible)"</h3>
+<p>The wheel collider's position doesn't match the wheel mesh's position.</p>
+<p><strong>Fix:</strong></p>
+<ul>
+<li>Open the vehicle prefab.</li>
+<li>Compare the position of each wheel mesh transform with its corresponding wheel collider child.</li>
+<li>They should be at the same world position. Move whichever is off.</li>
+</ul>
+<h3 id="the-car-wobbles-or-vibrates-at-rest">"The car wobbles or vibrates at rest"</h3>
+<p>The wheels aren't symmetric, OR the COM is unstable.</p>
+<p><strong>Fix:</strong></p>
+<ul>
+<li>Make sure all four wheel colliders have <strong>identical</strong> values for Radius, Suspension Spring, Damper, Target Position.</li>
+<li>Verify the COM transform is below the wheel resting positions.</li>
+<li>Try increasing the <code>Wheel Damping Rate</code> on each WheelCollider.</li>
+</ul>
+<h3 id="vehicle-stutters--vibrates-at-high-speed">"Vehicle stutters / vibrates at high speed"</h3>
+<p>Physics fixed timestep is too slow.</p>
+<p><strong>Fix:</strong></p>
+<ul>
+<li>In <code>RCC_Settings.asset</code>, set <strong>Fixed Time Step</strong> to <code>0.01</code> (100 Hz physics).</li>
+<li>Or in Unity's <strong>Edit → Project Settings → Time</strong>, set Fixed Timestep to 0.01.</li>
+</ul>
+<p>This costs more CPU but stabilizes high-speed simulation.</p>
+<h3 id="vehicle-clips-through-walls-or-terrain-at-high-speed">"Vehicle clips through walls or terrain at high speed"</h3>
+<p>Collision detection mode is too lazy.</p>
+<p><strong>Fix:</strong></p>
+<ul>
+<li>Click the vehicle's Rigidbody.</li>
+<li>Change <strong>Collision Detection</strong> from "Discrete" to <strong>"Continuous Dynamic"</strong> or <strong>"Continuous"</strong>.</li>
+</ul>
+<p>This costs more CPU but prevents tunneling.</p>
+<h3 id="auto-reset-keeps-flipping-the-vehicle-when-its-actually-upright">"Auto Reset keeps flipping the vehicle when it's actually upright"</h3>
+<p>The detection threshold is too sensitive.</p>
+<p><strong>Fix:</strong></p>
+<ul>
+<li>Open <code>RCC_Settings.asset</code>.</li>
+<li>Uncheck <strong>Auto Reset</strong> to disable it entirely.</li>
+<li>Or modify the threshold (currently in <code>RCC_CarControllerV4</code>'s <code>Update</code> — search for "reset" in the script).</li>
+</ul>
+<h2 id="camera-issues">Camera Issues</h2>
+<h3 id="the-camera-doesnt-follow-the-vehicle">"The camera doesn't follow the vehicle"</h3>
+<p>Either there's no <code>RCC_Camera</code> in the scene, OR the player vehicle isn't registered.</p>
+<p><strong>Fix:</strong></p>
+<ol>
+<li><strong>Tools → BoneCracker Games → Realistic Car Controller → Create → Cameras → Add RCC Camera To Scene</strong>.</li>
+<li>Delete the default Main Camera.</li>
+<li>Make sure your vehicle is tagged "Player" or registered via <code>RCC.RegisterPlayerVehicle()</code>.</li>
+</ol>
+<h3 id="two-cameras-are-conflicting">"Two cameras are conflicting"</h3>
+<p>Most often: you have both the default Unity Main Camera AND <code>RCC_Camera</code> in the scene. Delete the default Main Camera.</p>
+<h3 id="the-camera-goes-inside-the-vehicle--clips-through-walls">"The camera goes inside the vehicle / clips through walls"</h3>
+<p>There's no built-in collision avoidance. Increase the camera distance, or write your own occlusion logic using raycasts. See <strong><a href="13_CameraSystem.html">13 — Camera System</a></strong>.</p>
+<h3 id="hood-camera-shows-the-inside-of-the-body-mesh">"Hood camera shows the inside of the body mesh"</h3>
+<p>The hood camera anchor is positioned inside the model. Move it forward / upward until it's outside the cabin geometry.</p>
+<h2 id="audio-issues">Audio Issues</h2>
+<h3 id="i-dont-hear-engine-sounds">"I don't hear engine sounds"</h3>
+<p>Check:</p>
+<ol>
+<li>The vehicle's <strong>Audio Type</strong> isn't set to <strong>Off</strong>.</li>
+<li>The audio clips are assigned in the Inspector.</li>
+<li>The scene has an <code>AudioListener</code> (on the camera). Only one should exist.</li>
+<li>Unity's master volume / OS master volume isn't muted.</li>
+</ol>
+<h3 id="engine-sound-is-too-high-pitched-chipmunk-effect">"Engine sound is too high-pitched (chipmunk effect)"</h3>
+<p><code>Max Engine Sound Pitch</code> is too high. Set to 1.5 or 1.6 instead of 1.8+.</p>
+<h3 id="crash-sound-plays-for-tiny-scrapes">"Crash sound plays for tiny scrapes"</h3>
+<p>The crash threshold is too sensitive. Lower <code>maxCrashSoundVolume</code> in <code>RCC_Settings</code>, or modify the velocity threshold in <code>RCC_CarControllerV4.OnCollisionEnter</code> (advanced).</p>
+<h3 id="audio-cuts-in-and-out-when-there-are-many-vehicles">"Audio cuts in and out when there are many vehicles"</h3>
+<p>Unity is hitting the max audio voices limit (default 256). Reduce the number of active vehicles, or reduce the per-vehicle audio source count (use TwoSource instead of ThreeSource).</p>
+<h2 id="lighting-issues">Lighting Issues</h2>
+<h3 id="headlights-dont-illuminate-the-scene">"Headlights don't illuminate the scene"</h3>
+<p>Either:</p>
+<ul>
+<li>The Unity <code>Light</code> component is disabled (check the GameObject).</li>
+<li>The light's <strong>Range</strong> is too short (try 30 m for headlights).</li>
+<li>In URP, the <strong>Additional Lights</strong> mode is set to Disabled or Per Vertex (change to Per Pixel in the URP Asset).</li>
+</ul>
+<h3 id="lights-are-too-bright-in-hdrp">"Lights are too bright in HDRP"</h3>
+<p>HDRP uses lumens, which are much larger numbers than the Built-in / URP scale. Reduce intensity to 500–2000 lumens for vehicle lights.</p>
+<h3 id="indicators-dont-blink">"Indicators don't blink"</h3>
+<p>The <code>RCC_Light.lightType</code> is wrong. It needs to be <code>IndicatorLeft</code>, <code>IndicatorRight</code>, or <code>IndicatorHazard</code> — not <code>BrakeLight</code> or other.</p>
+<h3 id="headlights-light-my-own-car-interior">"Headlights light my own car interior"</h3>
+<p>Set the light's <strong>Culling Mask</strong> to exclude the vehicle's own layer (<code>RCC_Vehicle</code>).</p>
+<h2 id="ui-issues">UI Issues</h2>
+<h3 id="speedometer-reads-0-even-when-driving">"Speedometer reads 0 even when driving"</h3>
+<p>The UI canvas isn't bound to a vehicle.</p>
+<p><strong>Fix:</strong> Most RCC UI widgets find the active player vehicle automatically via <code>RCC_SceneManager.Instance.activePlayerVehicle</code>. If they're not finding it:</p>
+<ul>
+<li>Make sure the vehicle is registered as the player.</li>
+<li>Make sure the UI canvas (<code>RCC_Canvas</code> prefab) is in the scene.</li>
+<li>Make sure the scene has an <code>EventSystem</code>.</li>
+</ul>
+<h3 id="touch-buttons-appear-but-dont-respond">"Touch buttons appear but don't respond"</h3>
+<p>The scene is missing an <code>EventSystem</code>. Add it: <strong>GameObject → UI → Event System</strong>.</p>
+<h3 id="touch-buttons-appear-on-desktop-too-unwanted">"Touch buttons appear on desktop too (unwanted)"</h3>
+<p>You enabled <strong>Mobile Controller Enabled</strong> in <code>RCC_Settings</code>. Turn it off for desktop builds. The mobile UI canvas auto-detects platform if its components are configured correctly.</p>
+<h2 id="customization-issues">Customization Issues</h2>
+<h3 id="paint-changes-dont-apply-to-the-body">"Paint changes don't apply to the body"</h3>
+<p>The PaintManager's <strong>Paint Targets</strong> array isn't pointing at the right Renderer. Open the vehicle prefab, find the PaintManager, and assign the body MeshRenderer.</p>
+<h3 id="wheel-customization-doesnt-show-new-wheels">"Wheel customization doesn't show new wheels"</h3>
+<p>The available wheels list (in <code>RCC_ChangableWheels.asset</code>) doesn't include your new wheel prefab. Add it.</p>
+<h3 id="saved-customization-doesnt-load-on-next-play">"Saved customization doesn't load on next play"</h3>
+<p>PlayerPrefs storage may differ between platforms. On WebGL, PlayerPrefs is browser-storage-based and can be cleared by the user. On iOS, it persists indefinitely. Test on your actual target platform.</p>
+<h2 id="ai-issues">AI Issues</h2>
+<h3 id="ai-doesnt-follow-my-waypoints">"AI doesn't follow my waypoints"</h3>
+<p>Check:</p>
+<ol>
+<li>The AI vehicle's <code>RCC_AICarController</code> has its <strong>Waypoints Container</strong> field assigned.</li>
+<li><strong>Navigation Mode</strong> is set to <strong>Following Waypoints</strong>.</li>
+<li>The waypoints container actually contains child waypoints.</li>
+</ol>
+<h3 id="ai-keeps-spinning-out">"AI keeps spinning out"</h3>
+<p>Tune down AI <strong>Steering Speed</strong> to ~5-6, or enable <strong>Override Behavior</strong> on the AI vehicle and configure friction values manually.</p>
+<h3 id="ai-cars-get-stuck-against-walls">"AI cars get stuck against walls"</h3>
+<p>Enable <strong>Use Obstacle Avoidance</strong> on the <code>RCC_AICarController</code>. Tune <strong>Ray Distance</strong> to match your scene layout.</p>
+<h3 id="ai-flips-over-on-jumps">"AI flips over on jumps"</h3>
+<p>The AI's <code>Max Speed</code> is too high for the geometry. Lower it.</p>
+<h2 id="performance-issues">Performance Issues</h2>
+<h3 id="frame-rate-drops-with-multiple-ai-vehicles">"Frame rate drops with multiple AI vehicles"</h3>
+<p>Each AI has 4 WheelColliders and an AI controller running. The cost adds up.</p>
+<p><strong>Fixes (in order of impact):</strong></p>
+<ol>
+<li>Reduce number of active AI vehicles.</li>
+<li>Add <code>RCC_LOD</code> to vehicles for distance-based throttling.</li>
+<li>Disable particle effects globally (<code>RCC_Settings.dontUseAnyParticleEffects</code>).</li>
+<li>Disable skidmarks (<code>RCC_Settings.dontUseSkidmarks</code>).</li>
+<li>Switch lights to vertex lighting where possible.</li>
+</ol>
+<h3 id="fps-is-low-on-mobile-even-with-one-vehicle">"FPS is low on mobile even with one vehicle"</h3>
+<p>Mobile is more sensitive. In addition to the above:</p>
+<ul>
+<li>Set <strong>Fixed Time Step</strong> to 0.04 (25 Hz physics).</li>
+<li>Use URP (not HDRP) for the render pipeline.</li>
+<li>Set Quality Settings → Shadows to disabled or Lowest.</li>
+<li>Reduce shadow distance.</li>
+</ul>
+<h3 id="memory-grows-over-a-long-play-session">"Memory grows over a long play session"</h3>
+<p>Skidmarks accumulate. They cap eventually but the cap can be large. Reduce <code>maxMarks</code> on the <code>RCC_SkidmarksManager</code>, or call <code>RCC.CleanSkidmarks()</code> periodically.</p>
+<h2 id="build-issues">Build Issues</h2>
+<h3 id="build-fails-with-a-missing-reference-error">"Build fails with a 'missing reference' error"</h3>
+<p>Most often: editor-only scripts are referenced from runtime code. Check the Console for the specific class — usually it's something inside <code>#if UNITY_EDITOR</code> that's accidentally being referenced outside of that block.</p>
+<p>Re-importing the package usually fixes it.</p>
+<h3 id="standalone-build-crashes-on-launch">"Standalone build crashes on launch"</h3>
+<p>Check the player log:</p>
+<ul>
+<li>Windows: <code>%appdata%\..\LocalLow\&lt;CompanyName&gt;\&lt;ProductName&gt;\Player.log</code>.</li>
+<li>macOS: <code>~/Library/Logs/&lt;CompanyName&gt;/&lt;ProductName&gt;/Player.log</code>.</li>
+<li>Linux: <code>~/.config/unity3d/&lt;CompanyName&gt;/&lt;ProductName&gt;/Player.log</code>.</li>
+</ul>
+<p>Common causes: missing audio mixer asset (re-import RCC), missing prefab reference (check <code>RCC_Settings.asset</code>).</p>
+<h3 id="mobile-build-crashes-when-first-vehicle-spawns">"Mobile build crashes when first vehicle spawns"</h3>
+<p>Often a memory issue. Reduce vehicle quality:</p>
+<ul>
+<li>Disable particle effects globally.</li>
+<li>Use Mobile Diffuse or URP/Lit shaders.</li>
+<li>Reduce texture sizes for the vehicle.</li>
+</ul>
+<h2 id="compile-symbol-issues">Compile Symbol Issues</h2>
+<h3 id="code-in-if-bcg_urp-doesnt-run-even-though-im-using-urp">"Code in #if BCG_URP doesn't run even though I'm using URP"</h3>
+<p>The <code>BCG_URP</code> define isn't set. Run the Render Pipeline Converter — it sets the define automatically. Or manually add it: <strong>Project Settings → Player → Scripting Define Symbols</strong>.</p>
+<h3 id="i-see-if-rcc_photon-or-bcg_enterexit--should-i-remove-the-define">"I see #if RCC_PHOTON or BCG_ENTEREXIT — should I remove the define?"</h3>
+<p>Yes, both addons were removed in V5. Remove the defines from your project's Scripting Define Symbols.</p>
+<h2 id="when-nothing-works">When Nothing Works</h2>
+<p>If you've tried everything above and the issue persists:</p>
+<ol>
+<li><strong>Create a minimal repro.</strong> Make a new scene with just the Scene Manager, one vehicle, and a UI canvas. If the bug happens here, it's a bug in RCC. If it doesn't, your project has a conflict — narrow it down.</li>
+<li><strong>Check the Console.</strong> Even a single warning can give you the hint. Filter by Errors / Warnings and read them.</li>
+<li><strong>Look at the demo scenes.</strong> If a demo scene works correctly, compare what it does differently from your scene.</li>
+<li><strong>Email support.</strong> <code>bonecrackergames@gmail.com</code>. Include:
+   - Unity version.
+   - RCC version.
+   - Render pipeline (Built-in / URP / HDRP).
+   - A description of the problem.
+   - Screenshots of the Console and your scene Hierarchy.</li>
+</ol>
+<h2 id="next-steps">Next Steps</h2>
+<ul>
+<li><strong><a href="29_FAQ.html">29 — FAQ</a></strong> — frequently asked questions.</li>
+<li><strong><a href="00_TableOfContents.html">00 — Table of Contents</a></strong> — back to the index.</li>
+</ul>
+</div>
+<div class="footer">
+Generated from: 28_Troubleshooting.md<br>
+Date: 2026-05-22 00:32<br>
+© 2014 - 2026 BoneCracker Games — Realistic Car Controller V5.0.0
+</div>
+</body>
+</html>

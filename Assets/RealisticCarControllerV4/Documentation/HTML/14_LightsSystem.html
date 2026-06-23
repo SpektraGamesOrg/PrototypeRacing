@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Lights System</title>
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    background: #f8f9fa;
+}
+.content {
+    background: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+h1 { color: #2c3e50; margin-top: 0; padding-bottom: 0.3em; border-bottom: 2px solid #eee; }
+h2 { color: #34495e; margin-top: 1.5em; padding-bottom: 0.2em; border-bottom: 1px solid #eee; }
+h3, h4 { color: #34495e; margin-top: 1.2em; }
+h5, h6 { color: #34495e; margin-top: 1.0em; }
+code {
+    background: #f4f4f4;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.9em;
+}
+pre {
+    background: #2d2d2d;
+    color: #f8f8f2;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
+    margin: 1em 0;
+    font-size: 0.9em;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+    color: #f8f8f2;
+    white-space: pre;
+}
+blockquote {
+    border-left: 4px solid #3498db;
+    margin: 1em 0;
+    padding: 0.5em 0 0.5em 20px;
+    color: #555;
+    background: #f9f9f9;
+}
+blockquote p { margin: 0.4em 0; }
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px 12px;
+    text-align: left;
+    vertical-align: top;
+}
+th {
+    background: #f4f4f4;
+    font-weight: bold;
+}
+tr:nth-child(even) { background: #f9f9f9; }
+a { color: #3498db; text-decoration: none; transition: color 0.2s; }
+a:hover { color: #2980b9; text-decoration: underline; }
+ul, ol { margin: 1em 0; padding-left: 30px; }
+li { margin: 0.4em 0; }
+li > ul, li > ol { margin: 0.3em 0; }
+hr { border: none; border-top: 2px solid #eee; margin: 2em 0; }
+p { margin: 1em 0; }
+.footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    color: #999;
+    font-size: 0.9em;
+    text-align: center;
+}
+
+</style>
+</head>
+<body>
+<div class="content">
+<h1 id="lights-system">Lights System</h1>
+<p>This document covers RCC's lighting system: how to add headlights, brake lights, reverse lights, indicators, and interior lights to a vehicle, how lights respond to driver inputs, how to configure lens flares, and how the system handles differences between Built-in / URP / HDRP.</p>
+<h2 id="how-rcc-lights-work">How RCC Lights Work</h2>
+<p>Every RCC light is a child GameObject under the vehicle with two components:</p>
+<ol>
+<li><strong>Unity's <code>Light</code> component</strong> — the actual light source.</li>
+<li><strong>RCC's <code>RCC_Light</code> component</strong> — wraps the Unity Light with logic that knows when to turn it on, dim it, blink it, or break it.</li>
+</ol>
+<p>Each frame, <code>RCC_Light</code> reads the parent vehicle's state — is the brake pressed, is reverse engaged, is the left indicator on — and sets the Unity Light's intensity accordingly.</p>
+<p>For example, a brake light's intensity goes to 0 when the driver isn't braking, and ramps up to its configured max when the driver is. The transition is smooth, not instant, which makes the lighting feel like real brake lights instead of a digital on/off.</p>
+<h2 id="light-types">Light Types</h2>
+<p><code>RCC_Light</code> has an enum field <code>lightType</code> with these options:</p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Headlight Low Beam</strong></td>
+<td>On when low-beam input is toggled.</td>
+</tr>
+<tr>
+<td><strong>Headlight High Beam</strong></td>
+<td>On when high-beam input is toggled.</td>
+</tr>
+<tr>
+<td><strong>Brake Light</strong></td>
+<td>Bright when <code>brakeInput &gt; 0</code>. Dim when on but not braking (parking light behavior — optional).</td>
+</tr>
+<tr>
+<td><strong>Reverse Light</strong></td>
+<td>On when the vehicle is in reverse gear (<code>direction == -1</code>).</td>
+</tr>
+<tr>
+<td><strong>Indicator Left</strong></td>
+<td>Blinks at a fixed interval when the left indicator is on.</td>
+</tr>
+<tr>
+<td><strong>Indicator Right</strong></td>
+<td>Same for right.</td>
+</tr>
+<tr>
+<td><strong>Indicator Hazard</strong></td>
+<td>Hazard mode — both left and right blink together.</td>
+</tr>
+<tr>
+<td><strong>Interior Light</strong></td>
+<td>On when the interior light toggle is on.</td>
+</tr>
+<tr>
+<td><strong>Tail Light</strong></td>
+<td>Always-on glow when headlights are on (lower than brake light intensity).</td>
+</tr>
+</tbody>
+</table>
+<h2 id="adding-lights-to-a-vehicle">Adding Lights to a Vehicle</h2>
+<p>The recommended workflow uses the menu items, which handle all the wiring automatically.</p>
+<h3 id="adding-a-headlight">Adding a Headlight</h3>
+<ol>
+<li>Create an empty GameObject at the headlight position on the front of the vehicle.</li>
+<li>Select it.</li>
+<li>Menu: <strong>Tools → BoneCracker Games → Realistic Car Controller → Create → Lights → Add Lights To Vehicle → HeadLight</strong>.</li>
+</ol>
+<p>The menu does the following:</p>
+<ul>
+<li>Adds a Unity <code>Light</code> component (configured as a spotlight).</li>
+<li>Adds an <code>RCC_Light</code> component with <code>lightType = HeadlightLowBeam</code>.</li>
+<li>Adds a lens flare (URP/HDRP/Built-in compatible — uses the prefab from <code>RCC_Settings.lensflareURP</code> or the equivalent).</li>
+<li>Sets default intensity, range, and angle.</li>
+</ul>
+<p>Repeat for the right headlight on the front-right side of the vehicle.</p>
+<h3 id="adding-a-brake-light">Adding a Brake Light</h3>
+<p>Same pattern but the menu is <strong>Lights → Brake</strong>. Place at the rear of the vehicle.</p>
+<p>The default brake light is configured to:</p>
+<ul>
+<li>Default intensity 0 (off).</li>
+<li>Max intensity 2.0 when braking.</li>
+<li>Smooth transition (not instant) when braking starts/stops.</li>
+</ul>
+<h3 id="adding-a-reverse-light">Adding a Reverse Light</h3>
+<p>Menu: <strong>Lights → Reverse</strong>. Place at the back, separate from the brake lights.</p>
+<h3 id="adding-indicator-lights">Adding Indicator Lights</h3>
+<p>Menu: <strong>Lights → Indicator → Left</strong> (for the left indicator) and <strong>Lights → Indicator → Right</strong>.</p>
+<p>Each indicator GameObject gets a <code>RCC_Light</code> configured to blink. The blink rate is roughly 0.5 seconds on / 0.5 seconds off (matches real-world turn signal frequency).</p>
+<p>Place left-indicator lights at the <strong>front left</strong> and <strong>rear left</strong>. Place right-indicator lights at the <strong>front right</strong> and <strong>rear right</strong>. The system handles all of them together — toggling left indicator on lights up both left lights.</p>
+<h3 id="adding-interior-lights">Adding Interior Lights</h3>
+<p>Menu: <strong>Lights → Interior</strong>. Place inside the cabin (e.g., dome light). On by default when interior light input is toggled.</p>
+<h2 id="customizing-light-properties">Customizing Light Properties</h2>
+<p>After you add a light, you'll likely want to tune it. Click the light GameObject and look at the Inspector.</p>
+<h3 id="unity-light-component">Unity Light Component</h3>
+<p>Standard Unity settings:</p>
+<ul>
+<li><strong>Type</strong> — Spot, Point, or Directional. RCC uses Spot for headlights and Point for indicators / brake lights.</li>
+<li><strong>Range</strong> — how far the light reaches.</li>
+<li><strong>Spot Angle</strong> — the cone width (for spotlights).</li>
+<li><strong>Color</strong> — yellow-white for headlights, red for brake, amber for indicators.</li>
+<li><strong>Intensity</strong> — the maximum intensity (the value used when the light is fully on).</li>
+<li><strong>Indirect Multiplier</strong> — set to 0 to avoid baking issues.</li>
+<li><strong>Shadows</strong> — usually leave on Hard Shadows. Set to None on mobile for performance.</li>
+</ul>
+<h3 id="rcc_light-component">RCC_Light Component</h3>
+<ul>
+<li><strong>Light Type</strong> — Headlight Low Beam, Brake, Reverse, etc.</li>
+<li><strong>Inertia</strong> — how smoothly the light transitions on/off. Higher = slower fade. Default 5.</li>
+<li><strong>Use Emission</strong> — if on, also drives material emission color/intensity (useful for the bulb's lens material).</li>
+<li><strong>Emission Material</strong> — the material whose emission to drive.</li>
+<li><strong>Emission Color</strong> — the color the bulb glows.</li>
+<li><strong>Use Lens Flare</strong> — toggle the lens flare effect.</li>
+<li><strong>Lens Flare Brightness</strong> — multiplier on lens flare intensity.</li>
+</ul>
+<h3 id="multiple-lights-as-one-bulb">Multiple Lights as One Bulb</h3>
+<p>If you have a single "light fixture" mesh (e.g., a headlight assembly with one diffuser cover), you can use <strong>one</strong> <code>RCC_Light</code> GameObject and have it drive the emission on the diffuser material. The Light component lights the scene; the emission material makes the bulb itself glow.</p>
+<p>To set up:</p>
+<ol>
+<li>The diffuser mesh's material has an emission slot (URP/Lit, HDRP/Lit, or Built-in/Standard all support this).</li>
+<li>On the <code>RCC_Light</code> component, enable <strong>Use Emission</strong>.</li>
+<li>Assign the diffuser material to <strong>Emission Material</strong>.</li>
+<li>Set the emission color to match the bulb (yellow-white for headlights).</li>
+</ol>
+<p>When the light's intensity ramps up, the emission color ramps up too — the bulb glows.</p>
+<h2 id="lens-flares">Lens Flares</h2>
+<p>RCC ships with lens flare prefabs that work across all three render pipelines:</p>
+<ul>
+<li><strong>Built-in</strong> — uses Unity's classic <code>LensFlare</code> component.</li>
+<li><strong>URP</strong> — uses <code>LensFlareComponentSRP</code>.</li>
+<li><strong>HDRP</strong> — uses <code>LensFlareComponentSRP</code> with different defaults.</li>
+</ul>
+<p>When the Render Pipeline Converter runs, it swaps the lens flare components on every RCC light automatically. You don't need to manage this by hand.</p>
+<h3 id="disabling-lens-flares">Disabling Lens Flares</h3>
+<p>Lens flares are aesthetic but can be distracting (especially with multiple cars in a scene at night). To disable globally:</p>
+<ol>
+<li>In <code>RCC_Settings.asset</code>, find each "Lights as vertex lights" toggle and decide if you want pixel or vertex lighting.</li>
+<li>Per-vehicle, uncheck <strong>Use Lens Flare</strong> on each <code>RCC_Light</code>.</li>
+</ol>
+<p>For mobile or VR, lens flares are typically disabled for performance.</p>
+<h2 id="light-performance--vertex-vs-pixel-lighting">Light Performance — Vertex vs Pixel Lighting</h2>
+<p>A "real-time pixel light" is computed per pixel and looks great but is expensive. A "vertex light" is computed per vertex and is much cheaper but less crisp.</p>
+<p><code>RCC_Settings</code> has toggles for each light type:</p>
+<ul>
+<li><strong>Use Head Lights As Vertex Lights</strong> — usually false (head lights look bad as vertex).</li>
+<li><strong>Use Brake Lights As Vertex Lights</strong> — usually true (brake lights are small and a per-pixel light is overkill).</li>
+<li><strong>Use Reverse Lights As Vertex Lights</strong> — usually true.</li>
+<li><strong>Use Indicator Lights As Vertex Lights</strong> — usually true.</li>
+<li><strong>Use Other Lights As Vertex Lights</strong> — usually true.</li>
+</ul>
+<p>If you're targeting mobile and seeing frame drops at night when many vehicles are visible, turn more of these to vertex.</p>
+<h2 id="light-damage-integration">Light Damage Integration</h2>
+<p>The damage system can break individual lights. See <strong><a href="12_DamageSystem.html">12 — Damage System</a></strong> for the full picture. In short: enable <strong>Use Light Damage</strong> on the vehicle's <code>RCC_Damage</code> section, and lights will stop emitting after enough impacts in their vicinity.</p>
+<p>When a light is broken, it stops contributing to the scene. Repair via <code>RCC.Repair(carController)</code> restores it.</p>
+<h2 id="light-events">Light Events</h2>
+<p>You can subscribe to indicator and headlight events through <code>RCC_Events</code>:</p>
+<pre><code class="language-csharp">using UnityEngine;
+
+public class IndicatorSound : MonoBehaviour {
+    public AudioSource clickSound;
+
+    void OnEnable() {
+        RCC_Events.OnIndicatorLeft += PlayClick;
+        RCC_Events.OnIndicatorRight += PlayClick;
+    }
+
+    void OnDisable() {
+        RCC_Events.OnIndicatorLeft -= PlayClick;
+        RCC_Events.OnIndicatorRight -= PlayClick;
+    }
+
+    void PlayClick() {
+        clickSound.Play();
+    }
+}
+</code></pre>
+<p>The events fire when the input toggles, regardless of whether the indicator was on or off. To check current state, query the vehicle directly:</p>
+<pre><code class="language-csharp">if (vehicle.indicatorsOn == RCC_CarControllerV4.IndicatorsOn.Left) { ... }
+</code></pre>
+<p>(Field name may vary slightly — check <code>RCC_CarControllerV4.cs</code> for the exact API in your version.)</p>
+<h2 id="render-pipeline-considerations">Render Pipeline Considerations</h2>
+<h3 id="built-in-render-pipeline">Built-in Render Pipeline</h3>
+<ul>
+<li>Light intensity uses Unity's classic scale (0–8 typical).</li>
+<li>Lens flares use the legacy <code>LensFlare</code> component.</li>
+<li>No special setup needed.</li>
+</ul>
+<h3 id="urp-universal-render-pipeline">URP (Universal Render Pipeline)</h3>
+<ul>
+<li>Light intensity uses a similar 0–8 scale.</li>
+<li>Lens flares use the modern <code>LensFlareComponentSRP</code>.</li>
+<li>Make sure your URP Asset has <strong>Additional Lights</strong> set to <strong>Per Pixel</strong> if you want multiple vehicle lights at night. The default is Vertex which makes brake/indicator lights look blocky.</li>
+</ul>
+<h3 id="hdrp-high-definition-render-pipeline">HDRP (High Definition Render Pipeline)</h3>
+<ul>
+<li>Light intensity uses <strong>lumens</strong> — much larger numbers (300–3000 for headlights).</li>
+<li>Lens flares use <code>LensFlareComponentSRP</code> with the lumen-aware brightness defaults.</li>
+<li>HDRP defaults to Volumetric lights — turn off Volumetric on vehicle lights to avoid the "fog" effect inside the cabin.</li>
+</ul>
+<p>When you run the Render Pipeline Converter, RCC adjusts intensities for you. If you set up custom lights yourself, you may need to manually re-tune intensity per pipeline.</p>
+<h2 id="tuning-light-intensity-for-realism">Tuning Light Intensity for Realism</h2>
+<p>A good rule of thumb:</p>
+<ul>
+<li><strong>Headlights</strong> at night: 2 (Built-in / URP) or 2000 lumens (HDRP).</li>
+<li><strong>Brake lights</strong> when braking: 1.5 (Built-in / URP) or 800 lumens (HDRP).</li>
+<li><strong>Reverse lights</strong> when reversing: 0.5 (Built-in / URP) or 500 lumens (HDRP).</li>
+<li><strong>Indicators</strong> when blinking: 0.8 (Built-in / URP) or 400 lumens (HDRP).</li>
+<li><strong>Interior</strong> at night: 0.3 (Built-in / URP) or 200 lumens (HDRP).</li>
+</ul>
+<p>These are starting points — adjust based on your scene's ambient lighting.</p>
+<h2 id="common-light-issues">Common Light Issues</h2>
+<h3 id="headlights-dont-turn-on">"Headlights don't turn on"</h3>
+<p>Check that you've added the right <code>lightType</code> to the RCC_Light component. A light with <code>lightType = BrakeLight</code> won't turn on when you press the headlight key.</p>
+<p>Also verify your scene has an <code>RCC_InputManager</code> and that the headlight input is bound in the Input Actions asset.</p>
+<h3 id="lights-look-blown-out-at-night">"Lights look blown out at night"</h3>
+<p>Lower the intensity. Try halving it. HDRP especially is sensitive to high lumen counts.</p>
+<h3 id="lights-dont-cast-light-on-the-scene-just-glow-on-themselves">"Lights don't cast light on the scene, just glow on themselves"</h3>
+<p>The Unity Light component might be disabled, or its <strong>Range</strong> is too short. Increase Range to ~30 meters for headlights, ~5 meters for brake lights.</p>
+<h3 id="indicators-dont-blink-theyre-just-on-solid">"Indicators don't blink, they're just on solid"</h3>
+<p>The <code>RCC_Light</code> component might be set to the wrong <code>lightType</code>. Indicator lights need <code>IndicatorLeft</code> or <code>IndicatorRight</code>, not <code>BrakeLight</code>.</p>
+<h3 id="lens-flare-appears-even-during-the-day">"Lens flare appears even during the day"</h3>
+<p>Lens flares always render. To make them appear only at night, write a script that toggles <code>useLensFlare</code> on every <code>RCC_Light</code> based on your day/night system.</p>
+<h2 id="adding-a-custom-light-type">Adding a Custom Light Type</h2>
+<p>If RCC's built-in light types don't cover your use case (e.g., a custom "police siren" flashing red/blue, or a "warning beacon"), you have two options:</p>
+<ol>
+<li><strong>Use <code>RCC_PoliceSiren</code></strong> — included specifically for police-style lights. See <code>Scripts/RCC_PoliceSiren.cs</code>.</li>
+<li><strong>Write your own</strong> — create a MonoBehaviour that drives a <code>Light</code> component based on whatever logic you need. Don't modify <code>RCC_Light</code>.</li>
+</ol>
+<p>For example, a beacon that flashes amber once per second:</p>
+<pre><code class="language-csharp">public class WarningBeacon : MonoBehaviour {
+    public Light beaconLight;
+    public float flashRate = 1f;
+    public float maxIntensity = 2f;
+
+    void Update() {
+        beaconLight.intensity = Mathf.PingPong(Time.time * flashRate, 1f) * maxIntensity;
+    }
+}
+</code></pre>
+<h2 id="next-steps">Next Steps</h2>
+<ul>
+<li><strong><a href="12_DamageSystem.html">12 — Damage System</a></strong> — light damage configuration.</li>
+<li><strong><a href="15_AudioSystem.html">15 — Audio System</a></strong> — indicator click sound and other audio.</li>
+<li><strong><a href="22_RenderPipelines.html">22 — URP &amp; HDRP Conversion</a></strong> — pipeline-specific intensity tuning.</li>
+</ul>
+</div>
+<div class="footer">
+Generated from: 14_LightsSystem.md<br>
+Date: 2026-05-22 00:32<br>
+© 2014 - 2026 BoneCracker Games — Realistic Car Controller V5.0.0
+</div>
+</body>
+</html>

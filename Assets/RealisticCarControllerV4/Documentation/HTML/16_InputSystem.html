@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Input System</title>
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    background: #f8f9fa;
+}
+.content {
+    background: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+h1 { color: #2c3e50; margin-top: 0; padding-bottom: 0.3em; border-bottom: 2px solid #eee; }
+h2 { color: #34495e; margin-top: 1.5em; padding-bottom: 0.2em; border-bottom: 1px solid #eee; }
+h3, h4 { color: #34495e; margin-top: 1.2em; }
+h5, h6 { color: #34495e; margin-top: 1.0em; }
+code {
+    background: #f4f4f4;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.9em;
+}
+pre {
+    background: #2d2d2d;
+    color: #f8f8f2;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
+    margin: 1em 0;
+    font-size: 0.9em;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+    color: #f8f8f2;
+    white-space: pre;
+}
+blockquote {
+    border-left: 4px solid #3498db;
+    margin: 1em 0;
+    padding: 0.5em 0 0.5em 20px;
+    color: #555;
+    background: #f9f9f9;
+}
+blockquote p { margin: 0.4em 0; }
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px 12px;
+    text-align: left;
+    vertical-align: top;
+}
+th {
+    background: #f4f4f4;
+    font-weight: bold;
+}
+tr:nth-child(even) { background: #f9f9f9; }
+a { color: #3498db; text-decoration: none; transition: color 0.2s; }
+a:hover { color: #2980b9; text-decoration: underline; }
+ul, ol { margin: 1em 0; padding-left: 30px; }
+li { margin: 0.4em 0; }
+li > ul, li > ol { margin: 0.3em 0; }
+hr { border: none; border-top: 2px solid #eee; margin: 2em 0; }
+p { margin: 1em 0; }
+.footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    color: #999;
+    font-size: 0.9em;
+    text-align: center;
+}
+
+</style>
+</head>
+<body>
+<div class="content">
+<h1 id="input-system">Input System</h1>
+<p>RCC uses Unity's modern <strong>Input System</strong> package (not the legacy <code>Input.GetAxis</code> API). This document explains the full input pipeline: how keyboard and gamepad input reaches the vehicle, how to rebind keys, how mobile input differs, and how to add new inputs.</p>
+<p>If you haven't installed the Input System package yet, do that first — see <strong><a href="02_HowToInstallRCC.html">02 — How to Install RCC</a></strong>.</p>
+<h2 id="the-input-pipeline">The Input Pipeline</h2>
+<pre><code>Physical Device (Keyboard / Gamepad / Touch / Wheel)
+          ↓
+RCC_InputActions.inputactions  (Input System binding asset)
+          ↓
+RCC_InputActions.cs  (auto-generated C# wrapper)
+          ↓
+RCC_InputManager (singleton, runs in Update)
+          ↓
+RCC_Inputs struct (throttle, brake, steer, etc.)
+          ↓
+RCC_CarControllerV4 reads inputs in FixedUpdate
+          ↓
+Vehicle moves
+</code></pre>
+<p>Every input — accelerating, braking, steering, shifting gears, toggling lights — flows through this pipeline. The key is the <code>RCC_Inputs</code> struct in the middle: it's a snapshot of what the player is doing right now, and every vehicle reads from it.</p>
+<h2 id="the-input-actions-asset">The Input Actions Asset</h2>
+<p>The binding configuration lives in:</p>
+<pre><code>Assets/RealisticCarControllerV4/Resources/RCC Assets/RCC_InputActions.inputactions
+</code></pre>
+<p>Open it by double-clicking. The Unity Input Actions editor opens, showing all the action maps and bindings.</p>
+<h3 id="action-maps">Action Maps</h3>
+<p>The asset has these action maps:</p>
+<table>
+<thead>
+<tr>
+<th>Action Map</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Vehicle</strong></td>
+<td>Standard driving actions: throttle, brake, steer, etc.</td>
+</tr>
+<tr>
+<td><strong>Camera</strong></td>
+<td>Camera control: change mode, orbit, look-back.</td>
+</tr>
+<tr>
+<td><strong>Optional</strong></td>
+<td>Indicator toggles, headlights, slow motion, replay.</td>
+</tr>
+</tbody>
+</table>
+<p>You can enable/disable maps independently — useful for, e.g., disabling the Vehicle map during a cutscene but keeping the Camera map active so the player can still look around.</p>
+<h3 id="default-bindings">Default Bindings</h3>
+<p>Each action has bindings for keyboard, gamepad, and (where applicable) mobile UI. The table in <strong><a href="04_DemoScenes.html">04 — Demo Scenes</a></strong> lists all the default bindings.</p>
+<h3 id="rebinding">Rebinding</h3>
+<p>To change a key:</p>
+<ol>
+<li>Open <code>RCC_InputActions.inputactions</code>.</li>
+<li>Expand the action you want to change (e.g., <strong>Vehicle / Throttle</strong>).</li>
+<li>Click the binding row to edit.</li>
+<li>Click <strong>Listen</strong> and press the new key (or gamepad button).</li>
+<li>Save.</li>
+</ol>
+<p>Changes apply immediately the next time you enter Play mode.</p>
+<h3 id="adding-a-new-binding">Adding a New Binding</h3>
+<p>If you want to add a second key for an existing action (e.g., both <strong>W</strong> and <strong>Up Arrow</strong> for throttle):</p>
+<ol>
+<li>Open the action.</li>
+<li>Click the <strong>+</strong> next to the action name.</li>
+<li>Add the new binding.</li>
+<li>Save.</li>
+</ol>
+<h2 id="rcc_inputmanager--the-singleton">RCC_InputManager — The Singleton</h2>
+<p>The Input Manager is a runtime singleton (<code>RCC_InputManager.Instance</code>). It:</p>
+<ul>
+<li>Loads the <code>RCC_InputActions</code> asset on Awake.</li>
+<li>Enables the action maps that should be active.</li>
+<li>Polls actions in <code>Update</code> and fills the <code>RCC_Inputs</code> struct.</li>
+<li>Fires <code>RCC_Events</code> for input toggles (engine start, indicators, gear shift, etc.).</li>
+</ul>
+<p>You don't usually touch this directly — it sets itself up automatically. But the public API lets you query current input state from any script:</p>
+<pre><code class="language-csharp">RCC_Inputs currentInputs = RCC_InputManager.Instance.GetInputs();
+float currentThrottle = currentInputs.throttleInput;
+</code></pre>
+<h2 id="the-rcc_inputs-struct">The RCC_Inputs Struct</h2>
+<p>The struct holds every numeric input value:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Range</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>throttleInput</code></td>
+<td>0 to 1</td>
+<td>Accelerator amount.</td>
+</tr>
+<tr>
+<td><code>brakeInput</code></td>
+<td>0 to 1</td>
+<td>Brake amount.</td>
+</tr>
+<tr>
+<td><code>steerInput</code></td>
+<td>-1 to 1</td>
+<td>Steering direction. -1 = full left, 1 = full right.</td>
+</tr>
+<tr>
+<td><code>clutchInput</code></td>
+<td>0 to 1</td>
+<td>Clutch disengagement. 0 = engaged, 1 = fully disengaged.</td>
+</tr>
+<tr>
+<td><code>handbrakeInput</code></td>
+<td>0 to 1</td>
+<td>Handbrake amount.</td>
+</tr>
+<tr>
+<td><code>boostInput</code></td>
+<td>0 to 1</td>
+<td>NOS / boost amount.</td>
+</tr>
+<tr>
+<td><code>gearInput</code></td>
+<td>int</td>
+<td>Gear index for direct gear selection.</td>
+</tr>
+<tr>
+<td><code>orbitX</code></td>
+<td>float</td>
+<td>Camera orbit horizontal.</td>
+</tr>
+<tr>
+<td><code>orbitY</code></td>
+<td>float</td>
+<td>Camera orbit vertical.</td>
+</tr>
+<tr>
+<td><code>scroll</code></td>
+<td>Vector2</td>
+<td>Mouse wheel / camera zoom.</td>
+</tr>
+</tbody>
+</table>
+<p>All values are clamped to their respective ranges by the input manager.</p>
+<h2 id="reading-input-in-your-own-scripts">Reading Input in Your Own Scripts</h2>
+<p>If you want to read RCC's input from your own script (e.g., to play a custom sound when the player presses gas hard):</p>
+<pre><code class="language-csharp">using UnityEngine;
+
+public class GasMonitor : MonoBehaviour {
+    void Update() {
+        RCC_Inputs inputs = RCC_InputManager.Instance.GetInputs();
+        if (inputs.throttleInput &gt; 0.9f) {
+            // Full throttle — do something.
+        }
+    }
+}
+</code></pre>
+<p>This is the read-only path. To <strong>inject</strong> custom input into a vehicle (e.g., for AI or replay), see <strong><a href="17_HowToOverrideInputs.html">17 — Overriding Inputs</a></strong>.</p>
+<h2 id="listening-for-input-events">Listening for Input Events</h2>
+<p>For one-shot inputs (start engine, shift up, toggle headlights), the cleanest pattern is event subscription:</p>
+<pre><code class="language-csharp">using UnityEngine;
+
+public class EngineStartHandler : MonoBehaviour {
+    void OnEnable() {
+        RCC_Events.OnStartStopEngine += HandleEngineToggle;
+    }
+
+    void OnDisable() {
+        RCC_Events.OnStartStopEngine -= HandleEngineToggle;
+    }
+
+    void HandleEngineToggle() {
+        Debug.Log(&quot;Engine toggle pressed!&quot;);
+        // Show key animation, play special sound, etc.
+    }
+}
+</code></pre>
+<p>The full event list is in <strong><a href="24_EventsSystem.html">24 — Events System</a></strong>.</p>
+<h2 id="gamepad-support">Gamepad Support</h2>
+<p>The default bindings work with any <strong>XInput</strong>-compatible controller (Xbox One, Xbox Series, third-party controllers). PlayStation controllers (DualShock 4, DualSense) also work — Unity Input System has built-in support.</p>
+<p>If your gamepad isn't detected:</p>
+<ol>
+<li>Open the Input Debug window: <strong>Window → Analysis → Input Debugger</strong>.</li>
+<li>Look for your device in the Devices list.</li>
+<li>If it's not listed, the device drivers may be missing — check the manufacturer's site.</li>
+</ol>
+<p>For older controllers (DirectInput / generic USB gamepads), the system may or may not detect them. As a workaround, use Steam Input or a tool like JoyToKey to map the controller to keyboard inputs that the Input System understands.</p>
+<h2 id="steering-wheels">Steering Wheels</h2>
+<p>For Logitech G29, G27, G923, Thrustmaster, and other USB / FFB-capable wheels, see <strong><a href="25_SteeringWheels.html">25 — Steering Wheels</a></strong> for a detailed setup.</p>
+<h2 id="mobile-input">Mobile Input</h2>
+<p>On mobile platforms (iOS, Android), the default Input System path is not used. Instead, RCC reads from <code>RCC_MobileButtons</code> — a static class populated by the on-screen UI.</p>
+<h3 id="how-to-switch-to-mobile-mode">How to Switch to Mobile Mode</h3>
+<p>In <code>RCC_Settings.asset</code>, enable <strong>Mobile Controller Enabled</strong>. Pick the mobile controller type:</p>
+<ul>
+<li><strong>Touch Screen</strong> — separate buttons for throttle / brake.</li>
+<li><strong>Gyro</strong> — device tilt for steering.</li>
+<li><strong>Steering Wheel</strong> — on-screen rotatable steering wheel.</li>
+<li><strong>Joystick</strong> — on-screen joystick.</li>
+</ul>
+<p>Then in the scene, use the <code>RCC_Canvas (AIO).prefab</code> UI canvas, which contains all the mobile UI widgets. The widgets are auto-hidden on desktop platforms.</p>
+<h3 id="mobile-input-settings">Mobile Input Settings</h3>
+<p>In <code>RCC_Settings</code>:</p>
+<ul>
+<li><strong>UI Button Sensitivity</strong> — how quickly throttle/brake ramp up (default 10).</li>
+<li><strong>UI Button Gravity</strong> — how quickly they release (default 10).</li>
+<li><strong>Gyro Sensitivity</strong> — steering multiplier for the gyroscope mode.</li>
+</ul>
+<p>See <strong><a href="18_MobileSetup.html">18 — Mobile Setup</a></strong> for full mobile configuration.</p>
+<h2 id="disabling-input">Disabling Input</h2>
+<p>Three ways to make a vehicle stop accepting input:</p>
+<h3 id="1-disable-per-vehicle">1. Disable Per-Vehicle</h3>
+<pre><code class="language-csharp">carController.SetCanControl(false);
+</code></pre>
+<p>The vehicle ignores all input (throttle, steer, brake) but stays in the scene and physics still applies.</p>
+<h3 id="2-disable-input-system-maps">2. Disable Input System Maps</h3>
+<p>If you want to disable input globally (e.g., during a pause menu):</p>
+<pre><code class="language-csharp">RCC_InputManager.Instance.DisableInputs();
+// later:
+RCC_InputManager.Instance.EnableInputs();
+</code></pre>
+<h3 id="3-use-override-inputs">3. Use Override Inputs</h3>
+<p>For AI or replay, use the override path:</p>
+<pre><code class="language-csharp">carController.overrideInputs = true;
+// then feed inputs each frame via:
+carController.OverrideInputs(myInputsStruct);
+</code></pre>
+<p>This <strong>bypasses</strong> the input manager entirely. See <strong><a href="17_HowToOverrideInputs.html">17 — Overriding Inputs</a></strong>.</p>
+<h2 id="common-input-issues">Common Input Issues</h2>
+<h3 id="pressing-w-doesnt-accelerate-the-car">"Pressing W doesn't accelerate the car"</h3>
+<p>Most common cause: the Unity Input System backend isn't enabled. Open <strong>Edit → Project Settings → Player → Other Settings → Active Input Handling</strong> and set to <strong>Input System Package (New)</strong> or <strong>Both</strong>. Restart Unity.</p>
+<h3 id="gamepad-controls-work-but-keyboard-doesnt-or-vice-versa">"Gamepad controls work but keyboard doesn't (or vice versa)"</h3>
+<p>The Input Actions asset's bindings may have been modified. Open <code>RCC_InputActions.inputactions</code> and verify both keyboard and gamepad bindings exist for the actions you're testing.</p>
+<h3 id="steering-is-too-fast--too-slow">"Steering is too fast / too slow"</h3>
+<p>In the Input Actions asset, the steer action has a <strong>Processors</strong> chain (typically <code>Normalize Vector 2</code> for stick input). You can add a <code>Scale</code> processor with a multiplier to tune the input strength globally.</p>
+<p>For a per-vehicle adjustment, modify <code>steeringSensitivityFactor</code> on the controller.</p>
+<h3 id="inputs-are-stale--take-a-moment-to-update">"Inputs are stale / take a moment to update"</h3>
+<p>The input manager runs in Update, so input is at most one frame stale. In a 60 FPS game, that's 16 ms — usually unnoticeable. If you're seeing larger delays, it's probably the vehicle's input smoothing settings (clutch inertia, steer sensitivity), not the input system itself.</p>
+<h3 id="i-want-to-rebind-keys-at-runtime">"I want to rebind keys at runtime"</h3>
+<p>The Input System supports interactive rebinding. Search the Unity Input System docs for "rebinding UI." This is non-trivial to set up but Unity provides a sample. RCC doesn't ship its own rebinding UI but works fine with one you build.</p>
+<h2 id="adding-a-new-input">Adding a New Input</h2>
+<p>If you want to add a custom action (e.g., "Honk Horn" bound to <strong>H</strong>):</p>
+<ol>
+<li>Open <code>RCC_InputActions.inputactions</code>.</li>
+<li>In the Vehicle action map, click <strong>+</strong> to add a new action.</li>
+<li>Name it <code>Horn</code>.</li>
+<li>Set its Action Type to <strong>Button</strong>.</li>
+<li>Add a binding (e.g., Keyboard / H).</li>
+<li>Save.</li>
+<li>In your own script:</li>
+</ol>
+<pre><code class="language-csharp">using UnityEngine.InputSystem;
+
+public class HornHandler : MonoBehaviour {
+    private RCC_InputActions actions;
+
+    void Awake() {
+        actions = new RCC_InputActions();
+    }
+
+    void OnEnable() {
+        actions.Vehicle.Enable();
+        actions.Vehicle.Horn.performed += OnHorn;
+    }
+
+    void OnDisable() {
+        actions.Vehicle.Horn.performed -= OnHorn;
+        actions.Vehicle.Disable();
+    }
+
+    void OnHorn(InputAction.CallbackContext ctx) {
+        Debug.Log(&quot;HONK!&quot;);
+    }
+}
+</code></pre>
+<p>You're not modifying RCC — your script is just another consumer of the same Input Actions asset.</p>
+<h2 id="next-steps">Next Steps</h2>
+<ul>
+<li><strong><a href="17_HowToOverrideInputs.html">17 — Overriding Inputs</a></strong> — feeding custom inputs into a vehicle.</li>
+<li><strong><a href="18_MobileSetup.html">18 — Mobile Setup</a></strong> — mobile-specific input.</li>
+<li><strong><a href="25_SteeringWheels.html">25 — Steering Wheels</a></strong> — Logitech and Thrustmaster setup.</li>
+<li><strong><a href="24_EventsSystem.html">24 — Events System</a></strong> — listening for input events.</li>
+</ul>
+</div>
+<div class="footer">
+Generated from: 16_InputSystem.md<br>
+Date: 2026-05-22 00:32<br>
+© 2014 - 2026 BoneCracker Games — Realistic Car Controller V5.0.0
+</div>
+</body>
+</html>

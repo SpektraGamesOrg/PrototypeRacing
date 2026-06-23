@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Quick Start — Drive Your First Vehicle in Five Minutes</title>
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    background: #f8f9fa;
+}
+.content {
+    background: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+h1 { color: #2c3e50; margin-top: 0; padding-bottom: 0.3em; border-bottom: 2px solid #eee; }
+h2 { color: #34495e; margin-top: 1.5em; padding-bottom: 0.2em; border-bottom: 1px solid #eee; }
+h3, h4 { color: #34495e; margin-top: 1.2em; }
+h5, h6 { color: #34495e; margin-top: 1.0em; }
+code {
+    background: #f4f4f4;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.9em;
+}
+pre {
+    background: #2d2d2d;
+    color: #f8f8f2;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
+    margin: 1em 0;
+    font-size: 0.9em;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+    color: #f8f8f2;
+    white-space: pre;
+}
+blockquote {
+    border-left: 4px solid #3498db;
+    margin: 1em 0;
+    padding: 0.5em 0 0.5em 20px;
+    color: #555;
+    background: #f9f9f9;
+}
+blockquote p { margin: 0.4em 0; }
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px 12px;
+    text-align: left;
+    vertical-align: top;
+}
+th {
+    background: #f4f4f4;
+    font-weight: bold;
+}
+tr:nth-child(even) { background: #f9f9f9; }
+a { color: #3498db; text-decoration: none; transition: color 0.2s; }
+a:hover { color: #2980b9; text-decoration: underline; }
+ul, ol { margin: 1em 0; padding-left: 30px; }
+li { margin: 0.4em 0; }
+li > ul, li > ol { margin: 0.3em 0; }
+hr { border: none; border-top: 2px solid #eee; margin: 2em 0; }
+p { margin: 1em 0; }
+.footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    color: #999;
+    font-size: 0.9em;
+    text-align: center;
+}
+
+</style>
+</head>
+<body>
+<div class="content">
+<h1 id="quick-start--drive-your-first-vehicle-in-five-minutes">Quick Start — Drive Your First Vehicle in Five Minutes</h1>
+<p>This is the fastest possible path from "RCC just imported" to "I'm driving a vehicle in my own scene." We're going to take an empty scene, add a Scene Manager, drop in a vehicle prefab, add a camera, add a UI, and press Play.</p>
+<p>If you haven't installed RCC yet, do <strong><a href="02_HowToInstallRCC.html">02 — How to Install RCC</a></strong> first. This guide assumes the package is in your project and there are no compile errors.</p>
+<h2 id="step-1--create-a-new-scene">Step 1 — Create a New Scene</h2>
+<p>In the menu bar, click <strong>File → New Scene</strong>. Pick the <strong>Basic (Built-in)</strong> template. Save the scene as <strong>MyFirstRCC.unity</strong> somewhere in your <code>Assets/</code> folder.</p>
+<p>You should now have an empty scene with just a Main Camera and a Directional Light. We're going to delete the default Main Camera in a moment because RCC provides its own camera.</p>
+<h2 id="step-2--add-a-ground-plane">Step 2 — Add a Ground Plane</h2>
+<p>Without a ground there's nothing to drive on. In the menu bar, click <strong>GameObject → 3D Object → Plane</strong>. A flat plane appears at the world origin. With the plane selected, in the Inspector set its <strong>Scale</strong> to <strong>(10, 1, 10)</strong> so it's big enough to drive on.</p>
+<p>Optionally, give it a color: drag any material onto the plane. The "Default-Material" works fine for a first test.</p>
+<h2 id="step-3--add-the-rcc-scene-manager">Step 3 — Add the RCC Scene Manager</h2>
+<p>Every RCC scene needs an <code>RCC_SceneManager</code>. There are two ways to add it:</p>
+<p><strong>Easy way (recommended):</strong> In the menu bar, click <strong>Tools → BoneCracker Games → Realistic Car Controller → Create → Managers → Scene Manager</strong>. A GameObject called <code>RCC_SceneManager</code> appears in your Hierarchy.</p>
+<p><strong>Manual way:</strong> Create an empty GameObject (<code>GameObject → Create Empty</code>), name it <code>RCC Scene Manager</code>, and add the <code>RCC_SceneManager</code> component to it via the Inspector.</p>
+<p>You don't need to configure anything on the Scene Manager — it auto-discovers vehicles and cameras at runtime.</p>
+<h2 id="step-4--add-a-vehicle">Step 4 — Add a Vehicle</h2>
+<p>In the Project window, navigate to:</p>
+<pre><code>Assets/RealisticCarControllerV4/Prefabs/Vehicles/
+</code></pre>
+<p>Drag any prefab into the scene — let's use <strong>M3_E46_New.prefab</strong>. The car appears at world origin and falls onto the ground plane (give it a moment for the physics to settle).</p>
+<p>Position it where you want the player to start. Set the Y position to about <strong>0.5</strong> so the wheels are above the ground; physics will settle it onto the surface during Play.</p>
+<h2 id="step-5--tell-rcc-this-is-the-player-vehicle">Step 5 — Tell RCC This Is the Player Vehicle</h2>
+<p>Select the car in the Hierarchy and look at its Inspector. At the top you'll see the <code>RCC_CarControllerV4</code> component. There's no checkbox saying "Is Player" — instead, RCC handles this in code at runtime.</p>
+<p>You have two options:</p>
+<p><strong>Option A — Tag the vehicle "Player":</strong> Click the <strong>Tag</strong> dropdown at the top of the Inspector and set it to <strong>Player</strong>. The Scene Manager auto-registers any vehicle tagged "Player" on startup.</p>
+<p><strong>Option B — Register manually via code:</strong> Create a tiny script that calls <code>RCC.RegisterPlayerVehicle()</code> on Start. Example:</p>
+<pre><code class="language-csharp">using UnityEngine;
+
+public class RegisterMyCar : MonoBehaviour {
+    public RCC_CarControllerV4 carToControl;
+
+    void Start() {
+        RCC.RegisterPlayerVehicle(carToControl);
+    }
+}
+</code></pre>
+<p>Drop this script on any GameObject and assign your car to its <code>carToControl</code> field. Both options achieve the same thing — the car becomes the active player vehicle, accepts input, and gets the dashboard UI bound to it.</p>
+<p>For this guide, use <strong>Option A</strong> (tag = Player). Simpler.</p>
+<h2 id="step-6--add-the-rcc-camera">Step 6 — Add the RCC Camera</h2>
+<p>In the menu bar, click <strong>Tools → BoneCracker Games → Realistic Car Controller → Create → Cameras → Add RCC Camera To Scene</strong>. An <code>RCC Camera</code> GameObject is added to the Hierarchy.</p>
+<p>You can now safely <strong>delete the default Main Camera</strong> that was in the scene — RCC's camera replaces it. The RCC camera will follow whichever vehicle is registered as the player vehicle.</p>
+<h2 id="step-7--add-the-dashboard-ui">Step 7 — Add the Dashboard UI</h2>
+<p>In the Project window, find:</p>
+<pre><code>Assets/RealisticCarControllerV4/Prefabs/UI/RCC_Canvas.prefab
+</code></pre>
+<p>Drag it into the scene. This gives you a speedometer, RPM gauge, gear indicator, and other dashboard widgets in the bottom corner.</p>
+<p>If you want full mobile UI (touch buttons, steering wheel, joystick), use <strong>RCC_Canvas (AIO).prefab</strong> instead.</p>
+<h2 id="step-8--press-play">Step 8 — Press Play</h2>
+<p>Click the <strong>Play</strong> button at the top of the editor.</p>
+<p>You should see:
+- The car spawned, wheels settled on the plane, engine started (you'll hear it idling).
+- A speedometer in the bottom-right corner of the screen, reading 0 km/h.
+- The camera following the car from behind.</p>
+<p>Press <strong>W</strong> (or up arrow) — the car accelerates forward. Press <strong>A / D</strong> to steer. Press <strong>S</strong> to brake. Press <strong>C</strong> to cycle camera modes (TPS → Hood → Wheel → Fixed → Cinematic → Top → back to TPS).</p>
+<p>That's it. You have a working RCC scene.</p>
+<h2 id="going-further">Going Further</h2>
+<p>Now that you have a working baseline, here are the most common next steps:</p>
+<h3 id="try-a-different-vehicle">Try a Different Vehicle</h3>
+<p>Delete your current car and drag in another prefab from <code>Prefabs/Vehicles/</code>. Tag it Player. Press Play. Each prefab has different mass, engine torque, and gear ratios, so they feel quite different.</p>
+<h3 id="switch-the-driving-behavior">Switch the Driving Behavior</h3>
+<p>The same vehicle drives very differently depending on which behavior preset is active. In any script, call:</p>
+<pre><code class="language-csharp">RCC.SetBehavior(0); // 0 = Simulator
+RCC.SetBehavior(1); // 1 = Drift
+RCC.SetBehavior(2); // 2 = Arcade
+</code></pre>
+<p>Or change the default by opening <code>Assets/RealisticCarControllerV4/Resources/RCC Assets/RCC_Settings.asset</code> and changing the <strong>Behavior Selected Index</strong> field at the top. See <strong><a href="10_BehaviorPresets.html">10 — Behavior Presets</a></strong>.</p>
+<h3 id="add-a-better-environment">Add a Better Environment</h3>
+<p>The plane is fine for testing, but for a real test drive you want walls, ramps, and turns. Open one of the demo city scenes, copy the city environment prefab, and paste it into your scene. The included city has appropriate physic materials so ground detection works automatically.</p>
+<h3 id="add-an-ai-opponent">Add an AI Opponent</h3>
+<p>In the menu bar, click <strong>Tools → BoneCracker Games → Realistic Car Controller → Create → Add AI Waypoints Container To Scene</strong>. Drop waypoint markers in a loop around your test environment. Then drag in <code>Prefabs/Vehicles/Skyline (AI Chaser).prefab</code>, expand its inspector, assign your waypoints container to the <code>Target Container</code> field, and press Play. The AI will follow your waypoints.</p>
+<p>See <strong><a href="19_AISystem.html">19 — AI System</a></strong> for the full setup.</p>
+<h3 id="spawn-vehicles-at-runtime">Spawn Vehicles at Runtime</h3>
+<p>For a car selection menu or any "spawn cars from code" gameplay, use the <code>RCC</code> static API:</p>
+<pre><code class="language-csharp">using UnityEngine;
+
+public class SpawnCarOnPress : MonoBehaviour {
+    public RCC_CarControllerV4 vehiclePrefab;
+    public Transform spawnPoint;
+
+    void Update() {
+        if (Input.GetKeyDown(KeyCode.B)) {
+            RCC.SpawnRCC(vehiclePrefab,
+                         spawnPoint.position,
+                         spawnPoint.rotation,
+                         registerAsPlayerVehicle: true,
+                         isControllable: true,
+                         isEngineRunning: true);
+        }
+    }
+}
+</code></pre>
+<p>(This snippet uses <code>Input.GetKeyDown</code> from the old Input class for brevity. Once you're past quick prototyping you'll want to switch to the Input System — see <strong><a href="16_InputSystem.html">16 — Input System</a></strong>.)</p>
+<h3 id="make-your-own-vehicle">Make Your Own Vehicle</h3>
+<p>If you have your own 3D car model, you can turn it into an RCC vehicle with the setup wizard. See <strong><a href="07_HowToCreateNewVehicles.html">07 — Creating New Vehicles</a></strong>.</p>
+<h2 id="what-if-nothing-works">What If Nothing Works?</h2>
+<h3 id="the-car-spawned-but-i-cant-drive-it">"The car spawned but I can't drive it"</h3>
+<p>Most likely the vehicle isn't registered as the player. Make sure you tagged it <strong>Player</strong>, OR that the Scene Manager exists in the scene, OR that a script is calling <code>RCC.RegisterPlayerVehicle()</code>.</p>
+<p>Also check the Console (<strong>Window → General → Console</strong>) for errors. Any compile error blocks Play mode from running the way you'd expect.</p>
+<h3 id="i-can-hear-the-engine-but-the-car-isnt-visible">"I can hear the engine but the car isn't visible"</h3>
+<p>Your camera is probably at world origin and the car spawned somewhere else (or vice versa). Click the car in the Hierarchy, then press <strong>F</strong> in the Scene view to frame it. Move your camera or your car so they share approximately the same area, then press Play again.</p>
+<h3 id="the-car-falls-through-the-floor">"The car falls through the floor"</h3>
+<p>Your ground plane has no collider, or its collider was disabled. Click the plane and confirm it has a <code>Mesh Collider</code> (or <code>Box Collider</code>) component active in the Inspector.</p>
+<h3 id="the-wheels-are-inside-out--pointing-wrong">"The wheels are inside out / pointing wrong"</h3>
+<p>The wheel transforms aren't aligned to the conventional axis. For the included demo prefabs this won't happen — but if it does, open the menu <strong>Tools → BoneCracker Games → Realistic Car Controller → Check Axis Orientation</strong> and follow the prompts.</p>
+<h3 id="anything-else">Anything Else</h3>
+<p>See <strong><a href="28_Troubleshooting.html">28 — Troubleshooting</a></strong> for a long list of common issues. If you're still stuck, contact support at <strong>bonecrackergames@gmail.com</strong> with a screenshot of the Console and a description of what you did.</p>
+<h2 id="next-steps">Next Steps</h2>
+<p>You have a working vehicle in your own scene. From here, you can read <strong><a href="06_HowTheSystemWorks.html">06 — How the System Works</a></strong> to understand the architecture before going deeper, or jump to whatever topic you need from the <strong><a href="00_TableOfContents.html">Table of Contents</a></strong>.</p>
+</div>
+<div class="footer">
+Generated from: 05_QuickStart.md<br>
+Date: 2026-05-22 00:32<br>
+© 2014 - 2026 BoneCracker Games — Realistic Car Controller V5.0.0
+</div>
+</body>
+</html>

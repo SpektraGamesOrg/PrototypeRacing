@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: c25271813931d814680ab7c84ef90710
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: -10
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 16296
+  packageName: Realistic Car Controller
+  packageVersion: 5.0.0
+  assetPath: Assets/RealisticCarControllerV4/Scripts/RCC_CarControllerV4.cs
+  uploadId: 920646

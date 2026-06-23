@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: b6fb5b7fc83451c40bc2ed9dcec44c23
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 16296
+  packageName: Realistic Car Controller
+  packageVersion: 5.0.0
+  assetPath: Assets/RealisticCarControllerV4/Models/Vehicles/M3_E36/M3_E36_Collider.prefab
+  uploadId: 920646

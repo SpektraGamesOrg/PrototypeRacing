@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>URP &amp; HDRP Conversion</title>
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    background: #f8f9fa;
+}
+.content {
+    background: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+h1 { color: #2c3e50; margin-top: 0; padding-bottom: 0.3em; border-bottom: 2px solid #eee; }
+h2 { color: #34495e; margin-top: 1.5em; padding-bottom: 0.2em; border-bottom: 1px solid #eee; }
+h3, h4 { color: #34495e; margin-top: 1.2em; }
+h5, h6 { color: #34495e; margin-top: 1.0em; }
+code {
+    background: #f4f4f4;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.9em;
+}
+pre {
+    background: #2d2d2d;
+    color: #f8f8f2;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
+    margin: 1em 0;
+    font-size: 0.9em;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+    color: #f8f8f2;
+    white-space: pre;
+}
+blockquote {
+    border-left: 4px solid #3498db;
+    margin: 1em 0;
+    padding: 0.5em 0 0.5em 20px;
+    color: #555;
+    background: #f9f9f9;
+}
+blockquote p { margin: 0.4em 0; }
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px 12px;
+    text-align: left;
+    vertical-align: top;
+}
+th {
+    background: #f4f4f4;
+    font-weight: bold;
+}
+tr:nth-child(even) { background: #f9f9f9; }
+a { color: #3498db; text-decoration: none; transition: color 0.2s; }
+a:hover { color: #2980b9; text-decoration: underline; }
+ul, ol { margin: 1em 0; padding-left: 30px; }
+li { margin: 0.4em 0; }
+li > ul, li > ol { margin: 0.3em 0; }
+hr { border: none; border-top: 2px solid #eee; margin: 2em 0; }
+p { margin: 1em 0; }
+.footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    color: #999;
+    font-size: 0.9em;
+    text-align: center;
+}
+
+</style>
+</head>
+<body>
+<div class="content">
+<h1 id="urp--hdrp-conversion">URP &amp; HDRP Conversion</h1>
+<p>RCC ships with <strong>Built-in Render Pipeline</strong> materials and shaders by default. If you're using <strong>URP</strong> (Universal Render Pipeline) or <strong>HDRP</strong> (High Definition Render Pipeline), you need to run the Render Pipeline Converter once to make every material, shader, lens flare, and light intensity work correctly under the new pipeline.</p>
+<p>This document explains why the converter exists, when to use it, and how to handle each pipeline.</p>
+<h2 id="why-render-pipelines-matter">Why Render Pipelines Matter</h2>
+<p>Unity supports three render pipelines that ship "in the box":</p>
+<ul>
+<li><strong>Built-in</strong> — the original Unity pipeline. Compatible with all assets shipped before 2019.</li>
+<li><strong>URP</strong> — modern, optimized for performance. Default for most new projects since 2020.</li>
+<li><strong>HDRP</strong> — physically-based, high-fidelity. For high-end PC / console.</li>
+</ul>
+<p>Each pipeline has its own shaders. A material with a Standard shader (Built-in) appears <strong>pink</strong> in URP because URP doesn't ship the Standard shader. To make a Built-in material work in URP, you must convert it to use URP's Lit shader (or a custom URP shader).</p>
+<p>The same applies to RCC's vehicle materials, dashboard materials, environment materials, and so on.</p>
+<h2 id="when-you-need-the-converter">When You Need the Converter</h2>
+<p>Run the converter when:</p>
+<ul>
+<li>You imported RCC into a URP or HDRP project and materials look pink.</li>
+<li>You switched your existing project from Built-in to URP / HDRP and RCC materials are now broken.</li>
+<li>You updated to a new Unity version and one of the pipelines reorganized its shaders.</li>
+</ul>
+<p>You <strong>don't</strong> need the converter if:</p>
+<ul>
+<li>You're staying on Built-in. RCC works out of the box.</li>
+<li>You created a fresh URP / HDRP project but haven't imported RCC yet. Import RCC first, then convert.</li>
+</ul>
+<h2 id="pre-conversion-setup">Pre-Conversion Setup</h2>
+<p>Before running the converter:</p>
+<h3 id="1-install-the-render-pipeline-package">1. Install the Render Pipeline Package</h3>
+<p>Open <strong>Window → Package Manager</strong>. From <strong>Unity Registry</strong>, install:</p>
+<ul>
+<li>For URP: <code>Universal RP</code> (<code>com.unity.render-pipelines.universal</code>).</li>
+<li>For HDRP: <code>High Definition RP</code> (<code>com.unity.render-pipelines.high-definition</code>).</li>
+</ul>
+<h3 id="2-create-a-render-pipeline-asset">2. Create a Render Pipeline Asset</h3>
+<p>Right-click in your project → <strong>Create → Rendering</strong> → and pick:</p>
+<ul>
+<li><strong>URP Asset (with Universal Renderer)</strong> for URP.</li>
+<li><strong>HDRP Asset</strong> for HDRP.</li>
+</ul>
+<h3 id="3-assign-the-asset">3. Assign the Asset</h3>
+<p>Open <strong>Edit → Project Settings → Graphics</strong>. Drag your new pipeline asset into the <strong>Scriptable Render Pipeline Settings</strong> slot.</p>
+<p>If you also have a <strong>Quality</strong> settings preset configured, assign the pipeline asset there too (Project Settings → Quality → each quality level → Rendering).</p>
+<p>Unity may prompt you to migrate your project to the new pipeline — accept.</p>
+<p>After this, your scenes will render through URP / HDRP. Most materials will appear pink at this point, including RCC's. That's expected — the converter fixes it.</p>
+<h2 id="running-the-converter">Running the Converter</h2>
+<p>In Unity:</p>
+<p><strong>Tools → BoneCracker Games → Realistic Car Controller → Render Pipeline Converter</strong></p>
+<p>A window opens with three big buttons:</p>
+<ul>
+<li><strong>Convert to URP</strong></li>
+<li><strong>Convert to HDRP</strong></li>
+<li><strong>Convert to Built-in</strong> (reverts)</li>
+</ul>
+<p>Click the one matching your project.</p>
+<h3 id="what-the-converter-does">What the Converter Does</h3>
+<p>The converter performs these steps:</p>
+<ol>
+<li><strong>Sets the compile-time define</strong>: <code>BCG_URP</code> for URP, <code>BCG_HDRP</code> for HDRP. This switches RCC's conditional compilation branches that handle pipeline differences.</li>
+<li><strong>Replaces materials</strong>: walks every material under <code>Assets/RealisticCarControllerV4/Materials/</code> and swaps the shader to the equivalent URP / HDRP shader. Material properties (color, texture, smoothness, metallic) carry over.</li>
+<li><strong>Updates lens flare components</strong>: the legacy <code>LensFlare</code> component (Built-in) is replaced with <code>LensFlareComponentSRP</code> (URP/HDRP).</li>
+<li><strong>Updates light intensity units</strong>: HDRP uses <strong>lumens</strong> (large numbers, 500-3000 typical for vehicle lights). URP and Built-in use a unitless 0-8 scale. The converter rescales intensities so lights look approximately the same after the switch.</li>
+<li><strong>Sets the HDRP volume profile</strong>: in HDRP mode, RCC instantiates the shipped Volume Profile prefab in the scene so HDRP's volumetric lighting and post-processing have something to work with.</li>
+</ol>
+<p>The conversion is <strong>scene-aware</strong> — it iterates only objects in the current scene + any RCC prefabs. It doesn't modify your own custom materials outside the RCC folder.</p>
+<h3 id="conversion-is-one-way-almost">Conversion is One-Way (Almost)</h3>
+<p>The converter is mostly idempotent — running it twice on the same pipeline doesn't break anything. But:</p>
+<ul>
+<li><strong>Converting from URP back to Built-in works</strong>, materials swap back.</li>
+<li><strong>Converting from HDRP back to Built-in works</strong>, but you may lose some fine-grained HDRP-specific tuning (volumetric fog densities, etc.).</li>
+</ul>
+<p>Always commit your work to Git before running the converter, in case something goes wrong.</p>
+<h2 id="pipeline-specific-behavior">Pipeline-Specific Behavior</h2>
+<h3 id="built-in-render-pipeline">Built-in Render Pipeline</h3>
+<ul>
+<li>Shaders: Unity Standard for body materials, Mobile/Particles for VFX.</li>
+<li>Lens flares: legacy <code>LensFlare</code> component.</li>
+<li>Light intensities: unitless, 0–8 typical.</li>
+<li>Decals: legacy Projector component (or none).</li>
+<li>Performance: medium — RCC's Built-in defaults are tuned for desktop.</li>
+</ul>
+<h3 id="urp-universal-render-pipeline">URP (Universal Render Pipeline)</h3>
+<ul>
+<li>Shaders: URP/Lit for body, URP/Unlit for transparent VFX.</li>
+<li>Lens flares: <code>LensFlareComponentSRP</code>.</li>
+<li>Light intensities: unitless, 0–8 typical (same as Built-in).</li>
+<li>Decals: URP Decal Renderer Feature (you must enable this in your URP Renderer Data asset to see decals).</li>
+<li>Performance: best out of the box for mobile.</li>
+</ul>
+<h3 id="hdrp-high-definition-render-pipeline">HDRP (High Definition Render Pipeline)</h3>
+<ul>
+<li>Shaders: HDRP/Lit for body, HDRP/Unlit for transparent VFX.</li>
+<li>Lens flares: <code>LensFlareComponentSRP</code>.</li>
+<li>Light intensities: <strong>lumens</strong> — much larger numbers (500–3000 for headlights, 300–1500 for brake lights).</li>
+<li>Decals: HDRP Decal Projector component.</li>
+<li>Performance: most expensive — HDRP is for high-end PC / console, not mobile.</li>
+</ul>
+<h2 id="urp-specific-notes">URP-Specific Notes</h2>
+<h3 id="renderer-features-required">Renderer Features Required</h3>
+<p>If your URP Asset uses the default Universal Renderer, certain RCC visuals may not appear unless you enable specific renderer features:</p>
+<ul>
+<li><strong>Decal Renderer Feature</strong> — enables decals on materials. Required for the Customization decal system.</li>
+</ul>
+<p>To add a renderer feature: select your URP Renderer Data asset in the Project window, click <strong>Add Renderer Feature</strong> at the bottom of the Inspector, and pick from the list.</p>
+<h3 id="additional-lights-mode">Additional Lights Mode</h3>
+<p>URP's URP Asset has an <strong>Additional Lights</strong> dropdown:</p>
+<ul>
+<li><strong>Disabled</strong> — only the main directional light is real-time.</li>
+<li><strong>Per Vertex</strong> — additional lights compute per vertex (cheap but blocky).</li>
+<li><strong>Per Pixel</strong> — additional lights compute per pixel (expensive but crisp).</li>
+</ul>
+<p>For vehicle headlights at night, you want <strong>Per Pixel</strong>. With Per Vertex, headlights will look blocky and won't light geometry well.</p>
+<p>If you're targeting mobile and need performance, use Per Vertex and accept reduced light quality.</p>
+<h3 id="camera-stack">Camera Stack</h3>
+<p>URP supports a Camera Stack — multiple cameras rendering on top of each other. RCC's camera works fine as a base camera in any stack. If you have a separate UI camera, make sure the RCC camera is the base and the UI camera is an overlay.</p>
+<h2 id="hdrp-specific-notes">HDRP-Specific Notes</h2>
+<h3 id="volume-profile">Volume Profile</h3>
+<p>HDRP requires a Volume Profile to drive lighting, fog, exposure, etc. The converter spawns the included Volume Profile prefab (<code>RCC_Settings.hdrpVolumeProfilePrefab</code>) into your scene automatically.</p>
+<p>If your scene already has a Volume, the converter respects it — you can edit your scene's existing volume to suit your art direction.</p>
+<h3 id="exposure">Exposure</h3>
+<p>HDRP uses physical exposure. The default Volume Profile sets exposure to a reasonable value for car scenes, but if your scene is too dark or too bright, adjust the Exposure component on the Volume.</p>
+<h3 id="volumetric-lights">Volumetric Lights</h3>
+<p>HDRP supports volumetric ("god ray") lighting on point and spot lights. By default, RCC vehicle lights have volumetrics turned <strong>off</strong> (they look strange inside a vehicle cabin). Turn them on per-light if you want the cinematic effect.</p>
+<h3 id="light-intensity-units">Light Intensity Units</h3>
+<p>HDRP requires <code>lumens</code> for spot/point lights. The defaults RCC sets after conversion:</p>
+<table>
+<thead>
+<tr>
+<th>Light Type</th>
+<th>HDRP Lumens</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Head Light Low Beam</td>
+<td>1000</td>
+</tr>
+<tr>
+<td>Head Light High Beam</td>
+<td>2000</td>
+</tr>
+<tr>
+<td>Brake Light</td>
+<td>800</td>
+</tr>
+<tr>
+<td>Reverse Light</td>
+<td>500</td>
+</tr>
+<tr>
+<td>Indicator</td>
+<td>400</td>
+</tr>
+<tr>
+<td>Interior</td>
+<td>200</td>
+</tr>
+</tbody>
+</table>
+<p>Adjust to taste — these are starting points.</p>
+<h2 id="manual-conversion-steps-if-the-converter-fails">Manual Conversion Steps (If the Converter Fails)</h2>
+<p>If the automatic converter doesn't work (rare, but happens with extensively customized projects), you can convert manually:</p>
+<ol>
+<li>
+<p><strong>Open each RCC material</strong> under <code>Assets/RealisticCarControllerV4/Materials/</code>. Change its shader:
+   - Built-in <code>Standard</code> → URP <code>Universal Render Pipeline/Lit</code> or HDRP <code>HDRP/Lit</code>.
+   - Built-in <code>Particles/...</code> → URP <code>Particles/...</code> or HDRP equivalent.</p>
+</li>
+<li>
+<p><strong>Replace each lens flare</strong>: every <code>LensFlare</code> component → remove and add <code>LensFlareComponentSRP</code>. Drag the appropriate lens flare data asset.</p>
+</li>
+<li>
+<p><strong>Update light intensities</strong> if switching to HDRP: each spot/point light's intensity → multiply by ~500 (Built-in 2.0 → HDRP 1000 lumens).</p>
+</li>
+<li>
+<p><strong>Set the scripting define</strong>: open <strong>Edit → Project Settings → Player → Other Settings → Scripting Define Symbols</strong>. Add <code>BCG_URP</code> or <code>BCG_HDRP</code>.</p>
+</li>
+<li>
+<p><strong>Re-import RCC scripts</strong> so the conditional compilation reads the new define. (Sometimes Unity caches this — restart the editor if changes don't take effect.)</p>
+</li>
+</ol>
+<h2 id="common-conversion-issues">Common Conversion Issues</h2>
+<h3 id="materials-are-still-pink-after-running-the-converter">"Materials are still pink after running the converter"</h3>
+<p>Either the converter wasn't given write permission, or it ran but Unity didn't refresh. Try:</p>
+<ol>
+<li>Close the Render Pipeline Converter window.</li>
+<li>Right-click each RCC material in the Project window → <strong>Reimport</strong>.</li>
+<li>If pink persists, check the material's shader assignment in the Inspector. It should be <code>Universal Render Pipeline/Lit</code> for URP, not <code>Hidden/InternalErrorShader</code>.</li>
+</ol>
+<h3 id="lens-flares-appear-too-bright-in-hdrp">"Lens flares appear too bright in HDRP"</h3>
+<p>HDRP lens flares are in physical brightness units. Lower the lens flare's intensity multiplier on the <code>LensFlareComponentSRP</code>. Or use a less aggressive lens flare data asset (RCC ships a few preset variations).</p>
+<h3 id="brake-lights-are-invisible-after-urp-conversion">"Brake lights are invisible after URP conversion"</h3>
+<p>URP's Additional Lights mode is set to Disabled or Per Vertex. Set it to Per Pixel in your URP Asset.</p>
+<h3 id="decals-dont-appear-in-urp">"Decals don't appear in URP"</h3>
+<p>You need to enable the Decal Renderer Feature in your URP Renderer Data asset.</p>
+<h3 id="headlights-are-too-dim--too-bright-in-hdrp">"Headlights are too dim / too bright in HDRP"</h3>
+<p>Adjust the light's <code>Intensity</code> in lumens. The default 1000 lumens may be too low for a brightly-lit scene or too high for a dimly-lit one.</p>
+<h3 id="compile-errors-after-switching">"Compile errors after switching"</h3>
+<p>The <code>BCG_URP</code> or <code>BCG_HDRP</code> define isn't set. Either:</p>
+<ol>
+<li>Re-run the converter (it should set the define).</li>
+<li>Manually add the define in <strong>Project Settings → Player → Scripting Define Symbols</strong>.</li>
+</ol>
+<h3 id="performance-dropped-after-hdrp-conversion">"Performance dropped after HDRP conversion"</h3>
+<p>HDRP is more expensive than URP or Built-in by design. If your target is mobile, do NOT use HDRP — stick with URP or Built-in.</p>
+<h2 id="performance-tips-per-pipeline">Performance Tips per Pipeline</h2>
+<table>
+<thead>
+<tr>
+<th>Tip</th>
+<th>Built-in</th>
+<th>URP</th>
+<th>HDRP</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Vertex lights for small bulbs</td>
+<td>✓</td>
+<td>✓</td>
+<td>N/A</td>
+</tr>
+<tr>
+<td>Disable particle effects</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>Disable skidmarks</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>Reduce shadow distance</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>Disable real-time additional lights</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>Lower fixed timestep</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>Use static batching for scene geometry</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+</tbody>
+</table>
+<p>For mobile: <strong>URP</strong> is the right pipeline. HDRP is for desktop / console only.</p>
+<h2 id="next-steps">Next Steps</h2>
+<ul>
+<li><strong><a href="14_LightsSystem.html">14 — Lights System</a></strong> — pipeline-specific lighting details.</li>
+<li><strong><a href="21_RCC_Settings.html">21 — RCC Settings Deep Dive</a></strong> — the HDRP Volume Profile reference.</li>
+<li><strong><a href="28_Troubleshooting.html">28 — Troubleshooting</a></strong> — common pipeline issues.</li>
+</ul>
+</div>
+<div class="footer">
+Generated from: 22_RenderPipelines.md<br>
+Date: 2026-05-22 00:32<br>
+© 2014 - 2026 BoneCracker Games — Realistic Car Controller V5.0.0
+</div>
+</body>
+</html>

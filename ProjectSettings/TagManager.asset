@@ -7,6 +7,9 @@ TagManager:
   - Vehicle
   - EnterExitPoint
   - Wheel
+  - IgnoreDamage
+  - Trailer
+  - RuntimeInspector
   layers:
   - Default
   - TransparentFX
@@ -19,10 +22,10 @@ TagManager:
   - Banner
   - Prop3
   - Ground
-  - 
-  - 
-  - 
-  - 
+  - RCC_Vehicle
+  - RCC_WheelCollider
+  - RCC_DetachablePart
+  - RCC_Prop
   - 
   - 
   - 

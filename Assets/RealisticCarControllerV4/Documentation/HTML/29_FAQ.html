@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Frequently Asked Questions</title>
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    background: #f8f9fa;
+}
+.content {
+    background: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+h1 { color: #2c3e50; margin-top: 0; padding-bottom: 0.3em; border-bottom: 2px solid #eee; }
+h2 { color: #34495e; margin-top: 1.5em; padding-bottom: 0.2em; border-bottom: 1px solid #eee; }
+h3, h4 { color: #34495e; margin-top: 1.2em; }
+h5, h6 { color: #34495e; margin-top: 1.0em; }
+code {
+    background: #f4f4f4;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.9em;
+}
+pre {
+    background: #2d2d2d;
+    color: #f8f8f2;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
+    margin: 1em 0;
+    font-size: 0.9em;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+    color: #f8f8f2;
+    white-space: pre;
+}
+blockquote {
+    border-left: 4px solid #3498db;
+    margin: 1em 0;
+    padding: 0.5em 0 0.5em 20px;
+    color: #555;
+    background: #f9f9f9;
+}
+blockquote p { margin: 0.4em 0; }
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px 12px;
+    text-align: left;
+    vertical-align: top;
+}
+th {
+    background: #f4f4f4;
+    font-weight: bold;
+}
+tr:nth-child(even) { background: #f9f9f9; }
+a { color: #3498db; text-decoration: none; transition: color 0.2s; }
+a:hover { color: #2980b9; text-decoration: underline; }
+ul, ol { margin: 1em 0; padding-left: 30px; }
+li { margin: 0.4em 0; }
+li > ul, li > ol { margin: 0.3em 0; }
+hr { border: none; border-top: 2px solid #eee; margin: 2em 0; }
+p { margin: 1em 0; }
+.footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    color: #999;
+    font-size: 0.9em;
+    text-align: center;
+}
+
+</style>
+</head>
+<body>
+<div class="content">
+<h1 id="frequently-asked-questions">Frequently Asked Questions</h1>
+<h2 id="general">General</h2>
+<h3 id="what-is-the-latest-version-of-rcc">What is the latest version of RCC?</h3>
+<p>The current version is <strong>V5.0.0</strong>, the long-term-support (LTS) release. It's intended to be kept stable and Unity-compatible for the foreseeable future. Future updates will be bug fixes and Unity compatibility patches only — no new features.</p>
+<h3 id="how-is-rcc-different-from-rcc-pro-rccp">How is RCC different from RCC Pro (RCCP)?</h3>
+<p>RCC (this product) is the <strong>2014-vintage vehicle controller</strong> with everything in one big <code>MonoBehaviour</code>. It's stable, easy to import, and the global namespace + monolithic assembly make it forgiving for beginners.</p>
+<p>RCC Pro (RCCP) is a <strong>2023-vintage rewrite</strong> with a modular architecture. Each system (engine, gearbox, drivetrain, audio, lights) is a separate component you compose onto a vehicle. RCCP supports runtime-built vehicles, addon systems, and advanced telemetry.</p>
+<p>They are <strong>completely different products</strong>. Prefabs from one can't be imported into the other. Code is not shared. RCCP is sold separately on the Asset Store.</p>
+<h3 id="should-i-use-rcc-or-rccp">Should I use RCC or RCCP?</h3>
+<p>Use <strong>RCC</strong> if:</p>
+<ul>
+<li>You're a beginner Unity developer.</li>
+<li>You want something that "just works" without configuration.</li>
+<li>You don't need a modular addon architecture.</li>
+<li>You prefer LTS stability over new features.</li>
+</ul>
+<p>Use <strong>RCCP</strong> if:</p>
+<ul>
+<li>You're shipping a commercial racing game and need flexibility.</li>
+<li>You want to build vehicles at runtime.</li>
+<li>You want fine-grained component composition.</li>
+<li>You're comfortable with a more complex setup.</li>
+</ul>
+<h3 id="what-unity-versions-does-rcc-support">What Unity versions does RCC support?</h3>
+<p><strong>Unity 2022.3 LTS</strong> through <strong>Unity 6.x LTS</strong>. The project file ships set to 2022.3.51f1 for the widest compatibility.</p>
+<p>Unity 2021 and older are <strong>not supported</strong> because of dependencies on the Input System and a few Unity 2022+ APIs.</p>
+<h3 id="does-rcc-support-built-in--urp--hdrp">Does RCC support Built-in / URP / HDRP?</h3>
+<p>All three. The Render Pipeline Converter handles the switch — see <strong><a href="22_RenderPipelines.html">22 — URP &amp; HDRP Conversion</a></strong>.</p>
+<h3 id="what-platforms-does-rcc-build-to">What platforms does RCC build to?</h3>
+<p>Desktop (Windows, macOS, Linux), Mobile (iOS, Android), and any platform Unity supports — RCC has no platform-specific dependencies beyond the Input System.</p>
+<h3 id="is-rcc-source-included-or-compiled">Is RCC source-included or compiled?</h3>
+<p>Source-included. All 169 C# scripts are visible and editable.</p>
+<h3 id="can-i-edit-rccs-source-code">Can I edit RCC's source code?</h3>
+<p>Yes, but it's not recommended for two reasons:</p>
+<ol>
+<li><strong>Updates overwrite your changes.</strong> If you re-import a new RCC version, your modified scripts are reverted unless you've manually merged.</li>
+<li><strong>Most things can be done via events instead.</strong> The <code>RCC_Events</code> hub lets you add behavior without touching RCC source.</li>
+</ol>
+<p>If you must modify, document your changes well (Git commits) and be prepared to re-apply them on each update.</p>
+<h2 id="installation">Installation</h2>
+<h3 id="why-are-the-materials-pink-after-import">Why are the materials pink after import?</h3>
+<p>You're using URP or HDRP. Run the Render Pipeline Converter. See <strong><a href="22_RenderPipelines.html">22 — URP &amp; HDRP Conversion</a></strong>.</p>
+<h3 id="why-are-there-hundreds-of-compile-errors">Why are there hundreds of compile errors?</h3>
+<p>The Input System package isn't installed, or "Active Input Handling" is set to "Old Input Manager." Install the Input System package and set Active Input Handling to "Input System Package (New)" or "Both."</p>
+<h3 id="do-i-need-photon-or-bcg-shared-assets-to-use-rcc">Do I need Photon or BCG Shared Assets to use RCC?</h3>
+<p>No. Both were optional addons that have been removed in V5. RCC works standalone.</p>
+<h3 id="can-i-use-rcc-in-a-multiplayer-game">Can I use RCC in a multiplayer game?</h3>
+<p>Yes, but RCC doesn't ship networking out of the box (the Photon Integration Addon has been removed). Use Netcode for GameObjects, Mirror, or Photon Fusion. RCC's <code>OverrideInputs()</code> is the integration point — see <strong><a href="17_HowToOverrideInputs.html">17 — Overriding Inputs</a></strong>.</p>
+<h2 id="vehicle-setup">Vehicle Setup</h2>
+<h3 id="how-do-i-make-my-own-vehicle">How do I make my own vehicle?</h3>
+<p>Use the Quick Vehicle Setup Wizard: <strong>Tools → BoneCracker Games → Realistic Car Controller → Quick Vehicle Setup Wizard</strong>. See <strong><a href="07_HowToCreateNewVehicles.html">07 — Creating New Vehicles</a></strong>.</p>
+<h3 id="whats-the-easiest-way-to-copy-one-of-the-demo-vehicles">What's the easiest way to copy one of the demo vehicles?</h3>
+<p>Drag a prefab from <code>Prefabs/Vehicles/</code> into your scene. That's it — you have a fully-configured vehicle. To make a copy you can modify, right-click the prefab in the Project window → <strong>Duplicate</strong>, then rename and edit.</p>
+<h3 id="how-do-i-add-a-trailer">How do I add a trailer?</h3>
+<p>Use the included <code>RCC_TruckTrailer</code> script on a trailer prefab. Add <code>RCC_TrailerAttachPoint</code> on the towing vehicle. The trailer attaches to the hitch automatically.</p>
+<h3 id="can-i-have-more-than-4-wheels">Can I have more than 4 wheels?</h3>
+<p>Yes. The controller has <code>ExtraRearWheelsTransform[]</code> and <code>ExtraRearWheelsCollider[]</code> arrays. Set <code>hasExtraWheels = true</code> and assign the extras.</p>
+<h3 id="how-do-i-configure-for-a-motorcycle-2-wheels">How do I configure for a motorcycle (2 wheels)?</h3>
+<p>Bikes are out of scope for the default setup — the controller assumes 4+ wheels. If you really want a bike, you'd need to extensively modify the controller, OR write your own controller and re-use RCC's audio / damage / camera systems.</p>
+<h2 id="driving-feel">Driving Feel</h2>
+<h3 id="my-car-drives-like-a-tank-whats-wrong">My car drives like a tank. What's wrong?</h3>
+<p>Most likely the <strong>Mass</strong> is too high, <strong>Brake Torque</strong> is too high, or <strong>COM</strong> is wrong. Defaults work for sports cars at 1500 kg. For lighter vehicles (race cars 800 kg, motorbikes 150 kg), reduce mass and the rest scales naturally.</p>
+<h3 id="my-car-spins-out-constantly">My car spins out constantly</h3>
+<p>Switch to the Arcade behavior preset: <code>RCC.SetBehavior(4)</code>. If you want to keep Simulator but reduce spin-outs, increase the rear wheels' Sideways Friction Stiffness, or move the COM forward.</p>
+<h3 id="my-car-doesnt-turn--just-pushes-forward">My car doesn't turn — just pushes forward</h3>
+<p>Understeer. Increase the front wheels' Sideways Friction Stiffness, or move COM forward. See <strong><a href="09_HowWheelCollidersWork.html">09 — How WheelColliders Work</a></strong>.</p>
+<h3 id="can-i-get-a-more-realistic-feel">Can I get a more realistic feel?</h3>
+<p>Use the <strong>Realistic</strong> behavior preset, turn off all driver assists (ABS, ESP, TCS), and use a steering wheel for input. See <strong><a href="10_BehaviorPresets.html">10 — Behavior Presets</a></strong> and <strong><a href="25_SteeringWheels.html">25 — Steering Wheels</a></strong>.</p>
+<h3 id="how-do-i-make-the-ai-faster--slower">How do I make the AI faster / slower?</h3>
+<p>Adjust the AI's <strong>Max Speed</strong> in <code>RCC_AICarController</code>. Higher = faster opponent. For drag-racing AI that always matches the player's speed, dynamically set max speed equal to the player's current speed each frame.</p>
+<h2 id="cameras">Cameras</h2>
+<h3 id="how-do-i-make-the-camera-follow-my-vehicle">How do I make the camera follow my vehicle?</h3>
+<p>Add an <code>RCC Camera</code> to the scene (<strong>Tools → BoneCracker Games → Realistic Car Controller → Create → Cameras → Add RCC Camera To Scene</strong>). Delete the default Main Camera. The new camera follows whichever vehicle is the active player.</p>
+<h3 id="how-do-i-add-a-custom-camera-mode">How do I add a custom camera mode?</h3>
+<p>Don't modify <code>RCC_Camera</code> — write your own MonoBehaviour that controls the Unity Camera component, and disable <code>RCC_Camera</code> when your mode is active. See <strong><a href="13_CameraSystem.html">13 — Camera System</a></strong>.</p>
+<h3 id="why-does-my-camera-clip-through-walls">Why does my camera clip through walls?</h3>
+<p>RCC's camera doesn't have built-in collision avoidance. Add your own raycast-based occlusion script, or increase camera distance so it's less likely to hit anything. See <strong><a href="13_CameraSystem.html">13 — Camera System</a></strong>.</p>
+<h2 id="audio">Audio</h2>
+<h3 id="how-do-i-replace-the-engine-sound">How do I replace the engine sound?</h3>
+<p>Open your vehicle prefab. Expand the Audio section. Drag your audio clip into the Engine Low / Mid / High Clip fields. See <strong><a href="15_AudioSystem.html">15 — Audio System</a></strong>.</p>
+<h3 id="why-does-my-engine-sound-chipmunky">Why does my engine sound chipmunky?</h3>
+<p><code>Max Engine Sound Pitch</code> is too high. Set to 1.5 or 1.6.</p>
+<h3 id="can-i-add-custom-sounds-horn-alarm-radio">Can I add custom sounds (horn, alarm, radio)?</h3>
+<p>Yes. Write your own MonoBehaviour with AudioSources and subscribe to <code>RCC_Events</code> for triggers. See <strong><a href="24_EventsSystem.html">24 — Events System</a></strong>.</p>
+<h2 id="damage">Damage</h2>
+<h3 id="how-do-i-make-a-tank-that-doesnt-take-damage">How do I make a tank that doesn't take damage?</h3>
+<p>Uncheck <strong>Use Damage</strong> on the vehicle's <code>RCC_Damage</code> section.</p>
+<h3 id="how-do-i-trigger-damage-from-code">How do I trigger damage from code?</h3>
+<p>You can apply impact damage by raising the vehicle's <code>damage.totalDamage</code> field, or simulate a collision force. The cleanest way is to apply force to the rigidbody and let normal collision damage do the rest.</p>
+<h3 id="how-do-i-make-the-vehicle-indestructible-to-mesh-deformation-but-still-let-parts-break-off">How do I make the vehicle indestructible to mesh deformation but still let parts break off?</h3>
+<p>Set <strong>Use Mesh Deformation</strong> to false in the damage section. Keep the detachable parts and wheel damage enabled.</p>
+<h3 id="how-do-i-repair-without-using-rccrepair">How do I repair without using <code>RCC.Repair()</code>?</h3>
+<p>Set <code>carController.damage.repairNow = true</code>. Same effect.</p>
+<h2 id="customization">Customization</h2>
+<h3 id="how-do-i-add-new-paint-colors">How do I add new paint colors?</h3>
+<p>The paint system accepts arbitrary RGB colors at runtime — no preconfiguration needed. Just call <code>customizer.PaintManager.Paint(color)</code>.</p>
+<h3 id="how-do-i-add-new-wheels">How do I add new wheels?</h3>
+<p>Add the wheel prefab to <code>Resources/RCC Assets/RCC_ChangableWheels.asset</code>. See <strong><a href="20_Customization.html">20 — Customization</a></strong>.</p>
+<h3 id="how-do-i-save-customization-to-the-cloud-instead-of-playerprefs">How do I save customization to the cloud instead of PlayerPrefs?</h3>
+<p>The customizer's <code>Loadout</code> is a serializable class. Convert it to JSON via <code>JsonUtility.ToJson(loadout)</code> and send to your server. Restore via <code>JsonUtility.FromJson&lt;RCC_Customizer_Loadout&gt;(json)</code>.</p>
+<h2 id="input">Input</h2>
+<h3 id="how-do-i-rebind-the-throttle-key">How do I rebind the throttle key?</h3>
+<p>Open <code>Assets/RealisticCarControllerV4/Resources/RCC Assets/RCC_InputActions.inputactions</code>. Find the Throttle action. Edit its binding. See <strong><a href="16_InputSystem.html">16 — Input System</a></strong>.</p>
+<h3 id="why-doesnt-my-gamepad-work">Why doesn't my gamepad work?</h3>
+<p>Make sure the Input System backends are enabled (Project Settings → Player → Active Input Handling). Then check <strong>Window → Analysis → Input Debugger</strong> to verify your gamepad is detected.</p>
+<h3 id="can-i-use-a-logitech-g29-wheel">Can I use a Logitech G29 wheel?</h3>
+<p>Yes. See <strong><a href="25_SteeringWheels.html">25 — Steering Wheels</a></strong>.</p>
+<h3 id="how-do-i-let-the-player-rebind-keys-at-runtime">How do I let the player rebind keys at runtime?</h3>
+<p>The Unity Input System supports interactive rebinding. RCC doesn't ship a rebind UI but works with any rebind setup you implement. Search Unity Input System docs for "rebinding UI samples."</p>
+<h2 id="mobile">Mobile</h2>
+<h3 id="how-do-i-enable-mobile-controls">How do I enable mobile controls?</h3>
+<p>Set <strong>Mobile Controller Enabled</strong> in <code>RCC_Settings.asset</code> to true, and use the <code>RCC_Canvas (AIO)</code> prefab. See <strong><a href="18_MobileSetup.html">18 — Mobile Setup</a></strong>.</p>
+<h3 id="can-i-disable-mobile-controls-for-testing-on-desktop">Can I disable mobile controls for testing on desktop?</h3>
+<p>Yes — set <strong>Mobile Controller Enabled</strong> to false. The desktop input path (keyboard / gamepad) becomes active.</p>
+<h3 id="how-do-i-support-both-touch-and-bluetooth-gamepad-on-mobile">How do I support both touch and Bluetooth gamepad on mobile?</h3>
+<p>The Input System handles this — Bluetooth gamepads on iOS / Android are detected automatically. Keep <strong>Mobile Controller Enabled</strong> off to let the Input System path handle both touch and gamepad.</p>
+<h2 id="ai">AI</h2>
+<h3 id="how-do-i-add-traffic-ai">How do I add traffic AI?</h3>
+<p>Drop <code>Skyline (AI Chaser).prefab</code> into the scene. Assign its <code>Waypoints Container</code> field to an <code>RCC_AIWaypointsContainer</code> in your scene. See <strong><a href="19_AISystem.html">19 — AI System</a></strong>.</p>
+<h3 id="how-do-i-make-the-ai-chase-the-player">How do I make the AI chase the player?</h3>
+<p>Set the AI's <strong>Navigation Mode</strong> to <strong>Chase Player</strong>.</p>
+<h3 id="how-many-ai-vehicles-can-rcc-handle">How many AI vehicles can RCC handle?</h3>
+<p>Desktop: 30–50 active AI is typical. Mobile: 5–15 depending on the device.</p>
+<h2 id="performance">Performance</h2>
+<h3 id="my-game-is-slow-on-mobile">My game is slow on mobile</h3>
+<p>See <strong><a href="28_Troubleshooting.html">28 — Troubleshooting</a></strong> under Performance. Common fixes: disable particles, disable skidmarks, lower fixed timestep, use vertex lights, switch to URP.</p>
+<h3 id="how-do-i-check-whats-slow">How do I check what's slow?</h3>
+<p>Use the Unity Profiler. The main costs in an RCC scene are usually WheelCollider raycasts (proportional to vehicle count) and skidmarks (proportional to active skid).</p>
+<h2 id="licensing--distribution">Licensing &amp; Distribution</h2>
+<h3 id="can-i-use-rcc-in-a-commercial-game">Can I use RCC in a commercial game?</h3>
+<p>Yes, under the Unity Asset Store EULA. One purchase covers all your projects.</p>
+<h3 id="can-i-share-my-games-source-code-that-uses-rcc">Can I share my game's source code that uses RCC?</h3>
+<p>Yes, but you can't redistribute RCC's source separately. Your final game build can include RCC; a public Git repo with RCC's <code>.cs</code> files in it would violate the EULA.</p>
+<h3 id="can-my-team-of-5-share-one-rcc-license">Can my team of 5 share one RCC license?</h3>
+<p>No. The Asset Store EULA requires one license per developer / per Unity ID. For team licenses, buy the appropriate seat count.</p>
+<h3 id="can-i-resell-modifications-to-rcc">Can I resell modifications to RCC?</h3>
+<p>No. You can modify it for your own use, but you can't sell those modifications as a separate Asset Store product. RCC remains BoneCracker Games' property.</p>
+<h2 id="support">Support</h2>
+<h3 id="where-do-i-get-help">Where do I get help?</h3>
+<ul>
+<li><strong>Documentation</strong>: this set of guides.</li>
+<li><strong>Email</strong>: bonecrackergames@gmail.com.</li>
+<li><strong>Asset Store reviews and forums</strong>: post in the RCC product page comments.</li>
+</ul>
+<h3 id="what-information-should-i-include-in-a-support-request">What information should I include in a support request?</h3>
+<ul>
+<li>Unity version.</li>
+<li>RCC version (from <code>RCC_Version.cs</code>).</li>
+<li>Render pipeline (Built-in / URP / HDRP).</li>
+<li>A clear description of the issue and steps to reproduce.</li>
+<li>Screenshots of the Unity Console and the relevant Inspector.</li>
+<li>If possible, a Unity package of a minimal repro scene.</li>
+</ul>
+<h3 id="are-bug-fixes-free">Are bug fixes free?</h3>
+<p>Yes — bug fixes for the current LTS version (V5.x) ship as free updates. Future major version releases (if there ever is one) may be a separate purchase.</p>
+<h3 id="how-quickly-are-bugs-fixed">How quickly are bugs fixed?</h3>
+<p>There's no SLA but minor issues are usually patched within a few weeks of being reported. Major issues (RCC doesn't compile on a new Unity version, demo scenes don't open) are prioritized and patched within days.</p>
+<h2 id="future">Future</h2>
+<h3 id="will-there-be-a-v6">Will there be a V6?</h3>
+<p>V5 is the LTS release. There are no plans for V6 of this product. New feature development happens in RCC Pro (RCCP).</p>
+<h3 id="will-photon--enter-exit-come-back">Will Photon / Enter-Exit come back?</h3>
+<p>No. They've been removed for the reasons explained in <strong><a href="26_AddonPackages.html">26 — Addon Packages</a></strong>.</p>
+<h3 id="will-there-be-dlc-for-new-vehicles-or-environments">Will there be DLC for new vehicles or environments?</h3>
+<p>Not currently planned. The 12 demo vehicles and demo scenes that ship with RCC are intended as starting points — you're expected to add your own art for your specific game.</p>
+<h2 id="next-steps">Next Steps</h2>
+<ul>
+<li><strong><a href="28_Troubleshooting.html">28 — Troubleshooting</a></strong> — for specific error symptoms.</li>
+<li><strong><a href="00_TableOfContents.html">00 — Table of Contents</a></strong> — back to the index.</li>
+</ul>
+</div>
+<div class="footer">
+Generated from: 29_FAQ.md<br>
+Date: 2026-05-22 00:32<br>
+© 2014 - 2026 BoneCracker Games — Realistic Car Controller V5.0.0
+</div>
+</body>
+</html>

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: beba8ea37b0baf749980ef71824b7ace
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 16296
+  packageName: Realistic Car Controller
+  packageVersion: 5.0.0
+  assetPath: Assets/RealisticCarControllerV4/Animators & Animations/RCC_Plane_Animation.anim
+  uploadId: 920646

@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 130eb253fa77134409683cf98b85cbb3
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 16296
+  packageName: Realistic Car Controller
+  packageVersion: 5.0.0
+  assetPath: Assets/RealisticCarControllerV4/Models/Vehicles/E46_New/E46_Collider.prefab
+  uploadId: 920646

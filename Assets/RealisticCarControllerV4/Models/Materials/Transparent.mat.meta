@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 7366bcd6ddd815540a05c0bdd302857a
+timeCreated: 1517180460
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 16296
+  packageName: Realistic Car Controller
+  packageVersion: 5.0.0
+  assetPath: Assets/RealisticCarControllerV4/Models/Materials/Transparent.mat
+  uploadId: 920646

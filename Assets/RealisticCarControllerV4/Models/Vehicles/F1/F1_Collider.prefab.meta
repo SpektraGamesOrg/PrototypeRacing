@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 72cbbaf1dacb9d74b830b647aa10e7ea
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 16296
+  packageName: Realistic Car Controller
+  packageVersion: 5.0.0
+  assetPath: Assets/RealisticCarControllerV4/Models/Vehicles/F1/F1_Collider.prefab
+  uploadId: 920646

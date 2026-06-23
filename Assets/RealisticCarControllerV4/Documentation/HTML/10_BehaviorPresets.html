@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Behavior Presets</title>
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    background: #f8f9fa;
+}
+.content {
+    background: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+h1 { color: #2c3e50; margin-top: 0; padding-bottom: 0.3em; border-bottom: 2px solid #eee; }
+h2 { color: #34495e; margin-top: 1.5em; padding-bottom: 0.2em; border-bottom: 1px solid #eee; }
+h3, h4 { color: #34495e; margin-top: 1.2em; }
+h5, h6 { color: #34495e; margin-top: 1.0em; }
+code {
+    background: #f4f4f4;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.9em;
+}
+pre {
+    background: #2d2d2d;
+    color: #f8f8f2;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
+    margin: 1em 0;
+    font-size: 0.9em;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+    color: #f8f8f2;
+    white-space: pre;
+}
+blockquote {
+    border-left: 4px solid #3498db;
+    margin: 1em 0;
+    padding: 0.5em 0 0.5em 20px;
+    color: #555;
+    background: #f9f9f9;
+}
+blockquote p { margin: 0.4em 0; }
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px 12px;
+    text-align: left;
+    vertical-align: top;
+}
+th {
+    background: #f4f4f4;
+    font-weight: bold;
+}
+tr:nth-child(even) { background: #f9f9f9; }
+a { color: #3498db; text-decoration: none; transition: color 0.2s; }
+a:hover { color: #2980b9; text-decoration: underline; }
+ul, ol { margin: 1em 0; padding-left: 30px; }
+li { margin: 0.4em 0; }
+li > ul, li > ol { margin: 0.3em 0; }
+hr { border: none; border-top: 2px solid #eee; margin: 2em 0; }
+p { margin: 1em 0; }
+.footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    color: #999;
+    font-size: 0.9em;
+    text-align: center;
+}
+
+</style>
+</head>
+<body>
+<div class="content">
+<h1 id="behavior-presets">Behavior Presets</h1>
+<p>A <strong>behavior preset</strong> is a complete bundle of driving-feel settings — ABS, ESP, TCS, friction curves, steering helpers, counter-steering aggressiveness, anti-roll forces — saved as a named preset and applied to every vehicle in your scene with a single line of code. This document explains what presets ship with RCC, what each one does, and how to switch between them.</p>
+<h2 id="why-presets-exist">Why Presets Exist</h2>
+<p>The same physical vehicle drives radically differently depending on assist settings and friction values. The same Skyline can feel like a hardcore simulator (where one mistake spins you out) or a forgiving arcade game (where you can mash gas through every corner). Rather than configure each vehicle individually for each game mode, RCC lets you switch the entire feel with one global setting.</p>
+<p>When the player selects a difficulty in your game's options menu — "Simulator," "Arcade," "Drift" — you call <code>RCC.SetBehavior(index)</code> and every car in the scene shifts to the new feel.</p>
+<h2 id="whats-included-out-of-the-box">What's Included Out of the Box</h2>
+<p>RCC ships with four pre-configured behavior presets. They live in <code>RCC_Settings.asset</code>, under the <code>behaviorTypes</code> array. The defaults are:</p>
+<table>
+<thead>
+<tr>
+<th>Index</th>
+<th>Name</th>
+<th>Style</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>Realistic</td>
+<td>Full simulator — every assist off, real friction, full consequences.</td>
+</tr>
+<tr>
+<td>1</td>
+<td>Race</td>
+<td>Race car feel — high grip, predictable, fast laps.</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Sport</td>
+<td>Sports car feel — balanced, communicative.</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Drift</td>
+<td>Optimized for sliding — low rear grip, aggressive counter-steer.</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Arcade</td>
+<td>Forgiving, easy — high grip, ABS / ESP / TCS on.</td>
+</tr>
+</tbody>
+</table>
+<p>(The exact preset names and order depend on the version of <code>RCC_Settings.asset</code> shipped with your install. Open it to see the actual list.)</p>
+<h2 id="what-a-preset-controls">What a Preset Controls</h2>
+<p>Every preset configures roughly 30 fields. The most impactful ones:</p>
+<h3 id="stability-assists">Stability Assists</h3>
+<ul>
+<li><strong>ABS</strong> — Anti-lock braking. When on, prevents wheel lockup during heavy braking. Beginner-friendly.</li>
+<li><strong>ESP</strong> — Electronic stability. Selective braking to correct slides.</li>
+<li><strong>TCS</strong> — Traction control. Cuts engine power when wheels spin freely.</li>
+<li><strong>Steering Helper</strong> — Active correction of fishtailing.</li>
+<li><strong>Traction Helper</strong> — Same as TCS but tuned for engine torque rather than brakes.</li>
+</ul>
+<p>A "simulator" preset turns these <strong>off</strong>. An "arcade" preset turns them all <strong>on</strong>.</p>
+<h3 id="steering-response">Steering Response</h3>
+<ul>
+<li><strong>Steering Type</strong> — Curve, Simple, or Constant (see <strong><a href="08_VehicleInspectorReference.html">08 — Vehicle Inspector Reference</a></strong>).</li>
+<li><strong>Steering Curve</strong> — speed → max angle.</li>
+<li><strong>Limit Steering</strong> — clamp max steering at high speed.</li>
+<li><strong>Counter Steering</strong> — auto counter-steer aggression.</li>
+<li><strong>Steering Sensitivity</strong> — smooth large steering input changes.</li>
+</ul>
+<p>A "drift" preset gives a slow steering curve (full lock available even at high speed) and aggressive counter-steer. An "arcade" preset gives instant response and heavy counter-steer.</p>
+<h3 id="friction-curves">Friction Curves</h3>
+<ul>
+<li><strong>Forward Extremum Slip / Value</strong> — peak forward grip.</li>
+<li><strong>Forward Asymptote Slip / Value</strong> — long-tail forward grip.</li>
+<li><strong>Sideways Extremum Slip / Value</strong> — peak sideways grip.</li>
+<li><strong>Sideways Asymptote Slip / Value</strong> — long-tail sideways grip.</li>
+</ul>
+<p>These are the <strong>single most important</strong> preset settings. They define how the tire grips. A simulator preset breaks grip cleanly; an arcade preset has high grip with a forgiving falloff; a drift preset breaks sideways grip early but keeps forward grip strong.</p>
+<h3 id="anti-roll">Anti-Roll</h3>
+<ul>
+<li><strong>Anti Roll Front Horizontal Minimum</strong> — base anti-roll force for the front axle.</li>
+<li><strong>Anti Roll Rear Horizontal Minimum</strong> — base anti-roll force for the rear axle.</li>
+</ul>
+<p>Higher values reduce body roll in turns. A simulator preset uses lower anti-roll (you can feel the car lean); an arcade preset uses higher (the car stays flat).</p>
+<h3 id="com-assister">COM Assister</h3>
+<ul>
+<li><strong>COM Assister</strong> — Off / Slight / Medium / Opposite. Dynamically shifts the center of mass based on the vehicle's rotation. Helps stabilize a high-COM vehicle.</li>
+</ul>
+<h2 id="switching-behavior-at-runtime">Switching Behavior at Runtime</h2>
+<p>The simplest way:</p>
+<pre><code class="language-csharp">RCC.SetBehavior(0); // Realistic
+RCC.SetBehavior(1); // Race
+RCC.SetBehavior(2); // Sport
+RCC.SetBehavior(3); // Drift
+RCC.SetBehavior(4); // Arcade
+</code></pre>
+<p>The call:</p>
+<ol>
+<li>Updates <code>RCC_Settings.behaviorSelectedIndex</code>.</li>
+<li>Applies the new preset's helper toggles to every vehicle in the scene.</li>
+<li>If the preset has <code>applyExternalWheelFrictions = true</code>, applies the new friction curves to every wheel.</li>
+<li>Fires the <code>RCC_Events.OnBehaviorChanged</code> event so UI / HUD code can update.</li>
+</ol>
+<p>Note: behavior changes mid-drive can feel jarring (the car's grip suddenly shifts). For the smoothest experience, switch behavior between scenes or before the player starts driving.</p>
+<h2 id="changing-the-default">Changing the Default</h2>
+<p>To make the game start in a particular preset:</p>
+<ol>
+<li>Open <code>Assets/RealisticCarControllerV4/Resources/RCC Assets/RCC_Settings.asset</code>.</li>
+<li>Set <strong>Behavior Selected Index</strong> to the index you want (0 = first preset, 4 = fifth).</li>
+<li>Save.</li>
+</ol>
+<p>The setting persists across Play mode (because of the runtime clone — <code>RCC_Settings</code> clones itself in Play mode so the asset isn't modified at runtime; the in-memory copy keeps the change for the session).</p>
+<h2 id="disabling-presets-entirely">Disabling Presets Entirely</h2>
+<p>You can turn off the global preset system by unchecking <strong>Override Behavior</strong> at the top of <code>RCC_Settings</code>. When off, every vehicle uses its own per-vehicle settings (the values configured on its <code>RCC_CarControllerV4</code>). This is useful when you want each vehicle to feel different — e.g., a hatchback that always feels sluggish and a sports car that always feels nimble in the same scene.</p>
+<p>The global override stays on by default because most games have one consistent "feel."</p>
+<h2 id="per-vehicle-override">Per-Vehicle Override</h2>
+<p>If you want most vehicles to follow the global preset, but <strong>one specific vehicle</strong> to ignore it (e.g., a tank that should always be heavy and slow regardless of game mode), enable <strong>Override Behavior</strong> on that vehicle's <code>RCC_CarControllerV4</code>. The flag is at the top of the Inspector.</p>
+<p>When per-vehicle override is on, that vehicle uses the fields configured directly on its controller and ignores the global preset.</p>
+<h2 id="creating-a-custom-preset">Creating a Custom Preset</h2>
+<p>To add your own preset (e.g., "Hardcore"):</p>
+<ol>
+<li>Open <code>RCC_Settings.asset</code>.</li>
+<li>Find the <code>behaviorTypes</code> array.</li>
+<li>Right-click the array and <strong>Add Element</strong> (or set the Array Size to one higher).</li>
+<li>Configure the new entry: name it, set ABS/ESP/TCS, configure friction curves, etc.</li>
+<li>Save the asset.</li>
+</ol>
+<p>Switch to your new preset:</p>
+<pre><code class="language-csharp">RCC.SetBehavior(5); // your new index
+</code></pre>
+<p>A practical workflow: duplicate an existing preset that's close to what you want, then adjust from there. Tweaking is faster than building from scratch.</p>
+<h2 id="what-each-default-preset-feels-like">What Each Default Preset Feels Like</h2>
+<h3 id="realistic-index-0">Realistic (Index 0)</h3>
+<p>Every helper off. Friction is realistic — the tire will lock up if you brake too hard, will spin if you stab the throttle from a stop, will plow understeer if you enter a corner too fast. ABS, ESP, TCS all off. The steering wheel doesn't auto-correct. The car can be flipped if you push too hard.</p>
+<p>This is the closest to a real driving simulator. New players will struggle.</p>
+<h3 id="race-index-1">Race (Index 1)</h3>
+<p>High friction curves with very predictable break-loose behavior. Steering helper and traction helper on, but ABS / ESP / TCS off — the player is in charge of brake and throttle modulation, but the car helps stabilize the rear.</p>
+<p>This is the typical "race game" feel — competitive, requires skill, not punishing.</p>
+<h3 id="sport-index-2">Sport (Index 2)</h3>
+<p>Balanced. Mid-range grip, mid-range helpers. ESP and ABS on. The car holds the road well but can be drifted with effort. Suitable for a general-purpose driving game without dedicated racing or arcade pretensions.</p>
+<h3 id="drift-index-3">Drift (Index 3)</h3>
+<p>Low sideways grip with a long break-loose curve. The car snaps into oversteer easily and holds the slide while the player counter-steers. High counter-steer aggression. The forward grip stays high so the engine can keep pulling through the slide.</p>
+<p>This is the typical drift game feel. Great for showing off; not great for going around a corner quickly.</p>
+<h3 id="arcade-index-4">Arcade (Index 4)</h3>
+<p>Every helper on. Friction is unrealistic — high grip across the board, with grip falling off very slowly even at high slip values. ABS, ESP, TCS all on. The car practically can't spin out. The steering helper is aggressive.</p>
+<p>Suitable for mobile games, casual racers, or any context where the player shouldn't lose control.</p>
+<h2 id="tuning-a-preset">Tuning a Preset</h2>
+<p>If a preset is <em>almost</em> what you want but slightly off:</p>
+<ol>
+<li>Open <code>RCC_Settings.asset</code> → <code>behaviorTypes</code> → the preset you're editing.</li>
+<li>Drive in Play mode and adjust live (the runtime clone preserves your edits for the session).</li>
+<li>When happy, <strong>exit Play mode</strong> and re-apply the values manually to the asset (the runtime clone doesn't write back).</li>
+</ol>
+<p>The most impactful single setting is <strong>Sideways Extremum Value</strong> — this is your "grip dial." Raise it for more arcade feel, lower it for more drifty / loose feel.</p>
+<p>The second most impactful is <strong>Steering Curve</strong> — adjust the high-speed end to control how nimble the car feels at speed.</p>
+<h2 id="listening-for-behavior-changes">Listening for Behavior Changes</h2>
+<p>If your UI or other game systems need to react when the player changes presets:</p>
+<pre><code class="language-csharp">using UnityEngine;
+
+public class BehaviorChangeListener : MonoBehaviour {
+    void OnEnable()  { RCC_Events.OnBehaviorChanged += HandleBehaviorChanged; }
+    void OnDisable() { RCC_Events.OnBehaviorChanged -= HandleBehaviorChanged; }
+
+    void HandleBehaviorChanged() {
+        Debug.Log($&quot;Behavior changed to index {RCC_Settings.Instance.behaviorSelectedIndex}&quot;);
+        // Update HUD, play sound, etc.
+    }
+}
+</code></pre>
+<p>See <strong><a href="24_EventsSystem.html">24 — Events System</a></strong> for the full event surface.</p>
+<h2 id="common-behavior-related-issues">Common Behavior-Related Issues</h2>
+<h3 id="switching-to-drift-didnt-change-anything">"Switching to Drift didn't change anything"</h3>
+<p>Make sure <code>applyExternalWheelFrictions</code> is enabled on the preset. Without it, the preset only changes helper toggles — friction curves stay at the per-wheel values.</p>
+<h3 id="the-arcade-preset-still-spins-me-out">"The Arcade preset still spins me out"</h3>
+<p>The behavior preset isn't being applied because <strong>Override Behavior</strong> at the top of the vehicle's Inspector is enabled. Disable it on the vehicle, or copy the preset values into the per-vehicle fields.</p>
+<h3 id="i-changed-rcc_settings-in-play-mode-and-the-changes-were-lost">"I changed RCC_Settings in Play mode and the changes were lost"</h3>
+<p>That's by design. <code>RCC_Settings</code> clones itself in Play mode so the asset on disk isn't modified at runtime. To make changes permanent, exit Play mode and re-apply them. See <code>RCC_Settings.cs</code> for the clone logic.</p>
+<h2 id="next-steps">Next Steps</h2>
+<ul>
+<li><strong><a href="09_HowWheelCollidersWork.html">09 — How WheelColliders Work</a></strong> — what friction curve values actually do.</li>
+<li><strong><a href="21_RCC_Settings.html">21 — RCC Settings Deep Dive</a></strong> — every field of <code>RCC_Settings</code>.</li>
+<li><strong><a href="23_ScriptingAPI.html">23 — Scripting API</a></strong> — <code>RCC.SetBehavior()</code> and related methods.</li>
+</ul>
+</div>
+<div class="footer">
+Generated from: 10_BehaviorPresets.md<br>
+Date: 2026-05-22 00:32<br>
+© 2014 - 2026 BoneCracker Games — Realistic Car Controller V5.0.0
+</div>
+</body>
+</html>

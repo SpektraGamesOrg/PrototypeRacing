@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 3de49cd7bd19b2b43ae506045a7ee34d
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 16296
+  packageName: Realistic Car Controller
+  packageVersion: 5.0.0
+  assetPath: Assets/RealisticCarControllerV4/Addon Packages/Shaders/RCC_VolumeProfile_HDRP.unitypackage
+  uploadId: 920646

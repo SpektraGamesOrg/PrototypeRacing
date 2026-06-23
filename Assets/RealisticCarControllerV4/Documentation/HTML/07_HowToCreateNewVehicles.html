@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>How to Create New Vehicles</title>
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    background: #f8f9fa;
+}
+.content {
+    background: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+h1 { color: #2c3e50; margin-top: 0; padding-bottom: 0.3em; border-bottom: 2px solid #eee; }
+h2 { color: #34495e; margin-top: 1.5em; padding-bottom: 0.2em; border-bottom: 1px solid #eee; }
+h3, h4 { color: #34495e; margin-top: 1.2em; }
+h5, h6 { color: #34495e; margin-top: 1.0em; }
+code {
+    background: #f4f4f4;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.9em;
+}
+pre {
+    background: #2d2d2d;
+    color: #f8f8f2;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
+    margin: 1em 0;
+    font-size: 0.9em;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+    color: #f8f8f2;
+    white-space: pre;
+}
+blockquote {
+    border-left: 4px solid #3498db;
+    margin: 1em 0;
+    padding: 0.5em 0 0.5em 20px;
+    color: #555;
+    background: #f9f9f9;
+}
+blockquote p { margin: 0.4em 0; }
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px 12px;
+    text-align: left;
+    vertical-align: top;
+}
+th {
+    background: #f4f4f4;
+    font-weight: bold;
+}
+tr:nth-child(even) { background: #f9f9f9; }
+a { color: #3498db; text-decoration: none; transition: color 0.2s; }
+a:hover { color: #2980b9; text-decoration: underline; }
+ul, ol { margin: 1em 0; padding-left: 30px; }
+li { margin: 0.4em 0; }
+li > ul, li > ol { margin: 0.3em 0; }
+hr { border: none; border-top: 2px solid #eee; margin: 2em 0; }
+p { margin: 1em 0; }
+.footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    color: #999;
+    font-size: 0.9em;
+    text-align: center;
+}
+
+</style>
+</head>
+<body>
+<div class="content">
+<h1 id="how-to-create-new-vehicles">How to Create New Vehicles</h1>
+<p>This document walks you through turning your own 3D vehicle model into a working RCC vehicle. The end result is a prefab that drives, brakes, steers, has lights, makes engine noise, and behaves exactly like the included demo vehicles.</p>
+<p>There are two paths to creating a vehicle:</p>
+<ol>
+<li><strong>The Quick Vehicle Setup Wizard</strong> — recommended. Handles wheel collider creation, hierarchy setup, and component wiring automatically.</li>
+<li><strong>Manual setup</strong> — useful when you need precise control or when your model is unusual.</li>
+</ol>
+<p>This guide covers both. We start with the wizard since it's what most users want.</p>
+<h2 id="what-you-need-before-you-start">What You Need Before You Start</h2>
+<p>Before you create an RCC vehicle, your 3D model needs to meet a few basic requirements:</p>
+<ul>
+<li><strong>A car body mesh</strong> with a <code>MeshRenderer</code> and a <code>MeshFilter</code>. The body can be one mesh or many.</li>
+<li><strong>Four wheel mesh transforms</strong> — the visible wheel models. They should be <strong>separate child GameObjects</strong> under the car, not merged into the body mesh.</li>
+<li><strong>Pivot at the wheel center.</strong> Each wheel's pivot point must be at the wheel's center of rotation (not at the corner of the bounding box). This is the most common mistake: if your wheel rotates around the wrong point, the car will look broken in motion.</li>
+<li><strong>Forward axis = +Z.</strong> The vehicle should face the <strong>positive Z direction</strong> in Unity. If your model points the wrong way, rotate the parent GameObject 180° before continuing.</li>
+<li><strong>Reasonable scale.</strong> RCC is tuned for vehicles around 4–5 meters long. If your car is the size of a building or the size of a coin, scale it down or up first.</li>
+</ul>
+<p>If your model came from Blender, Maya, 3ds Max, or Fusion 360, the axis convention may need adjusting. Drop the FBX into Unity and check that the forward axis points +Z and the up axis points +Y. If the wheels rotate around the wrong axis when you spin them in the Scene view, you'll fix that in the wizard.</p>
+<h2 id="path-1-the-quick-vehicle-setup-wizard">Path 1: The Quick Vehicle Setup Wizard</h2>
+<p>The wizard is the recommended path. It does most of the boring wiring for you and explains each step inline.</p>
+<h3 id="step-1--drop-the-model-into-the-scene">Step 1 — Drop the Model into the Scene</h3>
+<p>In the Project window, find your vehicle model (the <code>.fbx</code> or <code>.obj</code> file). Drag it into the Hierarchy. The model appears at world origin.</p>
+<p>In the Inspector, set its <strong>Scale</strong> to (1, 1, 1) and confirm it's facing +Z. If it's not, rotate it now.</p>
+<p>If your model has the wheel meshes parented under the body, you may want to <strong>unparent the wheel transforms first</strong> so they sit as direct children of the root. The wizard works either way, but a clean hierarchy makes future edits easier:</p>
+<pre><code>MyCar/
+├── Body (mesh)
+├── FL_Wheel (mesh)
+├── FR_Wheel (mesh)
+├── RL_Wheel (mesh)
+└── RR_Wheel (mesh)
+</code></pre>
+<h3 id="step-2--open-the-wizard">Step 2 — Open the Wizard</h3>
+<p>In the menu bar, click <strong>Tools → BoneCracker Games → Realistic Car Controller → Quick Vehicle Setup Wizard</strong>.</p>
+<p>A wizard window opens. It has fields for:</p>
+<ul>
+<li><strong>Vehicle root</strong> — drag your car GameObject here.</li>
+<li><strong>Front Left Wheel Transform</strong> — drag the FL wheel mesh.</li>
+<li><strong>Front Right Wheel Transform</strong> — drag the FR wheel mesh.</li>
+<li><strong>Rear Left Wheel Transform</strong> — drag the RL wheel mesh.</li>
+<li><strong>Rear Right Wheel Transform</strong> — drag the RR wheel mesh.</li>
+<li>(Optional) <strong>Extra Rear Wheels</strong> — for multi-axle vehicles like trucks.</li>
+</ul>
+<p>Fill these in. If you have a 6-wheel truck, add two extra rear-wheel slots and assign them.</p>
+<h3 id="step-3--auto-detect-possible-wheels-optional">Step 3 — Auto-Detect Possible Wheels (Optional)</h3>
+<p>If you're not sure which transforms are the wheels (for example, you imported a model with 200 children named "polySurface17"), use the <strong>Auto Detect Possible Wheels</strong> button. The wizard scans the model's hierarchy and proposes candidates based on naming patterns (<code>wheel</code>, <code>tire</code>, <code>FL</code>, <code>FR</code>, etc.) and on bounding-box shape (wheels tend to be flatter cylinders).</p>
+<p>Review the proposed assignments and accept or override them.</p>
+<h3 id="step-4--run-the-setup">Step 4 — Run the Setup</h3>
+<p>Click <strong>Create Vehicle</strong>. The wizard does the following automatically:</p>
+<ol>
+<li>Adds an <code>RCC_CarControllerV4</code> component to the root.</li>
+<li>Adds a <code>Rigidbody</code> (<code>RequireComponent</code> ensures this).</li>
+<li>Sets mass to <strong>1500 kg</strong>, drag to <strong>0.01</strong>, angular drag to <strong>0.5</strong> (from <code>RCC_InitialSettings.asset</code>).</li>
+<li>Computes a center-of-mass placement based on the model's bounding box, places a <code>COM</code> child transform.</li>
+<li>Creates a <code>Wheel Colliders</code> container child.</li>
+<li>For each wheel, creates a child GameObject with a Unity <code>WheelCollider</code> and an <code>RCC_WheelCollider</code>, positioned at the wheel's transform.</li>
+<li>Sets up the wheel collider radius and suspension distance based on the wheel mesh's bounding box.</li>
+<li>Assigns the wheel mesh transforms and the wheel colliders to the corresponding fields on <code>RCC_CarControllerV4</code>.</li>
+<li>Sets up default values for engine, gears, friction curves, anti-roll bars, brake torque.</li>
+<li>Tags the GameObject <strong>Player</strong> so the SceneManager registers it automatically.</li>
+</ol>
+<p>After the wizard finishes, your car is ready to drive.</p>
+<h3 id="step-5--test">Step 5 — Test</h3>
+<p>Make sure your scene has an <code>RCC Scene Manager</code> and an <code>RCC Canvas</code> (see <strong><a href="05_QuickStart.html">05 — Quick Start</a></strong>). Press Play. You should be able to drive your car.</p>
+<p>If it doesn't drive correctly out of the box, the most likely issue is wheel positioning. See "Common Wheel Issues" below.</p>
+<h2 id="path-2-manual-setup">Path 2: Manual Setup</h2>
+<p>Use manual setup when:</p>
+<ul>
+<li>The wizard mis-detects your wheels.</li>
+<li>You need a non-standard configuration (e.g., motorcycle, monster truck with raised suspension).</li>
+<li>You're learning what the wizard does behind the scenes.</li>
+</ul>
+<h3 id="manual-step-1--prepare-the-hierarchy">Manual Step 1 — Prepare the Hierarchy</h3>
+<p>Set up the GameObject hierarchy like this:</p>
+<pre><code>MyCar/                              ← gets RCC_CarControllerV4 + Rigidbody
+├── Body                            ← the visible mesh
+├── COM                             ← empty transform for center of mass
+├── Wheel Colliders/                ← container
+│   ├── WheelCollider_FL            ← gets WheelCollider + RCC_WheelCollider
+│   ├── WheelCollider_FR
+│   ├── WheelCollider_RL
+│   └── WheelCollider_RR
+├── FL                              ← the front-left wheel mesh
+├── FR
+├── RL
+└── RR
+</code></pre>
+<p>The <strong>mesh</strong> transforms (<code>FL</code>, <code>FR</code>, <code>RL</code>, <code>RR</code>) and the <strong>collider</strong> transforms (under <code>Wheel Colliders/</code>) are separate. The mesh shows the visible wheel; the collider drives the physics.</p>
+<h3 id="manual-step-2--add-the-controller">Manual Step 2 — Add the Controller</h3>
+<p>Select the root GameObject. In the Inspector, click <strong>Add Component → RCC_CarControllerV4</strong>. Unity will add a <code>Rigidbody</code> automatically because of <code>[RequireComponent(typeof(Rigidbody))]</code>.</p>
+<p>Set the Rigidbody mass to <strong>1500</strong>, drag to <strong>0.01</strong>, angular drag to <strong>0.5</strong>.</p>
+<h3 id="manual-step-3--position-the-com">Manual Step 3 — Position the COM</h3>
+<p>Move the <code>COM</code> transform inside the vehicle to roughly where you'd expect the center of mass to be: about waist-height in the front seats, near the floor. This dramatically affects handling — too high and the car flips, too low and it understeers.</p>
+<p>For a sports car, COM Y should be around <strong>0.2–0.4 m</strong> above the ground. For an SUV, around <strong>0.6 m</strong>.</p>
+<p>In the <code>RCC_CarControllerV4</code> inspector, assign the <code>COM</code> transform to the <strong>COM</strong> field.</p>
+<h3 id="manual-step-4--set-up-wheel-colliders">Manual Step 4 — Set Up Wheel Colliders</h3>
+<p>For each wheel collider GameObject under <code>Wheel Colliders/</code>:</p>
+<ol>
+<li>Position it at the wheel's center.</li>
+<li>Add a Unity <code>WheelCollider</code> component.</li>
+<li>Set its <strong>Radius</strong> to the wheel's actual radius (measure from the mesh's bounding box).</li>
+<li>Set its <strong>Suspension Distance</strong> to about <strong>0.2 m</strong> for a road car.</li>
+<li>Set its <strong>Center</strong> to (0, 0, 0) — the collider is already positioned, so the center offset stays at zero.</li>
+<li>Add an <code>RCC_WheelCollider</code> component.</li>
+<li>Assign the wheel <strong>mesh transform</strong> (the visible wheel) to the <strong>Wheel Model</strong> field on <code>RCC_WheelCollider</code>.</li>
+</ol>
+<h3 id="manual-step-5--wire-wheels-to-the-controller">Manual Step 5 — Wire Wheels to the Controller</h3>
+<p>On the root <code>RCC_CarControllerV4</code>:</p>
+<ul>
+<li>Assign the four wheel mesh transforms (FL, FR, RL, RR) to <code>FrontLeftWheelTransform</code>, <code>FrontRightWheelTransform</code>, <code>RearLeftWheelTransform</code>, <code>RearRightWheelTransform</code>.</li>
+<li>Assign the four <code>RCC_WheelCollider</code> components (NOT the wheel mesh transforms) to <code>FrontLeftWheelCollider</code>, <code>FrontRightWheelCollider</code>, <code>RearLeftWheelCollider</code>, <code>RearRightWheelCollider</code>.</li>
+</ul>
+<p>For extra wheels (trucks, 6-wheelers), use the <code>ExtraRearWheelsTransform</code> and <code>ExtraRearWheelsCollider</code> arrays and set <code>hasExtraWheels = true</code>.</p>
+<h3 id="manual-step-6--tag-as-player">Manual Step 6 — Tag as Player</h3>
+<p>In the Inspector, set the GameObject's <strong>Tag</strong> to <strong>Player</strong>. The SceneManager will auto-register this vehicle on Start.</p>
+<h3 id="manual-step-7--set-up-the-engine-and-gears">Manual Step 7 — Set Up the Engine and Gears</h3>
+<p>Default engine values are fine for a sports car. If you want to tune them:</p>
+<ul>
+<li><strong>Max Engine Torque</strong> — peak torque in Newton-meters (default 300 Nm).</li>
+<li><strong>Max Engine Torque At RPM</strong> — RPM at which torque peaks (default 5500).</li>
+<li><strong>Min Engine RPM</strong> — idle RPM (default 800).</li>
+<li><strong>Max Engine RPM</strong> — redline (default 7000).</li>
+<li><strong>Total Gears</strong> — forward gears (default 6).</li>
+<li><strong>Final Ratio</strong> — final drive ratio (default 3.23).</li>
+</ul>
+<p>The engine torque curve is auto-generated from these values. If you uncheck <strong>Auto Generate Engine RPM Curve</strong>, you can hand-edit the curve.</p>
+<p>For gear ratios, RCC auto-generates a sensible distribution from <code>totalGears</code> and <code>finalRatio</code>. To tune them by hand, expand the <code>gears</code> array and edit each gear's <code>maxRatio</code>, <code>maxSpeed</code>, and <code>targetSpeedForNextGear</code>.</p>
+<h3 id="manual-step-8--test">Manual Step 8 — Test</h3>
+<p>Make sure your scene has a Scene Manager, a UI Canvas, and a ground plane. Press Play. Your car should now drive.</p>
+<h2 id="adding-lights">Adding Lights</h2>
+<p>The wizard does not add lights — you do that as a separate step.</p>
+<h3 id="add-headlights">Add Headlights</h3>
+<ol>
+<li>Position empty GameObjects at each headlight location on the car (front left, front right).</li>
+<li>Use the menu <strong>Tools → BoneCracker Games → Realistic Car Controller → Create → Lights → Add Lights To Vehicle → HeadLight</strong>.</li>
+<li>The selected GameObject gets a <code>Light</code> component, an <code>RCC_Light</code> component, a lens flare, and is configured as a headlight type.</li>
+</ol>
+<p>Repeat for each light:</p>
+<ul>
+<li><strong>Brake Light</strong> — place at the back of the car.</li>
+<li><strong>Reverse Light</strong> — place near the brake lights, separate fixture.</li>
+<li><strong>Indicator Light Left</strong> — place at front left and rear left.</li>
+<li><strong>Indicator Light Right</strong> — place at front right and rear right.</li>
+<li><strong>Interior Light</strong> — place inside the cabin.</li>
+</ul>
+<p>See <strong><a href="14_LightsSystem.html">14 — Lights System</a></strong> for full configuration.</p>
+<h2 id="adding-exhaust-effects">Adding Exhaust Effects</h2>
+<p>For smoke and exhaust flame effects:</p>
+<ol>
+<li>Create an empty GameObject behind the exhaust outlet, positioned at the tailpipe.</li>
+<li>Add an <code>RCC_Exhaust</code> component.</li>
+<li>The component will spawn a <code>Particle System</code> automatically using the exhaust gas prefab from <code>RCC_Settings</code>.</li>
+</ol>
+<p>If your car has two exhausts, create two <code>RCC_Exhaust</code> GameObjects.</p>
+<h2 id="adding-other-optional-components">Adding Other Optional Components</h2>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>What It Does</th>
+<th>Where to Add It</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>RCC_Mirror</code></td>
+<td>Side mirror with a render-camera reflection.</td>
+<td>Each side mirror transform.</td>
+</tr>
+<tr>
+<td><code>RCC_DetachablePart</code></td>
+<td>Lets a part break off on damage.</td>
+<td>Each detachable child (hood, doors, bumpers).</td>
+</tr>
+<tr>
+<td><code>RCC_Caliper</code></td>
+<td>Rotates a brake caliper with the wheel.</td>
+<td>Each caliper transform.</td>
+</tr>
+<tr>
+<td><code>RCC_LOD</code></td>
+<td>Lowers detail at distance.</td>
+<td>The root vehicle GameObject.</td>
+</tr>
+<tr>
+<td><code>RCC_TruckTrailer</code></td>
+<td>Lets a vehicle pull a trailer.</td>
+<td>The trailer GameObject.</td>
+</tr>
+<tr>
+<td><code>RCC_TrailerAttachPoint</code></td>
+<td>Hitch point on the towing vehicle.</td>
+<td>The hitch transform on the towing vehicle.</td>
+</tr>
+<tr>
+<td><code>RCC_Customizer</code></td>
+<td>Enables the customization system.</td>
+<td>The root vehicle GameObject. See <strong><a href="20_Customization.html">20 — Customization</a></strong>.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="save-as-a-prefab">Save as a Prefab</h2>
+<p>Once your vehicle works in the scene, drag the root GameObject from the Hierarchy into the Project window to create a prefab. From now on you can drag this prefab into any scene.</p>
+<p>If you ever change something on the prefab and want to push it to existing scene instances, use Unity's standard <strong>Prefab → Apply All</strong> workflow.</p>
+<h2 id="common-wheel-issues">Common Wheel Issues</h2>
+<h3 id="wheels-tilt-sideways-camber-looks-wrong">Wheels Tilt Sideways (Camber Looks Wrong)</h3>
+<p>The wheel mesh's <strong>forward axis</strong> is wrong. RCC assumes the wheel's forward (rolling) direction is +Z and the up axis is +Y. If your wheels were modeled with +X as forward, they'll roll sideways.</p>
+<p>Fix: open <strong>Tools → BoneCracker Games → Realistic Car Controller → Check Axis Orientation</strong>. The window lets you reorient wheels without re-exporting from your modeling software.</p>
+<h3 id="wheels-look-sunken-into-the-ground">Wheels Look Sunken Into the Ground</h3>
+<p>The wheel collider radius is too small, or the suspension distance is too large. Increase the <code>Radius</code> on the <code>WheelCollider</code> component until the wheel mesh sits naturally on the ground.</p>
+<h3 id="car-wobbles-or-vibrates-at-rest">Car Wobbles or Vibrates at Rest</h3>
+<p>The wheel colliders aren't symmetric — one wheel is slightly different radius or position. Make sure all four wheels have identical <code>Radius</code>, <code>Suspension Distance</code>, and <code>Suspension Spring</code> values. Differences cause the vehicle to constantly correct itself.</p>
+<p>Also check the COM position. If COM is above the wheels' suspension target, the rigidbody can oscillate.</p>
+<h3 id="car-flips-over-easily">Car Flips Over Easily</h3>
+<p>COM is too high. Move the <code>COM</code> transform down. As a sanity check, a sports car COM should be at most 0.4 m above the ground; an SUV at most 0.7 m.</p>
+<p>If COM is correct and it still flips, increase <code>antiRollFrontHorizontal</code> and <code>antiRollRearHorizontal</code> on the controller (default 1000 N — try 2000–5000 for heavier vehicles).</p>
+<h3 id="car-understeers--wont-turn">Car Understeers / Won't Turn</h3>
+<p>Friction curves are too forgiving on the front wheels. The behavior preset's <code>sidewaysExtremumValue</code> is the main lever. For a tighter-turning car:</p>
+<ul>
+<li>Try the <strong>Arcade</strong> behavior (<code>RCC.SetBehavior(2)</code>) — it has higher sideways grip.</li>
+<li>Or in <code>RCC_Settings.asset</code>, increase <code>sidewaysExtremumValue</code> in the active behavior preset (e.g., from 1.0 to 1.3).</li>
+<li>Or per-vehicle, enable <code>overrideBehavior</code> on <code>RCC_CarControllerV4</code> and tune the wheel friction curves directly.</li>
+</ul>
+<h3 id="car-oversteers--tail-wags">Car Oversteers / Tail Wags</h3>
+<p>Opposite problem — too little rear grip relative to front. Increase the rear wheels' <code>sidewaysExtremumValue</code> or decrease the front's.</p>
+<h2 id="vehicle-tuning-sanity-checks">Vehicle Tuning Sanity Checks</h2>
+<p>After your vehicle drives, run through this checklist:</p>
+<table>
+<thead>
+<tr>
+<th>Check</th>
+<th>What "Good" Looks Like</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Acceleration</td>
+<td>Reaches max speed within ~10 seconds on flat ground.</td>
+</tr>
+<tr>
+<td>Braking</td>
+<td>Stops from 100 km/h within ~30 m on asphalt.</td>
+</tr>
+<tr>
+<td>Turning</td>
+<td>Can make a 90° turn at 30 km/h without losing control.</td>
+</tr>
+<tr>
+<td>Drift</td>
+<td>At 50 km/h with handbrake, the car slides predictably.</td>
+</tr>
+<tr>
+<td>Bumps</td>
+<td>Drives over small bumps without going airborne.</td>
+</tr>
+<tr>
+<td>Ramp landings</td>
+<td>Lands and recovers without bouncing wildly.</td>
+</tr>
+<tr>
+<td>Standstill</td>
+<td>At idle, the car sits still without drifting or vibrating.</td>
+</tr>
+</tbody>
+</table>
+<p>If any of these look wrong, the behavior preset is probably the culprit. Try switching presets (<strong><a href="10_BehaviorPresets.html">10 — Behavior Presets</a></strong>) before tweaking individual fields.</p>
+<h2 id="next-steps">Next Steps</h2>
+<ul>
+<li>For a field-by-field walkthrough of the controller's Inspector: <strong><a href="08_VehicleInspectorReference.html">08 — Vehicle Inspector Reference</a></strong>.</li>
+<li>To understand how WheelColliders actually compute friction: <strong><a href="09_HowWheelCollidersWork.html">09 — How WheelColliders Work</a></strong>.</li>
+<li>To pick a driving feel (drift / arcade / simulator): <strong><a href="10_BehaviorPresets.html">10 — Behavior Presets</a></strong>.</li>
+<li>To add lights: <strong><a href="14_LightsSystem.html">14 — Lights System</a></strong>.</li>
+<li>To add the customization system: <strong><a href="20_Customization.html">20 — Customization</a></strong>.</li>
+</ul>
+</div>
+<div class="footer">
+Generated from: 07_HowToCreateNewVehicles.md<br>
+Date: 2026-05-22 00:32<br>
+© 2014 - 2026 BoneCracker Games — Realistic Car Controller V5.0.0
+</div>
+</body>
+</html>

@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 9f4bcff8475b0e3499968910b3c9a696
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 16296
+  packageName: Realistic Car Controller
+  packageVersion: 5.0.0
+  assetPath: Assets/RealisticCarControllerV4/Documentation/HTML/17_HowToOverrideInputs.html
+  uploadId: 920646

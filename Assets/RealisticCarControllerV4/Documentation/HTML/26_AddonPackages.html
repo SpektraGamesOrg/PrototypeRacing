@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Addon Packages — History and Current State</title>
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    background: #f8f9fa;
+}
+.content {
+    background: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+h1 { color: #2c3e50; margin-top: 0; padding-bottom: 0.3em; border-bottom: 2px solid #eee; }
+h2 { color: #34495e; margin-top: 1.5em; padding-bottom: 0.2em; border-bottom: 1px solid #eee; }
+h3, h4 { color: #34495e; margin-top: 1.2em; }
+h5, h6 { color: #34495e; margin-top: 1.0em; }
+code {
+    background: #f4f4f4;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.9em;
+}
+pre {
+    background: #2d2d2d;
+    color: #f8f8f2;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
+    margin: 1em 0;
+    font-size: 0.9em;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+    color: #f8f8f2;
+    white-space: pre;
+}
+blockquote {
+    border-left: 4px solid #3498db;
+    margin: 1em 0;
+    padding: 0.5em 0 0.5em 20px;
+    color: #555;
+    background: #f9f9f9;
+}
+blockquote p { margin: 0.4em 0; }
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px 12px;
+    text-align: left;
+    vertical-align: top;
+}
+th {
+    background: #f4f4f4;
+    font-weight: bold;
+}
+tr:nth-child(even) { background: #f9f9f9; }
+a { color: #3498db; text-decoration: none; transition: color 0.2s; }
+a:hover { color: #2980b9; text-decoration: underline; }
+ul, ol { margin: 1em 0; padding-left: 30px; }
+li { margin: 0.4em 0; }
+li > ul, li > ol { margin: 0.3em 0; }
+hr { border: none; border-top: 2px solid #eee; margin: 2em 0; }
+p { margin: 1em 0; }
+.footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    color: #999;
+    font-size: 0.9em;
+    text-align: center;
+}
+
+</style>
+</head>
+<body>
+<div class="content">
+<h1 id="addon-packages--history-and-current-state">Addon Packages — History and Current State</h1>
+<p>Historically, RCC was sold with two <strong>separately-purchased addon packages</strong> that added major systems on top of the core asset:</p>
+<ol>
+<li><strong>BCG Shared Assets</strong> — an Enter/Exit system that let players walk around on foot and enter/exit vehicles.</li>
+<li><strong>Photon Integration Package</strong> — multiplayer support using Photon PUN 2.</li>
+</ol>
+<p>Both addons have been <strong>discontinued in V5</strong>. This document explains why, what to do if you have an old project that uses them, and where to look for equivalent functionality today.</p>
+<h2 id="why-both-addons-were-removed">Why Both Addons Were Removed</h2>
+<p>When V5 of RCC went into LTS / maintenance mode, BoneCracker Games audited every system to decide what fit the new scope. The two addons were removed for these reasons:</p>
+<ul>
+<li><strong>They weren't part of RCC's identity.</strong> RCC is a <em>vehicle physics</em> package. Multiplayer and on-foot character control are major systems with their own complexity and maintenance burden. Tying them to RCC's release cycle was holding both back.</li>
+<li><strong>Better alternatives exist.</strong> Unity now ships its own first-party networking (Netcode for GameObjects), and the Unity Asset Store has dozens of dedicated character controllers. Maintaining custom versions inside RCC was duplicating work.</li>
+<li><strong>LTS philosophy.</strong> RCC is now a "stable, no new features" asset. Photon and Enter/Exit changes would have forced ongoing development, which isn't compatible with the LTS commitment.</li>
+</ul>
+<p>For projects that need these features going forward, the recommendation is to layer your own network sync or character system on top of RCC. <strong><a href="17_HowToOverrideInputs.html">17 — Overriding Inputs</a></strong> is the foundation: any external controller — multiplayer, AI, or character-driven — talks to the vehicle through that same interface.</p>
+<h2 id="bcg-shared-assets--the-enterexit-system">BCG Shared Assets — The Enter/Exit System</h2>
+<h3 id="what-it-was">What It Was</h3>
+<p>The Enter/Exit system gave you:</p>
+<ul>
+<li>A third-person character controller (player walks around).</li>
+<li>A vehicle "enter" trigger zone — walk up to a vehicle, press a key, the camera transitions to vehicle mode and you take control.</li>
+<li>An "exit" mechanic — press the same key to step out, the camera returns to character mode.</li>
+<li>A bridge between RCC's vehicle events and the character (so the character ragdolled during major vehicle crashes, for example).</li>
+</ul>
+<p>It was sold as a separate Asset Store package because the character system was substantial enough to warrant its own price.</p>
+<h3 id="why-it-was-useful">Why It Was Useful</h3>
+<p>GTA-style gameplay, where the player can be on foot or in a vehicle, requires this kind of transition. Without it, you had to build the character controller and the enter/exit logic yourself — non-trivial work, especially the camera handoff.</p>
+<h3 id="what-replaces-it">What Replaces It</h3>
+<p>For new projects, build your own:</p>
+<ol>
+<li>Use any third-party character controller (Unity's free Starter Assets pack, or commercial ones like UMotion, Opsive's UCC).</li>
+<li>When the player presses "enter":
+   - Hide the character mesh.
+   - Disable the character controller.
+   - Call <code>RCC.RegisterPlayerVehicle(vehicle)</code>.
+   - The RCC camera takes over and follows the vehicle.</li>
+<li>When the player presses "exit":
+   - Call <code>RCC.DeRegisterPlayerVehicle()</code>.
+   - Re-enable the character.
+   - Position the character next to the vehicle's exit anchor.
+   - Disable the RCC camera and re-enable a character follow camera.</li>
+</ol>
+<p>This is a few hundred lines of glue code, mostly state-machine logic for the transitions. Use the <code>RCC_Events.OnRCCPlayerSpawned</code> / <code>OnRCCPlayerDestroyed</code> events to coordinate.</p>
+<h3 id="migrating-an-old-project">Migrating an Old Project</h3>
+<p>If you have an existing project that uses the old BCG Shared Assets package:</p>
+<ol>
+<li><strong>Don't update RCC yet.</strong> Updating overwrites the integration points the addon hooks into.</li>
+<li><strong>Decide your migration strategy.</strong> Options:
+   - Stay on RCC V4.x indefinitely (the addon works there).
+   - Update to RCC V5 and rewrite your enter/exit logic from scratch.
+   - Stay on V4.x for one final release and migrate to V5 for the next.</li>
+<li><strong>Back up your project</strong> (Git commit) before any RCC update.</li>
+</ol>
+<p>If you ask BoneCracker Games support, they can sometimes share archived V4-era versions of the addon for projects that need backward compatibility.</p>
+<h2 id="photon-integration-package">Photon Integration Package</h2>
+<h3 id="what-it-was_1">What It Was</h3>
+<p>The Photon Integration Package wrapped RCC vehicles with Photon PUN 2 networking. Each player's vehicle was a <code>PhotonView</code>, and the package handled:</p>
+<ul>
+<li>Input replication (player inputs sent over the network).</li>
+<li>Transform sync (position / rotation interpolation).</li>
+<li>Rigidbody state sync (velocity, angular velocity).</li>
+<li>Event sync (gear shifts, indicator toggles, etc.).</li>
+<li>A demo scene with a lobby and a city scene.</li>
+</ul>
+<p>It was sold separately because Photon networking is a major dependency and not everyone needed it.</p>
+<h3 id="why-it-was-useful_1">Why It Was Useful</h3>
+<p>Multiplayer driving games are a popular genre. Pre-built networking saves weeks of work and avoids common pitfalls like jittery remote vehicles.</p>
+<h3 id="what-replaces-it_1">What Replaces It</h3>
+<p>For new projects, the recommended approach is Unity's official <strong>Netcode for GameObjects</strong> (NGO):</p>
+<ol>
+<li>Install Netcode for GameObjects via Package Manager.</li>
+<li>Add a <code>NetworkObject</code> component to your vehicle prefab.</li>
+<li>Add a <code>NetworkTransform</code> component for sync.</li>
+<li>Write a small script that:
+   - On the owning client, reads inputs from RCC's input system and pushes them via an RPC.
+   - On the non-owning clients, receives inputs and feeds them via <code>OverrideInputs()</code>.</li>
+</ol>
+<p>The full implementation depends on your authority model (server-authoritative vs client-authoritative) and your latency requirements. Search "Unity Netcode racing game" for community tutorials.</p>
+<p>Alternatives:</p>
+<ul>
+<li><strong>Mirror Networking</strong> — open-source, mature.</li>
+<li><strong>Photon Fusion</strong> — Photon's modern replacement for PUN, faster and more deterministic.</li>
+<li><strong>Photon PUN 2</strong> — still available, but no longer integrated with RCC. You'd build the integration yourself using the same pattern.</li>
+</ul>
+<h3 id="migrating-an-old-project_1">Migrating an Old Project</h3>
+<p>Same advice as for Enter/Exit:</p>
+<ol>
+<li>Back up.</li>
+<li>Decide: stay on V4.x, or migrate to V5 and rewrite networking.</li>
+<li>If migrating, use the Photon integration as a <em>reference</em> (it's a guide for how to bridge RCC to a network library), but the actual code needs to be rewritten on top of NGO / Fusion / Mirror.</li>
+</ol>
+<h2 id="photon-related-defines">Photon-Related Defines</h2>
+<p>If you previously had the Photon addon installed, your project may have these scripting define symbols left over:</p>
+<ul>
+<li><code>RCC_PHOTON</code></li>
+<li><code>PHOTON_UNITY_NETWORKING</code></li>
+</ul>
+<p>These were used by RCC's V4-era code to conditionally compile Photon-aware code paths. In V5, all <code>#if RCC_PHOTON</code> blocks have been removed. You can safely remove these defines from your project's <strong>Scripting Define Symbols</strong> (Project Settings → Player → Other Settings).</p>
+<p>If you see compile errors mentioning <code>Photon.PhotonNetwork</code> or <code>PhotonView</code> after updating to V5, it's because your project still has Photon assemblies but RCC no longer references them. Either:</p>
+<ul>
+<li>Install Photon PUN 2 (if you actually want multiplayer).</li>
+<li>Or remove Photon from your project entirely.</li>
+</ul>
+<h2 id="bcg_enterexit-define">BCG_ENTEREXIT Define</h2>
+<p>Similarly, the <code>BCG_ENTEREXIT</code> define was used by V4-era RCC code to conditionally enable Enter/Exit integration points. In V5:</p>
+<ul>
+<li>All <code>#if BCG_ENTEREXIT</code> blocks are still in <code>RCC_Events.cs</code> (so user code that subscribes to <code>OnPlayerEnteredVehicle</code> / <code>OnPlayerExitedVehicle</code> doesn't break at compile time).</li>
+<li>The events never fire because the addon is gone.</li>
+</ul>
+<p>You can safely remove the <code>BCG_ENTEREXIT</code> define from your project once you've ensured no game code depends on it.</p>
+<h2 id="whats-left-in-v5">What's Left in V5</h2>
+<p>V5 includes a minimal <code>RCC_CharacterController.cs</code> script in <code>Scripts/Others/</code>. This is a very basic placeholder (a few dozen lines) used by certain demo scenes for cameras that aren't following a vehicle. It is <strong>not</strong> an Enter/Exit system — don't try to use it as a base for character gameplay.</p>
+<h2 id="building-your-own-multiplayer--character-integration">Building Your Own Multiplayer / Character Integration</h2>
+<p>If you're starting fresh on either feature, here's the recommended path:</p>
+<h3 id="multiplayer">Multiplayer</h3>
+<ol>
+<li>Install Netcode for GameObjects.</li>
+<li>Make your vehicle prefab a <code>NetworkObject</code>.</li>
+<li>Use <code>OverrideInputs()</code> on non-owning clients to drive the vehicle from received inputs.</li>
+<li>Sync transform + rigidbody state with <code>NetworkTransform</code> + custom RPCs.</li>
+<li>Test on LAN, then iterate on latency masking.</li>
+</ol>
+<p>A complete implementation is roughly 200–400 lines of glue code. There are community examples on GitHub — search "Unity NGO car game."</p>
+<h3 id="character">Character</h3>
+<ol>
+<li>Use any third-party character controller.</li>
+<li>Detect "enter vehicle" via a trigger volume around each vehicle.</li>
+<li>On enter input, switch state machines (hide character, register RCC player).</li>
+<li>On exit input, switch back.</li>
+<li>Add cosmetic transitions (open door, animated entry, camera blend).</li>
+</ol>
+<p>Total: 100–300 lines, depending on polish.</p>
+<h2 id="next-steps">Next Steps</h2>
+<ul>
+<li><strong><a href="17_HowToOverrideInputs.html">17 — Overriding Inputs</a></strong> — the foundation for multiplayer / character integration.</li>
+<li><strong><a href="24_EventsSystem.html">24 — Events System</a></strong> — events to coordinate between vehicle and external systems.</li>
+<li><strong><a href="23_ScriptingAPI.html">23 — Scripting API</a></strong> — <code>RegisterPlayerVehicle</code> / <code>DeRegisterPlayerVehicle</code> for character transitions.</li>
+</ul>
+</div>
+<div class="footer">
+Generated from: 26_AddonPackages.md<br>
+Date: 2026-05-22 00:32<br>
+© 2014 - 2026 BoneCracker Games — Realistic Car Controller V5.0.0
+</div>
+</body>
+</html>

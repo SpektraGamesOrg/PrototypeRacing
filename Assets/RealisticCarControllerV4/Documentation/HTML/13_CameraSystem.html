@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Camera System</title>
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    background: #f8f9fa;
+}
+.content {
+    background: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+h1 { color: #2c3e50; margin-top: 0; padding-bottom: 0.3em; border-bottom: 2px solid #eee; }
+h2 { color: #34495e; margin-top: 1.5em; padding-bottom: 0.2em; border-bottom: 1px solid #eee; }
+h3, h4 { color: #34495e; margin-top: 1.2em; }
+h5, h6 { color: #34495e; margin-top: 1.0em; }
+code {
+    background: #f4f4f4;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.9em;
+}
+pre {
+    background: #2d2d2d;
+    color: #f8f8f2;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
+    margin: 1em 0;
+    font-size: 0.9em;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+    color: #f8f8f2;
+    white-space: pre;
+}
+blockquote {
+    border-left: 4px solid #3498db;
+    margin: 1em 0;
+    padding: 0.5em 0 0.5em 20px;
+    color: #555;
+    background: #f9f9f9;
+}
+blockquote p { margin: 0.4em 0; }
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px 12px;
+    text-align: left;
+    vertical-align: top;
+}
+th {
+    background: #f4f4f4;
+    font-weight: bold;
+}
+tr:nth-child(even) { background: #f9f9f9; }
+a { color: #3498db; text-decoration: none; transition: color 0.2s; }
+a:hover { color: #2980b9; text-decoration: underline; }
+ul, ol { margin: 1em 0; padding-left: 30px; }
+li { margin: 0.4em 0; }
+li > ul, li > ol { margin: 0.3em 0; }
+hr { border: none; border-top: 2px solid #eee; margin: 2em 0; }
+p { margin: 1em 0; }
+.footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    color: #999;
+    font-size: 0.9em;
+    text-align: center;
+}
+
+</style>
+</head>
+<body>
+<div class="content">
+<h1 id="camera-system">Camera System</h1>
+<p>RCC ships with a complete camera system designed to follow vehicles. It supports six camera modes that the player can cycle through, plus a few specialized cameras for showrooms and replays. This document explains each mode, how to add a camera to a scene, and how to extend the camera system for your own needs.</p>
+<h2 id="what-rcc_camera-does">What <code>RCC_Camera</code> Does</h2>
+<p>The <code>RCC_Camera</code> component is the main player-following camera. One per scene. It automatically follows whichever vehicle <code>RCC_SceneManager</code> says is the active player. When the player switches cars (e.g., via a car-selection menu), the camera switches its target automatically — no setup required.</p>
+<p>The component lives on a child GameObject under the camera's root, and the parent GameObject has the standard Unity <code>Camera</code> component plus <code>AudioListener</code>. RCC's camera replaces Unity's default Main Camera in any RCC scene.</p>
+<h2 id="the-camera-modes">The Camera Modes</h2>
+<p><code>RCC_Camera</code> cycles through these modes in order each time the player presses <strong>C</strong> (or your custom rebind):</p>
+<h3 id="tps--third-person-follow">TPS — Third-Person Follow</h3>
+<p>The default. The camera is positioned behind and above the vehicle, looking forward at it. It smoothly follows the vehicle's position and rotation with configurable damping.</p>
+<p>This mode has the most tuning options:</p>
+<ul>
+<li><strong>Distance</strong> — how far behind the vehicle.</li>
+<li><strong>Height</strong> — how high above.</li>
+<li><strong>Rotation Damping</strong> — how quickly the camera follows the vehicle's yaw.</li>
+<li><strong>Tilt with Steering</strong> — adds slight camera lean during turns for cinematic effect.</li>
+<li><strong>Tilt with Drift</strong> — adds more dramatic lean during big slides.</li>
+<li><strong>Look-Back Angle</strong> — the angle the camera flips to when the look-back input is held.</li>
+</ul>
+<p>Tune these in the <code>RCC_Camera</code> Inspector under the <strong>TPS Settings</strong> foldout.</p>
+<h3 id="hood--first-person-from-hood">Hood — First-Person from Hood</h3>
+<p>Camera attaches to a "hood camera anchor" inside the vehicle prefab (<code>RCC_HoodCamera</code> component on a child transform). You see the world from approximately the driver's perspective.</p>
+<p>This requires the vehicle to have an <code>RCC_HoodCamera</code> GameObject. Most demo vehicles include one already; if yours doesn't, see "Adding Hood Camera to a Vehicle" below.</p>
+<h3 id="wheel--close-up-wheel-view">Wheel — Close-Up Wheel View</h3>
+<p>Camera attaches to <code>RCC_WheelCamera</code> if the vehicle has one. Shows a close-up of a specific wheel during driving. Cinematic — not useful for actual gameplay, but great for screenshots and replays.</p>
+<p>Like the hood camera, this mode requires an <code>RCC_WheelCamera</code> child on the vehicle.</p>
+<h3 id="fixed--scene-anchor-points">Fixed — Scene Anchor Points</h3>
+<p>Camera teleports to whichever <code>RCC_FixedCamera</code> instance is in the scene. Useful for setting up dramatic angles at specific scene locations (e.g., a camera that watches the player drive past a particular landmark).</p>
+<p>Setup: place <code>RCC_FixedCamera</code> GameObjects in the scene at the angles you want. The camera will cycle between them.</p>
+<h3 id="cinematic--automated-dramatic-shots">Cinematic — Automated Dramatic Shots</h3>
+<p>The <code>RCC_CinematicCamera</code> singleton handles automatic cinematic shots: it orbits the vehicle, switches angles every few seconds, and adjusts FOV for dramatic effect. Designed for replays, victory screens, or AFK demo loops.</p>
+<p>Setup: drop the <code>RCC_CinematicCamera</code> prefab into your scene (or use <strong>Tools → BoneCracker Games → Realistic Car Controller → Create → Cameras → Cinematic Camera</strong>).</p>
+<h3 id="top--top-down-view">Top — Top-Down View</h3>
+<p>Camera positions itself directly above the vehicle looking down. Useful for spatial-awareness gameplay (e.g., parking levels, RTS-style camera) or for previewing a track.</p>
+<h2 id="adding-a-camera-to-a-scene">Adding a Camera to a Scene</h2>
+<p>The easiest path:</p>
+<p><strong>Tools → BoneCracker Games → Realistic Car Controller → Create → Cameras → Add RCC Camera To Scene</strong></p>
+<p>This adds a properly-configured <code>RCC Camera</code> GameObject. Delete Unity's default Main Camera afterwards — RCC's camera replaces it.</p>
+<p>If you instantiate the camera through code (rare), spawn the <code>RCC_MainCameraProvider</code>-managed prefab from <code>RCC_Settings.Instance.RCCMainCamera</code>:</p>
+<pre><code class="language-csharp">RCC_Camera cam = Instantiate(RCC_Settings.Instance.RCCMainCamera);
+</code></pre>
+<p>The camera will find the active player vehicle on its first Update and start following.</p>
+<h2 id="cycling-cameras-at-runtime">Cycling Cameras at Runtime</h2>
+<p>Three ways:</p>
+<h3 id="1-input">1. Input</h3>
+<p>Press <strong>C</strong> in any scene. The default Input System binding cycles modes.</p>
+<h3 id="2-public-api">2. Public API</h3>
+<pre><code class="language-csharp">RCC.ChangeCamera();
+</code></pre>
+<p>This is what the <strong>C</strong> key is wired to via <code>RCC_InputManager</code>.</p>
+<h3 id="3-direct-method">3. Direct Method</h3>
+<pre><code class="language-csharp">RCC_SceneManager.Instance.activePlayerCamera.ChangeCamera();
+</code></pre>
+<p>The first two are equivalent. Use whichever fits your code style.</p>
+<h2 id="adding-a-hood-camera-to-a-vehicle">Adding a Hood Camera to a Vehicle</h2>
+<p>If you want the Hood mode to work for a custom vehicle:</p>
+<ol>
+<li>Open the vehicle prefab.</li>
+<li>Create a child empty GameObject called <code>Hood Camera</code>.</li>
+<li>Position it at the driver's eye position (roughly at the windshield, slightly inset).</li>
+<li>Rotate it to face forward (+Z).</li>
+<li>Add an <code>RCC_HoodCamera</code> component.</li>
+</ol>
+<p>When the player cycles to Hood mode, the main camera will reparent to this transform.</p>
+<p>You can position this transform anywhere — front bumper for a bumper cam, dashboard for a dashboard cam, etc.</p>
+<h2 id="adding-a-wheel-camera-to-a-vehicle">Adding a Wheel Camera to a Vehicle</h2>
+<p>Same pattern as hood camera:</p>
+<ol>
+<li>Create a child empty GameObject called <code>Wheel Camera</code>.</li>
+<li>Position it next to one of the wheels (e.g., front-left wheel) at the desired angle.</li>
+<li>Add an <code>RCC_WheelCamera</code> component.</li>
+</ol>
+<p>When cycling to Wheel mode, the main camera will reparent to this transform.</p>
+<h2 id="setting-up-fixed-cameras">Setting Up Fixed Cameras</h2>
+<p>Fixed cameras are scene-specific anchor points the camera can teleport to.</p>
+<ol>
+<li>Create an empty GameObject in your scene at the location you want.</li>
+<li>Rotate it to point the camera the right way.</li>
+<li>Add an <code>RCC_FixedCamera</code> component.</li>
+</ol>
+<p>You can place multiple fixed cameras — the system cycles through them in order on each Fixed mode activation, or based on proximity to the vehicle, depending on the configuration.</p>
+<h2 id="setting-up-cinematic-camera">Setting Up Cinematic Camera</h2>
+<p>The cinematic camera is one per scene (a singleton).</p>
+<ol>
+<li>Use <strong>Tools → BoneCracker Games → Realistic Car Controller → Create → Cameras → Cinematic Camera</strong> to drop it in.</li>
+<li>The component finds the player vehicle automatically and starts orbiting.</li>
+</ol>
+<p>Cinematic settings on the component:</p>
+<ul>
+<li><strong>Switch Interval</strong> — how often to change angle (default 5 sec).</li>
+<li><strong>Orbit Speed</strong> — how fast the camera circles the vehicle.</li>
+<li><strong>FOV</strong> — fixed FOV for the cinematic look (default 50).</li>
+</ul>
+<h2 id="camera-field-of-view-fov">Camera Field of View (FOV)</h2>
+<p>Each mode has its own FOV. Tune in the Inspector:</p>
+<ul>
+<li>TPS: typical 60 (default).</li>
+<li>Hood: 75 (closer feels more immersive).</li>
+<li>Wheel: 35 (telephoto compression).</li>
+<li>Fixed: per-fixed-camera setting.</li>
+<li>Cinematic: 50 (default).</li>
+<li>Top: 60 with orthographic option available.</li>
+</ul>
+<h2 id="camera-damping-and-smoothness">Camera Damping and Smoothness</h2>
+<p>The camera's follow behavior is damped to feel cinematic. Key tunables:</p>
+<ul>
+<li><strong>Position Damp</strong> — how much the camera lags behind the vehicle's position. Higher = more lag (smoother but less responsive).</li>
+<li><strong>Rotation Damp</strong> — how much the camera lags the vehicle's yaw.</li>
+<li><strong>Look At Damp</strong> — how quickly the camera's look-at point follows the vehicle.</li>
+</ul>
+<p>For action / arcade games, decrease these (faster response, more responsive feel).
+For simulators / cinematic games, increase these (smoother, more cinematic).</p>
+<h2 id="camera-collision-avoidance">Camera Collision Avoidance</h2>
+<p>RCC's camera does <strong>not</strong> automatically avoid scene geometry by default. If the camera ends up inside a wall (a common problem in narrow scenes), you have two options:</p>
+<ol>
+<li><strong>Increase Camera Distance</strong> — keep the camera further from the vehicle so it's less likely to hit anything.</li>
+<li><strong>Add Custom Collision Logic</strong> — write a script that raycasts from the vehicle to the camera and snaps the camera closer if anything's in the way. This is the standard "TPS camera collision" pattern and you'll find Unity tutorials for it.</li>
+</ol>
+<p>The reason RCC doesn't ship this is that the optimal behavior depends heavily on your scene layout. A racing game on an open track needs no avoidance; a city scene needs aggressive avoidance.</p>
+<h2 id="adding-custom-camera-modes">Adding Custom Camera Modes</h2>
+<p>If you want a camera mode that RCC doesn't include (e.g., chase from far behind, or a fixed-angle isometric), the cleanest approach is to <strong>not modify <code>RCC_Camera</code></strong>. Instead:</p>
+<ol>
+<li>Create your own MonoBehaviour script that controls Unity's Camera component.</li>
+<li>Disable <code>RCC_Camera</code> when your custom mode is active.</li>
+<li>Re-enable it when switching back.</li>
+</ol>
+<p>For example:</p>
+<pre><code class="language-csharp">public class CustomTopDownCamera : MonoBehaviour {
+    public Camera mainCamera;
+    public Transform vehicleToFollow;
+    public float height = 30f;
+
+    void LateUpdate() {
+        Vector3 target = vehicleToFollow.position + Vector3.up * height;
+        mainCamera.transform.position = Vector3.Lerp(mainCamera.transform.position, target, Time.deltaTime * 5);
+        mainCamera.transform.LookAt(vehicleToFollow);
+    }
+}
+</code></pre>
+<p>To activate: get the active player vehicle from <code>RCC_SceneManager.Instance.activePlayerVehicle</code>, assign it to your script's <code>vehicleToFollow</code>, and disable the <code>RCC_Camera</code> component.</p>
+<h2 id="listening-for-camera-changes">Listening for Camera Changes</h2>
+<p>If your game has UI that should react to camera mode changes:</p>
+<pre><code class="language-csharp">using UnityEngine;
+
+public class CameraIndicator : MonoBehaviour {
+    void OnEnable()  { RCC_Events.OnChangeCamera += HandleChange; }
+    void OnDisable() { RCC_Events.OnChangeCamera -= HandleChange; }
+
+    void HandleChange() {
+        Debug.Log(&quot;Camera changed!&quot;);
+    }
+}
+</code></pre>
+<p>See <strong><a href="24_EventsSystem.html">24 — Events System</a></strong>.</p>
+<h2 id="listening-for-look-back">Listening for Look-Back</h2>
+<p>When the player holds the look-back button:</p>
+<pre><code class="language-csharp">void OnEnable()  { RCC_Events.OnLookBack += HandleLookBack; }
+void OnDisable() { RCC_Events.OnLookBack -= HandleLookBack; }
+
+void HandleLookBack(bool isLookingBack) {
+    // Update mirrors, post-processing, etc.
+}
+</code></pre>
+<h2 id="audio-listener">Audio Listener</h2>
+<p>The main camera GameObject also hosts the scene's <code>AudioListener</code>. This is important for 3D positional audio (engine sound coming from the right side when a car drives past). Don't put a separate AudioListener anywhere else in the scene — only one should exist.</p>
+<h2 id="multiple-cameras-split-screen">Multiple Cameras (Split Screen)</h2>
+<p>RCC's camera system is designed for <strong>single-player</strong>. For split-screen multiplayer, you'd need to:</p>
+<ol>
+<li>Disable <code>RCC_Camera</code>.</li>
+<li>Spawn two Unity <code>Camera</code>s side by side with different viewport rects.</li>
+<li>Write your own follow logic per camera, each targeting a different vehicle.</li>
+</ol>
+<p>This is non-trivial and outside RCC's core scope. If split-screen is critical to your game, plan for the camera work as a separate task.</p>
+<h2 id="common-camera-issues">Common Camera Issues</h2>
+<h3 id="the-camera-doesnt-follow-anything">"The camera doesn't follow anything"</h3>
+<p>The Scene Manager hasn't registered a player vehicle. Either tag a vehicle "Player" or call <code>RCC.RegisterPlayerVehicle(vehicle)</code>.</p>
+<h3 id="the-camera-follows-but-at-a-weird-angle">"The camera follows but at a weird angle"</h3>
+<p>Check the <strong>Distance</strong>, <strong>Height</strong>, and <strong>Rotation Damping</strong> values on the TPS settings. Default values are tuned for sports cars — trucks may want higher height and distance.</p>
+<h3 id="hood-mode-shows-the-inside-of-the-body">"Hood mode shows the inside of the body"</h3>
+<p>The hood camera transform is positioned inside the vehicle mesh. Move it forward / up until it's just outside the cabin geometry.</p>
+<h3 id="the-camera-is-shaky-at-high-speed">"The camera is shaky at high speed"</h3>
+<p>Increase position and rotation damping. Or check that <code>Time.fixedDeltaTime</code> is reasonable (default 0.02 s = 50 Hz). Higher fixed delta times produce visible vehicle vibration at high speed.</p>
+<h3 id="cinematic-mode-keeps-clipping-into-the-ground">"Cinematic mode keeps clipping into the ground"</h3>
+<p><code>RCC_CinematicCamera</code> orbits at a fixed height — if your scene has hilly terrain, the camera may dip below ground at certain angles. Increase the cinematic camera's minimum height, or add a raycast clamp to keep it above the ground.</p>
+<h2 id="next-steps">Next Steps</h2>
+<ul>
+<li><strong><a href="14_LightsSystem.html">14 — Lights System</a></strong> — light setup including dashboard lighting that reacts to the camera mode.</li>
+<li><strong><a href="24_EventsSystem.html">24 — Events System</a></strong> — events for camera and look-back changes.</li>
+<li><strong><a href="23_ScriptingAPI.html">23 — Scripting API</a></strong> — <code>RCC.ChangeCamera()</code> and friends.</li>
+</ul>
+</div>
+<div class="footer">
+Generated from: 13_CameraSystem.md<br>
+Date: 2026-05-22 00:32<br>
+© 2014 - 2026 BoneCracker Games — Realistic Car Controller V5.0.0
+</div>
+</body>
+</html>

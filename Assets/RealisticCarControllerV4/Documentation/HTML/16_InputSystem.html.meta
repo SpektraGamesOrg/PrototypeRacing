@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: b3e740287e0b4ad48a1e8cf2fd6e179d
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 16296
+  packageName: Realistic Car Controller
+  packageVersion: 5.0.0
+  assetPath: Assets/RealisticCarControllerV4/Documentation/HTML/16_InputSystem.html
+  uploadId: 920646

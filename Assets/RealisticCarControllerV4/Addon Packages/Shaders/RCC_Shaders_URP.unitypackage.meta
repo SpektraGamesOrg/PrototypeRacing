@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 01255535336085a42b7d177b6c88fbfd
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 16296
+  packageName: Realistic Car Controller
+  packageVersion: 5.0.0
+  assetPath: Assets/RealisticCarControllerV4/Addon Packages/Shaders/RCC_Shaders_URP.unitypackage
+  uploadId: 920646

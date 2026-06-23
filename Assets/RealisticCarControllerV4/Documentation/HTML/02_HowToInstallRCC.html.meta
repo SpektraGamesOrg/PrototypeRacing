@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: eb66af6bfb00d6844b2764b2652d158a
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 16296
+  packageName: Realistic Car Controller
+  packageVersion: 5.0.0
+  assetPath: Assets/RealisticCarControllerV4/Documentation/HTML/02_HowToInstallRCC.html
+  uploadId: 920646

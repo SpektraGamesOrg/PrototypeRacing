@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Events System</title>
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    background: #f8f9fa;
+}
+.content {
+    background: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+h1 { color: #2c3e50; margin-top: 0; padding-bottom: 0.3em; border-bottom: 2px solid #eee; }
+h2 { color: #34495e; margin-top: 1.5em; padding-bottom: 0.2em; border-bottom: 1px solid #eee; }
+h3, h4 { color: #34495e; margin-top: 1.2em; }
+h5, h6 { color: #34495e; margin-top: 1.0em; }
+code {
+    background: #f4f4f4;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.9em;
+}
+pre {
+    background: #2d2d2d;
+    color: #f8f8f2;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
+    margin: 1em 0;
+    font-size: 0.9em;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+    color: #f8f8f2;
+    white-space: pre;
+}
+blockquote {
+    border-left: 4px solid #3498db;
+    margin: 1em 0;
+    padding: 0.5em 0 0.5em 20px;
+    color: #555;
+    background: #f9f9f9;
+}
+blockquote p { margin: 0.4em 0; }
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px 12px;
+    text-align: left;
+    vertical-align: top;
+}
+th {
+    background: #f4f4f4;
+    font-weight: bold;
+}
+tr:nth-child(even) { background: #f9f9f9; }
+a { color: #3498db; text-decoration: none; transition: color 0.2s; }
+a:hover { color: #2980b9; text-decoration: underline; }
+ul, ol { margin: 1em 0; padding-left: 30px; }
+li { margin: 0.4em 0; }
+li > ul, li > ol { margin: 0.3em 0; }
+hr { border: none; border-top: 2px solid #eee; margin: 2em 0; }
+p { margin: 1em 0; }
+.footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    color: #999;
+    font-size: 0.9em;
+    text-align: center;
+}
+
+</style>
+</head>
+<body>
+<div class="content">
+<h1 id="events-system">Events System</h1>
+<p><code>RCC_Events</code> is a centralized event hub that fires at every interesting moment in a vehicle's life — spawn, destroy, collision, gear shift, indicator toggle, camera change, and so on. Subscribing to these events is the <strong>recommended way to integrate your game code with RCC</strong> because it doesn't require modifying any RCC scripts.</p>
+<p>This document covers every event, what triggers it, and shows working subscription patterns.</p>
+<h2 id="how-rcc_events-works">How <code>RCC_Events</code> Works</h2>
+<p><code>RCC_Events</code> is a plain static class. Each event is a static C# delegate. You subscribe in <code>OnEnable</code> and unsubscribe in <code>OnDisable</code>:</p>
+<pre><code class="language-csharp">void OnEnable()  { RCC_Events.OnRCCPlayerSpawned += MyHandler; }
+void OnDisable() { RCC_Events.OnRCCPlayerSpawned -= MyHandler; }
+
+void MyHandler(RCC_CarControllerV4 vehicle) {
+    Debug.Log(&quot;New player vehicle: &quot; + vehicle.name);
+}
+</code></pre>
+<p>This is the standard C# event pattern. <strong>Always unsubscribe</strong> in <code>OnDisable</code> to avoid memory leaks and null-reference exceptions when the subscribing GameObject is destroyed.</p>
+<h2 id="event-categories">Event Categories</h2>
+<p>The events are grouped into:</p>
+<ul>
+<li><strong>Vehicle Lifecycle</strong> — spawn, destroy, collide.</li>
+<li><strong>AI Lifecycle</strong> — AI spawn, AI destroy.</li>
+<li><strong>Camera</strong> — camera spawn.</li>
+<li><strong>Scene Management</strong> — behavior change, vehicle change.</li>
+<li><strong>Input Events</strong> — engine toggle, gear shift, indicator toggle, etc.</li>
+</ul>
+<h2 id="vehicle-lifecycle-events">Vehicle Lifecycle Events</h2>
+<h3 id="onrccplayerspawned">OnRCCPlayerSpawned</h3>
+<pre><code class="language-csharp">public delegate void onRCCPlayerSpawned(RCC_CarControllerV4 RCC);
+public static event onRCCPlayerSpawned OnRCCPlayerSpawned;
+</code></pre>
+<p>Fires after a vehicle is registered as the player. Triggered by <code>RCC.RegisterPlayerVehicle()</code> or by the SceneManager auto-registering a vehicle tagged "Player."</p>
+<p><strong>Use cases</strong>: bind your HUD to the new vehicle, attach a follow camera, update minimap.</p>
+<p><strong>Example: Bind HUD to the spawned player</strong></p>
+<pre><code class="language-csharp">using UnityEngine;
+
+public class HUDBinder : MonoBehaviour {
+    public Text speedometer;
+    private RCC_CarControllerV4 currentVehicle;
+
+    void OnEnable()  { RCC_Events.OnRCCPlayerSpawned += BindToVehicle; }
+    void OnDisable() { RCC_Events.OnRCCPlayerSpawned -= BindToVehicle; }
+
+    void BindToVehicle(RCC_CarControllerV4 vehicle) {
+        currentVehicle = vehicle;
+    }
+
+    void Update() {
+        if (currentVehicle != null) {
+            speedometer.text = $&quot;{currentVehicle.speed:F0} km/h&quot;;
+        }
+    }
+}
+</code></pre>
+<h3 id="onrccplayerdestroyed">OnRCCPlayerDestroyed</h3>
+<pre><code class="language-csharp">public delegate void onRCCPlayerDestroyed(RCC_CarControllerV4 RCC);
+public static event onRCCPlayerDestroyed OnRCCPlayerDestroyed;
+</code></pre>
+<p>Fires when the active player vehicle is de-registered — either because of <code>RCC.DeRegisterPlayerVehicle()</code> or because the vehicle's <code>OnDestroy</code> was called.</p>
+<p><strong>Use cases</strong>: clean up HUD bindings, detach the camera, save player state.</p>
+<h3 id="onrccplayercollision">OnRCCPlayerCollision</h3>
+<pre><code class="language-csharp">public delegate void onRCCPlayerCollision(RCC_CarControllerV4 RCC, Collision collision);
+public static event onRCCPlayerCollision OnRCCPlayerCollision;
+</code></pre>
+<p>Fires inside the player vehicle's <code>OnCollisionEnter</code>. The <code>collision</code> parameter is Unity's standard <code>Collision</code> — you have access to contact points, relative velocity, the other collider, etc.</p>
+<p><strong>Use cases</strong>: trigger crash audio, subtract health, play damage VFX, track collision count.</p>
+<p><strong>Example: Track crashes for a "no-crash" achievement</strong></p>
+<pre><code class="language-csharp">public class CrashTracker : MonoBehaviour {
+    public int crashCount = 0;
+    public float crashThresholdSpeed = 5f; // m/s
+
+    void OnEnable()  { RCC_Events.OnRCCPlayerCollision += OnCollision; }
+    void OnDisable() { RCC_Events.OnRCCPlayerCollision -= OnCollision; }
+
+    void OnCollision(RCC_CarControllerV4 vehicle, Collision collision) {
+        if (collision.relativeVelocity.magnitude &gt; crashThresholdSpeed) {
+            crashCount++;
+            // achievement failed, etc.
+        }
+    }
+}
+</code></pre>
+<h2 id="ai-lifecycle-events">AI Lifecycle Events</h2>
+<h3 id="onrccaispawned">OnRCCAISpawned</h3>
+<pre><code class="language-csharp">public delegate void onRCCAISpawned(RCC_AICarController RCCAI);
+public static event onRCCAISpawned OnRCCAISpawned;
+</code></pre>
+<p>Fires when an AI vehicle becomes active.</p>
+<p><strong>Use cases</strong>: add to a minimap, populate a hostile list, count active enemies.</p>
+<h3 id="onrccaidestroyed">OnRCCAIDestroyed</h3>
+<pre><code class="language-csharp">public delegate void onRCCAIDestroyed(RCC_AICarController RCCAI);
+public static event onRCCAIDestroyed OnRCCAIDestroyed;
+</code></pre>
+<p>Fires when an AI vehicle is removed.</p>
+<p><strong>Use cases</strong>: remove from minimap, decrement enemy count, mission completion.</p>
+<h2 id="camera-event">Camera Event</h2>
+<h3 id="onbcgcameraspawned">OnBCGCameraSpawned</h3>
+<pre><code class="language-csharp">public delegate void onBCGCameraSpawned(GameObject BCGCamera);
+public static event onBCGCameraSpawned OnBCGCameraSpawned;
+</code></pre>
+<p>Fires after the RCC camera is instantiated.</p>
+<p><strong>Use cases</strong>: attach post-processing, configure FOV, apply custom follow logic.</p>
+<h2 id="scene-management-events">Scene Management Events</h2>
+<h3 id="onbehaviorchanged">OnBehaviorChanged</h3>
+<pre><code class="language-csharp">public delegate void onBehaviorChanged();
+public static event onBehaviorChanged OnBehaviorChanged;
+</code></pre>
+<p>Fires when <code>RCC.SetBehavior()</code> or <code>RCC_SceneManager.Instance.SetBehavior()</code> changes the global driving behavior preset.</p>
+<p><strong>Use cases</strong>: update UI label to show new mode, play sound, apply secondary tuning.</p>
+<p><strong>Example: Show behavior change toast</strong></p>
+<pre><code class="language-csharp">public class BehaviorToast : MonoBehaviour {
+    public Text toastText;
+    public float toastDuration = 2f;
+
+    void OnEnable()  { RCC_Events.OnBehaviorChanged += ShowToast; }
+    void OnDisable() { RCC_Events.OnBehaviorChanged -= ShowToast; }
+
+    void ShowToast() {
+        string name = RCC_Settings.Instance.selectedBehaviorType?.behaviorName ?? &quot;Default&quot;;
+        toastText.text = $&quot;Behavior: {name}&quot;;
+        CancelInvoke(nameof(HideToast));
+        toastText.enabled = true;
+        Invoke(nameof(HideToast), toastDuration);
+    }
+
+    void HideToast() {
+        toastText.enabled = false;
+    }
+}
+</code></pre>
+<h3 id="onvehiclechanged">OnVehicleChanged</h3>
+<pre><code class="language-csharp">public delegate void onVehicleChanged();
+public static event onVehicleChanged OnVehicleChanged;
+</code></pre>
+<p>Fires when the active player vehicle is swapped (e.g., car selection menu, vehicle change at runtime).</p>
+<p><strong>Use cases</strong>: refresh HUD bindings, telemetry, AI targets.</p>
+<h2 id="input-events">Input Events</h2>
+<p>These fire once each time the corresponding input action is triggered. They're great for one-shot reactions.</p>
+<h3 id="onstartstopengine">OnStartStopEngine</h3>
+<p>Fires when the engine ignition input is pressed.</p>
+<p><strong>Use cases</strong>: ignition audio, dashboard "ignition" indicator, custom engine state.</p>
+<h3 id="onlowbeamheadlights--onhighbeamheadlights">OnLowBeamHeadlights / OnHighBeamHeadlights</h3>
+<p>Fires when low or high beam input is toggled.</p>
+<p><strong>Use cases</strong>: HUD indicator update, AI visibility logic.</p>
+<h3 id="onchangecamera">OnChangeCamera</h3>
+<p>Fires when the change-camera input is pressed.</p>
+<p><strong>Use cases</strong>: cycle custom camera modes, update HUD overlay per view, play camera transition sound.</p>
+<h3 id="onindicatorleft--onindicatorright--onindicatorhazard">OnIndicatorLeft / OnIndicatorRight / OnIndicatorHazard</h3>
+<p>Fires when each indicator input is toggled.</p>
+<p><strong>Use cases</strong>: HUD blinkers, indicator click sound, driving-school style validation.</p>
+<p><strong>Example: Play tick-tock sound on indicator toggle</strong></p>
+<pre><code class="language-csharp">public class IndicatorTickSound : MonoBehaviour {
+    public AudioSource tickAudio;
+
+    void OnEnable() {
+        RCC_Events.OnIndicatorLeft   += PlayTick;
+        RCC_Events.OnIndicatorRight  += PlayTick;
+        RCC_Events.OnIndicatorHazard += PlayTick;
+    }
+
+    void OnDisable() {
+        RCC_Events.OnIndicatorLeft   -= PlayTick;
+        RCC_Events.OnIndicatorRight  -= PlayTick;
+        RCC_Events.OnIndicatorHazard -= PlayTick;
+    }
+
+    void PlayTick() {
+        tickAudio.Play();
+    }
+}
+</code></pre>
+<h3 id="oninteriorlights">OnInteriorlights</h3>
+<p>Fires when the interior light input is toggled.</p>
+<h3 id="ongearshiftup--ongearshiftdown">OnGearShiftUp / OnGearShiftDown</h3>
+<p>Fires when the gearbox shifts up or down.</p>
+<p><strong>Use cases</strong>: shift audio (custom variations), force feedback, telemetry logging.</p>
+<h3 id="onngear">OnNGear</h3>
+<pre><code class="language-csharp">public delegate void onNGear(bool state);
+</code></pre>
+<p>Fires when the neutral gear input toggles. <code>state</code> is true when neutral is engaged, false when released.</p>
+<h3 id="onslowmotion">OnSlowMotion</h3>
+<pre><code class="language-csharp">public delegate void onSlowMotion(bool state);
+</code></pre>
+<p>Fires when slow motion is toggled. <code>state</code> is true when active.</p>
+<p><strong>Use cases</strong>: scale audio pitch alongside <code>Time.timeScale</code>, trigger cinematic VFX.</p>
+<h3 id="onrecord--onreplay">OnRecord / OnReplay</h3>
+<p>Fires when record / replay input is pressed.</p>
+<p><strong>Use cases</strong>: HUD overlays for record/replay status, disable user controls during playback.</p>
+<h3 id="onlookback">OnLookBack</h3>
+<pre><code class="language-csharp">public delegate void onLookBack(bool state);
+</code></pre>
+<p>Fires when the look-back input changes state. <code>state</code> is true while held.</p>
+<h3 id="ontrailerdetach">OnTrailerDetach</h3>
+<p>Fires when the trailer-detach input is pressed.</p>
+<p><strong>Use cases</strong>: HUD update, custom trailer-release logic (cargo drops, mission triggers).</p>
+<h2 id="defensive-subscribe-pattern">Defensive Subscribe Pattern</h2>
+<p>If your game has multiple scenes and the subscribing GameObject might be created before or after the event firer, use a defensive pattern:</p>
+<pre><code class="language-csharp">void OnEnable() {
+    RCC_Events.OnRCCPlayerSpawned += HandleSpawn;
+    // also handle the case where the player is already spawned:
+    var current = RCC_SceneManager.Instance.activePlayerVehicle;
+    if (current != null) HandleSpawn(current);
+}
+</code></pre>
+<p>This way, your handler runs both for vehicles that spawn after you subscribe and for the existing player vehicle if there is one.</p>
+<h2 id="firing-events-yourself">Firing Events Yourself</h2>
+<p>Each event has a corresponding <code>Event_OnXxx</code> static method that fires it:</p>
+<pre><code class="language-csharp">RCC_Events.Event_OnRCCPlayerSpawned(myVehicle);
+</code></pre>
+<p>You normally don't call these — they're called internally by RCC's controller and SceneManager. But if you're writing a custom integration (e.g., a different way to register player vehicles), you can call them to keep the event system consistent.</p>
+<h2 id="conditional-events-bcg_enterexit">Conditional Events (BCG_ENTEREXIT)</h2>
+<p>Some events only exist when the <code>BCG_ENTEREXIT</code> define is set. These are for the legacy BCG Shared Assets Enter/Exit system, which has been removed in V5. If you see references to <code>OnPlayerEnteredVehicle</code> or <code>OnPlayerExitedVehicle</code>, those are vestiges of the removed system — they won't fire in a stock V5 install.</p>
+<h2 id="common-event-pitfalls">Common Event Pitfalls</h2>
+<h3 id="subscribed-but-my-handler-isnt-called">"Subscribed but my handler isn't called"</h3>
+<p>Most common: you subscribed in <code>Start()</code> instead of <code>OnEnable()</code>. If the event fires during scene load (before <code>Start</code>), you miss it. Use <code>OnEnable</code> and / or query the current state on subscription.</p>
+<h3 id="my-handler-is-called-multiple-times">"My handler is called multiple times"</h3>
+<p>You subscribed multiple times without unsubscribing. Always pair <code>+=</code> with a <code>-=</code> in <code>OnDisable</code>.</p>
+<h3 id="nullreferenceexception-in-my-handler-after-scene-unload">"NullReferenceException in my handler after scene unload"</h3>
+<p>You forgot to unsubscribe in <code>OnDisable</code>. After scene change, the static event still holds a reference to your destroyed GameObject's handler — and calling it throws.</p>
+<h3 id="event-fires-but-the-vehicle-parameter-is-null">"Event fires but the vehicle parameter is null"</h3>
+<p>If a vehicle is being destroyed at the moment the event fires, it might already be <code>null</code> by the time your handler runs. Always null-check.</p>
+<h2 id="next-steps">Next Steps</h2>
+<ul>
+<li><strong><a href="23_ScriptingAPI.html">23 — Scripting API</a></strong> — the static <code>RCC</code> class.</li>
+<li><strong><a href="17_HowToOverrideInputs.html">17 — Overriding Inputs</a></strong> — for input flow.</li>
+<li><strong><a href="16_InputSystem.html">16 — Input System</a></strong> — how input events are triggered.</li>
+</ul>
+</div>
+<div class="footer">
+Generated from: 24_EventsSystem.md<br>
+Date: 2026-05-22 00:32<br>
+© 2014 - 2026 BoneCracker Games — Realistic Car Controller V5.0.0
+</div>
+</body>
+</html>

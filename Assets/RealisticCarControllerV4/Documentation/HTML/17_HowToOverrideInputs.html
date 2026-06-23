@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Overriding Inputs</title>
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    background: #f8f9fa;
+}
+.content {
+    background: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+h1 { color: #2c3e50; margin-top: 0; padding-bottom: 0.3em; border-bottom: 2px solid #eee; }
+h2 { color: #34495e; margin-top: 1.5em; padding-bottom: 0.2em; border-bottom: 1px solid #eee; }
+h3, h4 { color: #34495e; margin-top: 1.2em; }
+h5, h6 { color: #34495e; margin-top: 1.0em; }
+code {
+    background: #f4f4f4;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.9em;
+}
+pre {
+    background: #2d2d2d;
+    color: #f8f8f2;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
+    margin: 1em 0;
+    font-size: 0.9em;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+    color: #f8f8f2;
+    white-space: pre;
+}
+blockquote {
+    border-left: 4px solid #3498db;
+    margin: 1em 0;
+    padding: 0.5em 0 0.5em 20px;
+    color: #555;
+    background: #f9f9f9;
+}
+blockquote p { margin: 0.4em 0; }
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px 12px;
+    text-align: left;
+    vertical-align: top;
+}
+th {
+    background: #f4f4f4;
+    font-weight: bold;
+}
+tr:nth-child(even) { background: #f9f9f9; }
+a { color: #3498db; text-decoration: none; transition: color 0.2s; }
+a:hover { color: #2980b9; text-decoration: underline; }
+ul, ol { margin: 1em 0; padding-left: 30px; }
+li { margin: 0.4em 0; }
+li > ul, li > ol { margin: 0.3em 0; }
+hr { border: none; border-top: 2px solid #eee; margin: 2em 0; }
+p { margin: 1em 0; }
+.footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    color: #999;
+    font-size: 0.9em;
+    text-align: center;
+}
+
+</style>
+</head>
+<body>
+<div class="content">
+<h1 id="overriding-inputs">Overriding Inputs</h1>
+<p>The Override Inputs system lets you <strong>feed custom inputs into a vehicle from your own code</strong>, completely bypassing the player input system. This is how AI vehicles drive themselves, how replay playback works, how networked multiplayer feeds remote vehicle state, and how scripted cutscenes can move a car along a predetermined path.</p>
+<p>This document explains the override system, shows a complete working example, and lists the common use cases.</p>
+<h2 id="when-to-use-override-inputs">When to Use Override Inputs</h2>
+<p>Use override inputs when:</p>
+<ul>
+<li>You're building an <strong>AI driver</strong> (and not using RCC's built-in <code>RCC_AICarController</code>).</li>
+<li>You're playing back a <strong>recorded replay</strong> of past driver inputs.</li>
+<li>You're driving a <strong>networked vehicle</strong> based on inputs received from the network.</li>
+<li>You're running a <strong>scripted cinematic</strong> where the car must follow a precise path.</li>
+<li>You're building a <strong>driving school</strong> where the system temporarily takes over.</li>
+</ul>
+<p>Don't use it for normal player input — for that, the Input Manager path is simpler and free.</p>
+<h2 id="how-it-works">How It Works</h2>
+<p>Two flags on <code>RCC_CarControllerV4</code> control the input source:</p>
+<ul>
+<li><strong><code>overrideInputs</code></strong> — when <code>true</code>, the controller ignores <code>RCC_InputManager</code> and uses the inputs supplied via <code>OverrideInputs(RCC_Inputs)</code> each frame.</li>
+<li><strong><code>externalController</code></strong> — a related flag set by AI controllers. When <code>true</code>, the controller assumes an external script is driving it (used to suppress auto-start-engine on awake).</li>
+</ul>
+<p>The flow:</p>
+<ol>
+<li>Your script creates a new <code>RCC_Inputs</code> struct each frame.</li>
+<li>Your script fills in <code>throttleInput</code>, <code>brakeInput</code>, <code>steerInput</code>, etc.</li>
+<li>Your script calls <code>carController.OverrideInputs(myInputs)</code>.</li>
+<li>The controller uses your values instead of polling the InputManager.</li>
+<li>The vehicle moves according to your inputs.</li>
+</ol>
+<p>If you don't call <code>OverrideInputs</code> for a frame (e.g., your AI script returns early), the controller uses the <strong>last</strong> override inputs you sent — so don't worry about calling it every single frame, but do update at least every few frames or the car will drive on stale data.</p>
+<h2 id="minimal-example--drive-in-a-circle">Minimal Example — Drive in a Circle</h2>
+<pre><code class="language-csharp">using UnityEngine;
+
+public class DriveInCircle : MonoBehaviour {
+    public RCC_CarControllerV4 carController;
+
+    void Start() {
+        carController.overrideInputs = true;
+    }
+
+    void Update() {
+        RCC_Inputs inputs = new RCC_Inputs();
+        inputs.throttleInput = 0.4f;
+        inputs.steerInput = 0.5f; // constant right turn
+        inputs.brakeInput = 0f;
+        inputs.handbrakeInput = 0f;
+        inputs.clutchInput = 0f;
+
+        carController.OverrideInputs(inputs);
+    }
+}
+</code></pre>
+<p>Attach this to any GameObject, drag a vehicle into the <code>carController</code> field, press Play, and the car drives in a circle.</p>
+<h2 id="realistic-example--follow-a-target-point">Realistic Example — Follow a Target Point</h2>
+<p>A more useful pattern is steering toward a target:</p>
+<pre><code class="language-csharp">using UnityEngine;
+
+public class DriveToTarget : MonoBehaviour {
+    public RCC_CarControllerV4 carController;
+    public Transform target;
+    public float desiredSpeed = 80f; // km/h
+
+    void Start() {
+        carController.overrideInputs = true;
+    }
+
+    void Update() {
+        if (target == null) return;
+
+        RCC_Inputs inputs = new RCC_Inputs();
+
+        // Compute the steering direction.
+        Vector3 toTarget = target.position - carController.transform.position;
+        Vector3 localToTarget = carController.transform.InverseTransformDirection(toTarget.normalized);
+        // localToTarget.x is positive if target is to our right, negative if left.
+        inputs.steerInput = Mathf.Clamp(localToTarget.x * 2f, -1f, 1f);
+
+        // Cruise control — accelerate or brake to maintain desiredSpeed.
+        if (carController.speed &lt; desiredSpeed) {
+            inputs.throttleInput = 1f;
+            inputs.brakeInput = 0f;
+        } else {
+            inputs.throttleInput = 0f;
+            inputs.brakeInput = 0.5f;
+        }
+
+        carController.OverrideInputs(inputs);
+    }
+}
+</code></pre>
+<p>This is the <em>kernel</em> of how AI drivers work. Add more sophistication on top:</p>
+<ul>
+<li>Look ahead by several seconds and compute steering based on the <em>future</em> position of the target.</li>
+<li>Apply a "blend" steering — don't snap to full lock, ramp into it.</li>
+<li>Slow down for sharp turns by reading the angle to the target.</li>
+<li>Avoid obstacles via raycasts.</li>
+</ul>
+<p>The built-in <code>RCC_AICarController</code> does all of this and more — see <strong><a href="19_AISystem.html">19 — AI System</a></strong> for the full feature list. Use it unless you need a behavior that the AI doesn't support.</p>
+<h2 id="network-multiplayer-pattern">Network Multiplayer Pattern</h2>
+<p>For networked vehicles where the remote player's inputs arrive over the network:</p>
+<pre><code class="language-csharp">using UnityEngine;
+
+public class NetworkedVehicle : MonoBehaviour {
+    public RCC_CarControllerV4 carController;
+    public bool isLocalPlayer;
+
+    // These would be filled by your network library (Netcode, Mirror, Photon Fusion, etc.).
+    [SerializeField] private float networkThrottle;
+    [SerializeField] private float networkBrake;
+    [SerializeField] private float networkSteer;
+    [SerializeField] private float networkHandbrake;
+
+    void Start() {
+        if (isLocalPlayer) {
+            // This is OUR car — read player input normally.
+            carController.overrideInputs = false;
+        } else {
+            // This is someone else's car — feed inputs from the network.
+            carController.overrideInputs = true;
+        }
+    }
+
+    void Update() {
+        if (!isLocalPlayer) {
+            RCC_Inputs inputs = new RCC_Inputs();
+            inputs.throttleInput = networkThrottle;
+            inputs.brakeInput = networkBrake;
+            inputs.steerInput = networkSteer;
+            inputs.handbrakeInput = networkHandbrake;
+            carController.OverrideInputs(inputs);
+        }
+
+        // For local player, you'd also push current inputs over the network here:
+        if (isLocalPlayer) {
+            RCC_Inputs current = RCC_InputManager.Instance.GetInputs();
+            // Send current.throttleInput, current.brakeInput, etc. to the server.
+        }
+    }
+}
+</code></pre>
+<p>This is the building block for multiplayer. The network library handles the actual data sync — your job is to feed RCC the data once it arrives.</p>
+<p>For best results in networked games, you'll also want to sync the vehicle's <strong>transform</strong> (position + rotation) and <strong>rigidbody state</strong> (velocity + angular velocity) — input-only sync drifts over time because physics simulations aren't deterministic across clients. See your network library's docs for transform syncing patterns.</p>
+<h2 id="replay-pattern">Replay Pattern</h2>
+<p>RCC ships with a basic recorder/replayer in <code>Scripts/RCC_Recorder.cs</code>. The pattern is:</p>
+<pre><code class="language-csharp">// During recording, save inputs every frame:
+RCC_Inputs current = carController.GetInputs();
+recordedInputs.Add(current);
+
+// During replay, feed saved inputs back:
+carController.overrideInputs = true;
+foreach (var savedInput in recordedInputs) {
+    carController.OverrideInputs(savedInput);
+    yield return null; // wait one frame
+}
+</code></pre>
+<p>The included recorder also records position and rotation per frame for "ghost" / "rewind" gameplay. See <code>RCC_Recorder.cs</code> for the full implementation.</p>
+<p>To start/stop recording from code: <code>RCC.StartStopRecord()</code>. To start/stop replay: <code>RCC.StartStopReplay()</code>.</p>
+<h2 id="scripted-cinematic-pattern">Scripted Cinematic Pattern</h2>
+<p>For a "the car drives itself for 5 seconds" cutscene:</p>
+<pre><code class="language-csharp">using System.Collections;
+using UnityEngine;
+
+public class CinematicDrive : MonoBehaviour {
+    public RCC_CarControllerV4 carController;
+
+    public IEnumerator DriveStraightFor(float seconds) {
+        carController.overrideInputs = true;
+        RCC_Inputs inputs = new RCC_Inputs { throttleInput = 0.5f };
+
+        float t = 0f;
+        while (t &lt; seconds) {
+            carController.OverrideInputs(inputs);
+            t += Time.deltaTime;
+            yield return null;
+        }
+
+        // Restore player control.
+        carController.overrideInputs = false;
+    }
+}
+</code></pre>
+<p>Call <code>StartCoroutine(DriveStraightFor(5f))</code> from anywhere to make the car drive itself for 5 seconds.</p>
+<h2 id="combining-override-with-player-input">Combining Override With Player Input</h2>
+<p>You can blend player input with override input — e.g., for "assisted driving" where the AI nudges the player toward the racing line:</p>
+<pre><code class="language-csharp">void Update() {
+    RCC_Inputs playerInputs = RCC_InputManager.Instance.GetInputs();
+    RCC_Inputs assistInputs = ComputeAssistInputs();
+
+    RCC_Inputs blended = new RCC_Inputs();
+    blended.throttleInput = playerInputs.throttleInput;  // player controls throttle
+    blended.brakeInput = playerInputs.brakeInput;        // player controls brake
+    blended.steerInput = Mathf.Lerp(playerInputs.steerInput, assistInputs.steerInput, 0.3f); // blend steering
+
+    carController.OverrideInputs(blended);
+}
+</code></pre>
+<p>For this pattern to work, <code>overrideInputs</code> must stay <strong>true</strong> — otherwise the controller polls the InputManager directly.</p>
+<h2 id="disabling-override">Disabling Override</h2>
+<p>To return control to the player:</p>
+<pre><code class="language-csharp">carController.overrideInputs = false;
+</code></pre>
+<p>The controller immediately starts reading from the InputManager again on the next FixedUpdate.</p>
+<h2 id="when-overrideinputs-doesnt-fully-take-effect">When <code>OverrideInputs</code> Doesn't Fully Take Effect</h2>
+<p>A few things keep working even when override is active:</p>
+<ul>
+<li><strong>Camera inputs</strong> — <code>orbitX</code>, <code>orbitY</code>, <code>scroll</code>. The camera still reads these from the player. To control the camera from override, fill these fields in your RCC_Inputs struct.</li>
+<li><strong>Engine ignition</strong> — <code>RunEngineAtAwake</code> and <code>engineRunning</code> state aren't part of the inputs. To start/stop the engine programmatically, call <code>carController.StartEngine()</code> / <code>carController.KillEngine()</code>.</li>
+<li><strong>Gear shifts via inputs</strong> — gear input has special handling. To force a gear, call <code>carController.ShiftToGear(int)</code> directly.</li>
+</ul>
+<p>For most uses, just filling throttle/brake/steer/handbrake/clutch is enough.</p>
+<h2 id="common-pitfalls">Common Pitfalls</h2>
+<h3 id="i-set-override--true-but-the-car-still-responds-to-player-input">"I set override = true but the car still responds to player input"</h3>
+<p>Make sure you're calling <code>OverrideInputs()</code> every frame after setting the flag. If you only set the flag without supplying inputs, the controller uses the inputs from before override was enabled — which were the player's last inputs.</p>
+<h3 id="i-want-override-only-sometimes-but-the-car-keeps-drifting-on-stale-inputs">"I want override only sometimes, but the car keeps drifting on stale inputs"</h3>
+<p>Whenever you stop driving the car via override, call <code>carController.OverrideInputs(new RCC_Inputs())</code> once to zero everything out, then set <code>overrideInputs = false</code>.</p>
+<h3 id="override-doesnt-engage-from-a-parked-state">"Override doesn't engage from a parked state"</h3>
+<p>If the engine isn't running, the override won't move the car. Make sure to call <code>carController.StartEngine()</code> before driving via override.</p>
+<h3 id="override-breaks-when-i-switch-behaviors">"Override breaks when I switch behaviors"</h3>
+<p>It shouldn't — behavior switching doesn't affect override state. If you see this, file a bug.</p>
+<h2 id="see-also">See Also</h2>
+<ul>
+<li><strong><a href="19_AISystem.html">19 — AI System</a></strong> — the built-in AI uses Override Inputs internally.</li>
+<li><strong><a href="23_ScriptingAPI.html">23 — Scripting API</a></strong> — the public <code>RCC</code> static class.</li>
+<li><strong><a href="24_EventsSystem.html">24 — Events System</a></strong> — events related to vehicle lifecycle.</li>
+<li><strong><a href="16_InputSystem.html">16 — Input System</a></strong> — the normal player input pipeline.</li>
+</ul>
+</div>
+<div class="footer">
+Generated from: 17_HowToOverrideInputs.md<br>
+Date: 2026-05-22 00:32<br>
+© 2014 - 2026 BoneCracker Games — Realistic Car Controller V5.0.0
+</div>
+</body>
+</html>

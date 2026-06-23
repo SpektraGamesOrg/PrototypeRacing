@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Ground Physics — Configuring Surfaces</title>
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    background: #f8f9fa;
+}
+.content {
+    background: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+h1 { color: #2c3e50; margin-top: 0; padding-bottom: 0.3em; border-bottom: 2px solid #eee; }
+h2 { color: #34495e; margin-top: 1.5em; padding-bottom: 0.2em; border-bottom: 1px solid #eee; }
+h3, h4 { color: #34495e; margin-top: 1.2em; }
+h5, h6 { color: #34495e; margin-top: 1.0em; }
+code {
+    background: #f4f4f4;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.9em;
+}
+pre {
+    background: #2d2d2d;
+    color: #f8f8f2;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
+    margin: 1em 0;
+    font-size: 0.9em;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+    color: #f8f8f2;
+    white-space: pre;
+}
+blockquote {
+    border-left: 4px solid #3498db;
+    margin: 1em 0;
+    padding: 0.5em 0 0.5em 20px;
+    color: #555;
+    background: #f9f9f9;
+}
+blockquote p { margin: 0.4em 0; }
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px 12px;
+    text-align: left;
+    vertical-align: top;
+}
+th {
+    background: #f4f4f4;
+    font-weight: bold;
+}
+tr:nth-child(even) { background: #f9f9f9; }
+a { color: #3498db; text-decoration: none; transition: color 0.2s; }
+a:hover { color: #2980b9; text-decoration: underline; }
+ul, ol { margin: 1em 0; padding-left: 30px; }
+li { margin: 0.4em 0; }
+li > ul, li > ol { margin: 0.3em 0; }
+hr { border: none; border-top: 2px solid #eee; margin: 2em 0; }
+p { margin: 1em 0; }
+.footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    color: #999;
+    font-size: 0.9em;
+    text-align: center;
+}
+
+</style>
+</head>
+<body>
+<div class="content">
+<h1 id="ground-physics--configuring-surfaces">Ground Physics — Configuring Surfaces</h1>
+<p>This document explains how RCC handles different driving surfaces (asphalt, dirt, grass, sand, snow, ice), how to add your own surfaces, and how to fine-tune the feel of each.</p>
+<p>RCC supports two parallel mechanisms for ground detection:</p>
+<ol>
+<li><strong>PhysicMaterial-based</strong> — works on any collider in the scene. Just paint a <code>PhysicMaterial</code> onto a mesh or primitive collider.</li>
+<li><strong>Terrain splatmap-based</strong> — works on Unity Terrain. Reads which paint texture is at the wheel's position.</li>
+</ol>
+<p>Both are configured in the same asset: <code>RCC_GroundMaterials.asset</code>.</p>
+<h2 id="why-multiple-surfaces-matter">Why Multiple Surfaces Matter</h2>
+<p>A car on asphalt grips differently than a car on grass. Without surface-aware physics, your vehicle drives the same regardless of whether it's on the road or off it — which feels wrong and removes one of the most satisfying parts of driving games (the moment you go off-road and feel the loss of grip).</p>
+<p>With ground materials, you get:</p>
+<ul>
+<li><strong>Different grip</strong> per surface (low grip on grass, high grip on asphalt).</li>
+<li><strong>Different audio</strong> per surface (smooth asphalt squeal, gravelly dirt rumble).</li>
+<li><strong>Different particles</strong> per surface (grey asphalt dust, brown dirt dust, white snow spray).</li>
+<li><strong>Different skidmarks</strong> per surface (visible on asphalt, fainter on dirt).</li>
+<li><strong>Tire deflation</strong> on hazardous surfaces (e.g., a "sharp rocks" surface that punctures tires).</li>
+</ul>
+<h2 id="how-the-lookup-works">How the Lookup Works</h2>
+<p>When a wheel touches the ground, RCC reads the surface and looks it up in <code>RCC_GroundMaterials.asset</code>:</p>
+<h3 id="for-regular-colliders">For Regular Colliders</h3>
+<pre><code>1. Wheel raycasts down, hits a collider.
+2. RCC reads the collider's `material` (its PhysicMaterial).
+3. RCC searches the `frictions[]` array in RCC_GroundMaterials.asset for an entry with that PhysicMaterial.
+4. The matched entry provides stiffness multipliers, audio, particles, skidmarks.
+5. If no match is found, the wheel uses the entry at index 0 (the default).
+</code></pre>
+<h3 id="for-unity-terrain">For Unity Terrain</h3>
+<pre><code>1. Wheel raycasts down, hits a TerrainCollider.
+2. RCC reads the splatmap weights at that position.
+3. RCC finds the dominant texture layer index.
+4. RCC searches the `terrainFrictions[]` array for an entry whose `splatmapIndexes` array contains that index.
+5. The matched entry provides the same fields as the PhysicMaterial path.
+</code></pre>
+<h2 id="opening-the-ground-materials-asset">Opening the Ground Materials Asset</h2>
+<p>In the Project window, navigate to:</p>
+<pre><code>Assets/RealisticCarControllerV4/Resources/RCC Assets/RCC_GroundMaterials.asset
+</code></pre>
+<p>Click it. The Inspector shows two foldout sections:</p>
+<h3 id="frictions-physicmaterial-based">Frictions (PhysicMaterial-based)</h3>
+<p>An array of <code>GroundMaterialFrictions</code> entries. Each entry has:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>What It Does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ground Material</td>
+<td>The <code>PhysicMaterial</code> this entry matches against.</td>
+</tr>
+<tr>
+<td>Forward Stiffness</td>
+<td>Multiplier on the wheel's forward friction curve. 1.0 = full grip, 0.5 = half grip.</td>
+</tr>
+<tr>
+<td>Sideways Stiffness</td>
+<td>Multiplier on the wheel's sideways friction curve.</td>
+</tr>
+<tr>
+<td>Slip</td>
+<td>Base slip target for this surface.</td>
+</tr>
+<tr>
+<td>Damp</td>
+<td>Damping force applied at this surface.</td>
+</tr>
+<tr>
+<td>Volume</td>
+<td>Audio volume scalar (0–1).</td>
+</tr>
+<tr>
+<td>Ground Particles</td>
+<td>Particle prefab spawned at the wheel when slipping on this surface.</td>
+</tr>
+<tr>
+<td>Ground Sound</td>
+<td>Audio clip played at the wheel on this surface.</td>
+</tr>
+<tr>
+<td>Skidmark</td>
+<td>Optional custom skidmark style.</td>
+</tr>
+<tr>
+<td>Deflate</td>
+<td>If true, tires can deflate on this surface.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="terrain-frictions">Terrain Frictions</h3>
+<p>An array of <code>TerrainFrictions</code> entries. Each one references a <code>PhysicMaterial</code> and lists which splatmap layer indexes use it.</p>
+<h2 id="adding-a-new-surface">Adding a New Surface</h2>
+<p>Let's add a "Snow" surface as a complete worked example.</p>
+<h3 id="step-1--create-a-physicmaterial">Step 1 — Create a PhysicMaterial</h3>
+<p>In the Project window:</p>
+<ol>
+<li>Right-click in any folder → <strong>Create → Physic Material</strong>.</li>
+<li>Name it <code>Snow</code>.</li>
+<li>Set Dynamic Friction = <strong>0.4</strong>, Static Friction = <strong>0.4</strong> (these are Unity's friction values, not RCC's — they affect Unity's general collision behavior).</li>
+<li>Set Friction Combine and Bounce Combine to <strong>Average</strong>.</li>
+</ol>
+<h3 id="step-2--apply-it-to-your-snow-geometry">Step 2 — Apply It to Your Snow Geometry</h3>
+<p>In your scene, find the mesh that represents snow ground (a mesh painted white, snow-piled terrain section, etc.). Click it. In the Inspector, find its <code>MeshCollider</code> (or <code>BoxCollider</code>). Drag your <code>Snow.physicMaterial</code> into the <strong>Material</strong> slot.</p>
+<p>You can also apply the same PhysicMaterial to multiple colliders. All of them will trigger the same "Snow" behavior.</p>
+<h3 id="step-3--add-an-entry-to-rcc_groundmaterials">Step 3 — Add an Entry to RCC_GroundMaterials</h3>
+<p>Open <code>RCC_GroundMaterials.asset</code>. Expand the <code>frictions[]</code> array. Right-click the array → <strong>Add Element</strong>, or increase the Array Size by 1.</p>
+<p>In the new entry:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+<th>Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ground Material</td>
+<td>Drag your <code>Snow.physicMaterial</code> here.</td>
+<td>Tells RCC which PhysicMaterial this entry corresponds to.</td>
+</tr>
+<tr>
+<td>Forward Stiffness</td>
+<td>0.4</td>
+<td>Snow is slippery — only 40% of asphalt grip.</td>
+</tr>
+<tr>
+<td>Sideways Stiffness</td>
+<td>0.3</td>
+<td>Even less sideways grip.</td>
+</tr>
+<tr>
+<td>Slip</td>
+<td>0.3</td>
+<td>A bit easier to break loose.</td>
+</tr>
+<tr>
+<td>Damp</td>
+<td>1.0</td>
+<td>Default damping.</td>
+</tr>
+<tr>
+<td>Volume</td>
+<td>0.3</td>
+<td>Snow audio is quiet — soft crunch.</td>
+</tr>
+<tr>
+<td>Ground Particles</td>
+<td>Drag a snow-particle prefab here, or leave empty.</td>
+<td>Optional white spray when sliding.</td>
+</tr>
+<tr>
+<td>Ground Sound</td>
+<td>Drag a snow audio clip here.</td>
+<td>Soft crunch / spray sound.</td>
+</tr>
+<tr>
+<td>Skidmark</td>
+<td>Leave empty for default.</td>
+<td>Default looks fine on snow.</td>
+</tr>
+<tr>
+<td>Deflate</td>
+<td>False</td>
+<td>Snow doesn't puncture tires.</td>
+</tr>
+</tbody>
+</table>
+<p>Save the asset (Ctrl+S or close the inspector).</p>
+<h3 id="step-4--test">Step 4 — Test</h3>
+<p>Open a scene with snow geometry, press Play, drive onto the snow. You should immediately feel reduced grip and hear the new audio.</p>
+<p>If nothing changes, the most likely cause is that the collider's <code>PhysicMaterial</code> slot is empty or assigned a different material. Verify in the Inspector.</p>
+<h2 id="adding-a-terrain-surface">Adding a Terrain Surface</h2>
+<p>If your snow lives on Unity Terrain instead of a separate mesh:</p>
+<h3 id="step-1--paint-snow-on-the-terrain">Step 1 — Paint Snow on the Terrain</h3>
+<p>In Unity Terrain Inspector, use the paint tool to paint a snow texture on the terrain layer of your choice. Note which <strong>layer index</strong> snow is in (the order in the Terrain Layers list — usually 0 is grass, 1 is dirt, etc.).</p>
+<h3 id="step-2--create-a-physicmaterial">Step 2 — Create a PhysicMaterial</h3>
+<p>Same as Step 1 above — create a <code>Snow.physicMaterial</code>.</p>
+<h3 id="step-3--add-a-terrain-friction-entry">Step 3 — Add a Terrain Friction Entry</h3>
+<p>In <code>RCC_GroundMaterials.asset</code>, expand the <code>terrainFrictions[]</code> array. Add an element.</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ground Material</td>
+<td>Your <code>Snow.physicMaterial</code>.</td>
+</tr>
+<tr>
+<td>Splatmap Indexes</td>
+<td>Array of one element with <code>index = 1</code> (or whichever layer snow is at on your terrain).</td>
+</tr>
+</tbody>
+</table>
+<p>If your snow can appear in multiple terrain layers (e.g., layer 1 <em>and</em> layer 3), add both indexes to the <code>splatmapIndexes</code> array.</p>
+<p>The terrain lookup uses the dominant texture at the wheel's position. So a wheel partially on snow and partially on grass will trigger whichever is more dominant at that moment.</p>
+<h2 id="existing-default-surfaces">Existing Default Surfaces</h2>
+<p>The default <code>RCC_GroundMaterials.asset</code> ships with entries for:</p>
+<ul>
+<li><strong>Asphalt</strong> — full grip (forward/sideways stiffness 1.0), asphalt squeal audio, no particles.</li>
+<li><strong>Dirt</strong> — reduced grip (~0.6), dirt rumble audio, brown dust particles.</li>
+<li><strong>Grass</strong> — low grip (~0.4), grass rustle audio, grass particles.</li>
+<li><strong>Sand</strong> — reduced grip with high resistance, sand audio, sand particles.</li>
+<li><strong>Mud</strong> — very low grip, splash audio.</li>
+</ul>
+<p>You can edit the values on these entries to taste — the defaults are starting points, not gospel.</p>
+<h2 id="adjusting-default-surfaces">Adjusting Default Surfaces</h2>
+<p>If asphalt feels too grippy or grass too slippery, you can adjust the stiffness without changing anything else:</p>
+<ol>
+<li>Open <code>RCC_GroundMaterials.asset</code>.</li>
+<li>Find the entry for the surface you want to change.</li>
+<li>Adjust <strong>Forward Stiffness</strong> and <strong>Sideways Stiffness</strong>.</li>
+<li>Test in Play mode.</li>
+</ol>
+<p>A good rule of thumb:</p>
+<table>
+<thead>
+<tr>
+<th>Surface</th>
+<th>Forward</th>
+<th>Sideways</th>
+<th>Reasoning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Race track asphalt</td>
+<td>1.5</td>
+<td>1.5</td>
+<td>High grip, race tires.</td>
+</tr>
+<tr>
+<td>Normal asphalt</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>Default reference.</td>
+</tr>
+<tr>
+<td>Wet asphalt</td>
+<td>0.7</td>
+<td>0.6</td>
+<td>Reduced grip.</td>
+</tr>
+<tr>
+<td>Dirt</td>
+<td>0.6</td>
+<td>0.5</td>
+<td>Loose surface.</td>
+</tr>
+<tr>
+<td>Grass</td>
+<td>0.4</td>
+<td>0.3</td>
+<td>Slippery.</td>
+</tr>
+<tr>
+<td>Sand</td>
+<td>0.5</td>
+<td>0.4</td>
+<td>Resistance + low grip.</td>
+</tr>
+<tr>
+<td>Snow</td>
+<td>0.4</td>
+<td>0.3</td>
+<td>Slippery.</td>
+</tr>
+<tr>
+<td>Ice</td>
+<td>0.1</td>
+<td>0.1</td>
+<td>Almost no grip.</td>
+</tr>
+<tr>
+<td>Mud</td>
+<td>0.3</td>
+<td>0.2</td>
+<td>Slip + drag.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="custom-skidmarks-per-surface">Custom Skidmarks per Surface</h2>
+<p>For full visual control, you can give a surface its own skidmark style. Drag a custom <code>RCC_Skidmarks</code> component prefab into the <strong>Skidmark</strong> field of the ground material entry. This is how, for example, snow skidmarks can look different from asphalt skidmarks.</p>
+<p>If you don't assign a custom skidmark, the surface uses the default <code>RCC_SkidmarksManager</code> settings (configured in <code>RCC_Settings.asset</code>).</p>
+<h2 id="tire-deflation-surfaces">Tire Deflation Surfaces</h2>
+<p>To create a "broken glass" or "spike strip" surface that punctures tires:</p>
+<ol>
+<li>Create the PhysicMaterial.</li>
+<li>Apply it to the collider.</li>
+<li>In the ground material entry, set <strong>Deflate</strong> = true.</li>
+<li>Set <strong>Forward Stiffness</strong> and <strong>Sideways Stiffness</strong> very low (0.1–0.2) since flat tires reduce grip.</li>
+</ol>
+<p>When a wheel touches a deflate-true surface, the tire flattens after a short delay. The vehicle handles poorly until repaired via <code>RCC.Repair(carController)</code>.</p>
+<h2 id="audio-clips">Audio Clips</h2>
+<p>A few notes on audio clips for ground surfaces:</p>
+<ul>
+<li>The clip should be <strong>loopable</strong> — RCC plays it continuously while the wheel is on this surface.</li>
+<li>The clip should be <strong>mono</strong> if it's spatial audio (it's positioned at the wheel transform).</li>
+<li>For surfaces with no audio (e.g., grass that you want silent), leave the clip empty. The wheel won't make any surface-specific sound.</li>
+</ul>
+<p>The <strong>volume</strong> field is multiplied with the default RCC audio mixer level, so 1.0 = mixer default, 0.5 = quieter.</p>
+<h2 id="particle-effects">Particle Effects</h2>
+<p>Ground particle prefabs are placed at the wheel transform and emit while the wheel is on this surface and slipping. You can use:</p>
+<ul>
+<li>The included particle prefabs in <code>Assets/RealisticCarControllerV4/Prefabs/Particles/</code>.</li>
+<li>Or create your own — any GameObject with a <code>ParticleSystem</code> works.</li>
+</ul>
+<p>The emission rate scales with slip — a stationary wheel emits no particles, a heavily-spinning wheel emits maximum particles.</p>
+<h2 id="performance-considerations">Performance Considerations</h2>
+<p>Each wheel does one raycast per FixedUpdate. The cost is small but multiplied by:</p>
+<ul>
+<li>Number of wheels per vehicle (typically 4).</li>
+<li>Number of active vehicles in the scene.</li>
+</ul>
+<p>For very large scenes with many AI vehicles:</p>
+<ul>
+<li>Use the <code>RCC_LOD</code> component to disable far-away wheel updates.</li>
+<li>Limit the number of distinct ground material entries to ~10. Each lookup is linear search through the array.</li>
+</ul>
+<h2 id="common-issues">Common Issues</h2>
+<h3 id="i-added-a-surface-but-nothing-changed">"I added a surface but nothing changed"</h3>
+<p>Most likely the collider doesn't have your PhysicMaterial assigned. Double-check the collider's Material slot in the Inspector.</p>
+<p>If you added a terrain surface, check that the splatmap index in your <code>TerrainFrictions</code> entry matches the actual terrain layer order. If you paint a new texture, its index might be different from what you expect.</p>
+<h3 id="the-same-surface-behaves-differently-in-different-scenes">"The same surface behaves differently in different scenes"</h3>
+<p>This usually means the PhysicMaterial is duplicated. In Project view, search for the material name — you might have two <code>Snow.physicMaterial</code> files in different folders. RCC matches by reference, so the same-name-but-different-asset materials are treated as different surfaces. Consolidate to one.</p>
+<h3 id="the-default-surface-is-used-even-though-my-collider-has-a-physicmaterial">"The default surface is used even though my collider has a PhysicMaterial"</h3>
+<p>Check that the PhysicMaterial is referenced in <code>RCC_GroundMaterials.asset</code>. The lookup is "find an entry whose <code>groundMaterial</code> field equals this collider's material." If no entry references the material, the fallback (index 0) is used.</p>
+<h2 id="next-steps">Next Steps</h2>
+<ul>
+<li><strong><a href="09_HowWheelCollidersWork.html">09 — How WheelColliders Work</a></strong> — the friction curve math.</li>
+<li><strong><a href="15_AudioSystem.html">15 — Audio System</a></strong> — vehicle audio.</li>
+<li><strong><a href="21_RCC_Settings.html">21 — RCC Settings Deep Dive</a></strong> — global settings including skidmark count.</li>
+</ul>
+</div>
+<div class="footer">
+Generated from: 11_GroundPhysics.md<br>
+Date: 2026-05-22 00:32<br>
+© 2014 - 2026 BoneCracker Games — Realistic Car Controller V5.0.0
+</div>
+</body>
+</html>

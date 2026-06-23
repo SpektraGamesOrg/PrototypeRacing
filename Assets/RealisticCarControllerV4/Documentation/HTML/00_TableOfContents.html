@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Realistic Car Controller — Documentation</title>
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    background: #f8f9fa;
+}
+.content {
+    background: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+h1 { color: #2c3e50; margin-top: 0; padding-bottom: 0.3em; border-bottom: 2px solid #eee; }
+h2 { color: #34495e; margin-top: 1.5em; padding-bottom: 0.2em; border-bottom: 1px solid #eee; }
+h3, h4 { color: #34495e; margin-top: 1.2em; }
+h5, h6 { color: #34495e; margin-top: 1.0em; }
+code {
+    background: #f4f4f4;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.9em;
+}
+pre {
+    background: #2d2d2d;
+    color: #f8f8f2;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
+    margin: 1em 0;
+    font-size: 0.9em;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+    color: #f8f8f2;
+    white-space: pre;
+}
+blockquote {
+    border-left: 4px solid #3498db;
+    margin: 1em 0;
+    padding: 0.5em 0 0.5em 20px;
+    color: #555;
+    background: #f9f9f9;
+}
+blockquote p { margin: 0.4em 0; }
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px 12px;
+    text-align: left;
+    vertical-align: top;
+}
+th {
+    background: #f4f4f4;
+    font-weight: bold;
+}
+tr:nth-child(even) { background: #f9f9f9; }
+a { color: #3498db; text-decoration: none; transition: color 0.2s; }
+a:hover { color: #2980b9; text-decoration: underline; }
+ul, ol { margin: 1em 0; padding-left: 30px; }
+li { margin: 0.4em 0; }
+li > ul, li > ol { margin: 0.3em 0; }
+hr { border: none; border-top: 2px solid #eee; margin: 2em 0; }
+p { margin: 1em 0; }
+.footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    color: #999;
+    font-size: 0.9em;
+    text-align: center;
+}
+
+</style>
+</head>
+<body>
+<div class="content">
+<h1 id="realistic-car-controller--documentation">Realistic Car Controller — Documentation</h1>
+<p>Welcome to the official documentation for <strong>Realistic Car Controller (RCC)</strong>, a Unity vehicle physics package by BoneCracker Games. This documentation is written for <strong>beginner and intermediate Unity developers</strong>. You don't need to be an experienced programmer or a physics expert to follow it.</p>
+<p>If you are new to RCC, read the documents in order. If you already imported RCC and just need to look something up, jump straight to the topic you care about.</p>
+<h2 id="where-to-start">Where to Start</h2>
+<p>If this is your first time using RCC, follow this path:</p>
+<ol>
+<li><strong><a href="01_OverviewAndFeatures.html">01 — Overview &amp; Features</a></strong> — Understand what RCC actually is and what it gives you.</li>
+<li><strong><a href="02_HowToInstallRCC.html">02 — How to Install RCC</a></strong> — Import the package, install dependencies, and set up the Input System.</li>
+<li><strong><a href="03_FirstLook.html">03 — First Look</a></strong> — See where everything lives in your project after import.</li>
+<li><strong><a href="04_DemoScenes.html">04 — Demo Scenes</a></strong> — Open the included demos to see RCC in action.</li>
+<li><strong><a href="05_QuickStart.html">05 — Quick Start</a></strong> — Drive your first vehicle in five minutes.</li>
+</ol>
+<p>After that, pick the topics that match what you want to build.</p>
+<h2 id="full-document-list">Full Document List</h2>
+<h3 id="getting-started">Getting Started</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Document</th>
+<th>What It Covers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>00</td>
+<td><a href="00_TableOfContents.html">Table of Contents</a></td>
+<td>This page.</td>
+</tr>
+<tr>
+<td>01</td>
+<td><a href="01_OverviewAndFeatures.html">Overview &amp; Features</a></td>
+<td>What RCC is, who it's for, supported features, supported Unity versions.</td>
+</tr>
+<tr>
+<td>02</td>
+<td><a href="02_HowToInstallRCC.html">How to Install RCC</a></td>
+<td>Importing the <code>.unitypackage</code>, installing the Unity Input System, fixing common import errors.</td>
+</tr>
+<tr>
+<td>03</td>
+<td><a href="03_FirstLook.html">First Look</a></td>
+<td>What you got after import: folder structure, scripts, prefabs, settings, demo scenes.</td>
+</tr>
+<tr>
+<td>04</td>
+<td><a href="04_DemoScenes.html">Demo Scenes</a></td>
+<td>A walkthrough of every demo scene that ships with RCC.</td>
+</tr>
+<tr>
+<td>05</td>
+<td><a href="05_QuickStart.html">Quick Start</a></td>
+<td>The fastest possible way to put a working RCC vehicle into your own scene.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="how-rcc-works">How RCC Works</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Document</th>
+<th>What It Covers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>06</td>
+<td><a href="06_HowTheSystemWorks.html">How the System Works</a></td>
+<td>A beginner-friendly tour of RCC's architecture. Useful before you start customizing.</td>
+</tr>
+<tr>
+<td>07</td>
+<td><a href="07_HowToCreateNewVehicles.html">Creating New Vehicles</a></td>
+<td>Step-by-step tutorial: turn a car model into a working RCC vehicle using the setup wizard.</td>
+</tr>
+<tr>
+<td>08</td>
+<td><a href="08_VehicleInspectorReference.html">Vehicle Inspector Reference</a></td>
+<td>Every field on <code>RCC_CarControllerV4</code>, explained in plain language.</td>
+</tr>
+<tr>
+<td>09</td>
+<td><a href="09_HowWheelCollidersWork.html">How WheelColliders Work</a></td>
+<td>What a WheelCollider is, what RCC's <code>RCC_WheelCollider</code> adds, and how to tune friction.</td>
+</tr>
+<tr>
+<td>10</td>
+<td><a href="10_BehaviorPresets.html">Behavior Presets</a></td>
+<td>Switching between Simulator, Drift, Arcade, and custom behaviors.</td>
+</tr>
+<tr>
+<td>11</td>
+<td><a href="11_GroundPhysics.html">Ground Physics</a></td>
+<td>Configuring different surfaces — asphalt, sand, grass, snow — using <code>RCC_GroundMaterials</code>.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="vehicle-systems">Vehicle Systems</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Document</th>
+<th>What It Covers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>12</td>
+<td><a href="12_DamageSystem.html">Damage System</a></td>
+<td>How vehicle deformation, detachable parts, and tire damage work.</td>
+</tr>
+<tr>
+<td>13</td>
+<td><a href="13_CameraSystem.html">Camera System</a></td>
+<td>All camera modes: TPS, hood, wheel, fixed, cinematic, top-down, orbit.</td>
+</tr>
+<tr>
+<td>14</td>
+<td><a href="14_LightsSystem.html">Lights System</a></td>
+<td>Headlights, brake lights, reverse lights, indicators, interior lights, lens flares.</td>
+</tr>
+<tr>
+<td>15</td>
+<td><a href="15_AudioSystem.html">Audio System</a></td>
+<td>Engine sound layers, gear shift sounds, wind, crash, exhaust flame sounds.</td>
+</tr>
+<tr>
+<td>16</td>
+<td><a href="16_InputSystem.html">Input System</a></td>
+<td>How RCC reads input: keyboard, gamepad, mobile, override mode.</td>
+</tr>
+<tr>
+<td>17</td>
+<td><a href="17_HowToOverrideInputs.html">Overriding Inputs</a></td>
+<td>Feeding custom throttle / steer / brake values into a vehicle.</td>
+</tr>
+<tr>
+<td>18</td>
+<td><a href="18_MobileSetup.html">Mobile Setup</a></td>
+<td>Touch screen, steering wheel, joystick, and gyroscope input on mobile.</td>
+</tr>
+<tr>
+<td>19</td>
+<td><a href="19_AISystem.html">AI System</a></td>
+<td>The waypoint-based AI driver. Building a track, configuring chase AI.</td>
+</tr>
+<tr>
+<td>20</td>
+<td><a href="20_Customization.html">Customization</a></td>
+<td>Paint, spoilers, wheels, decals, neon, sirens, engine/handling/brake upgrades.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="settings--pipelines">Settings &amp; Pipelines</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Document</th>
+<th>What It Covers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>21</td>
+<td><a href="21_RCC_Settings.html">RCC Settings Deep Dive</a></td>
+<td>Every panel in <code>RCC_Settings.asset</code>, what to change and what not to.</td>
+</tr>
+<tr>
+<td>22</td>
+<td><a href="22_RenderPipelines.html">URP &amp; HDRP Conversion</a></td>
+<td>Switching from Built-in to URP or HDRP without breaking lights and materials.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="scripting--integration">Scripting &amp; Integration</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Document</th>
+<th>What It Covers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>23</td>
+<td><a href="23_ScriptingAPI.html">Scripting API</a></td>
+<td>The static <code>RCC</code> class — spawn vehicles, change camera, set behavior, repair, transport.</td>
+</tr>
+<tr>
+<td>24</td>
+<td><a href="24_EventsSystem.html">Events System</a></td>
+<td><code>RCC_Events</code> — subscribe to player spawn, AI spawn, collisions, indicator toggles.</td>
+</tr>
+<tr>
+<td>25</td>
+<td><a href="25_SteeringWheels.html">Steering Wheels</a></td>
+<td>Logitech G29 / G27 / G923 and other wheels with the Unity Input System.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="reference--help">Reference &amp; Help</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Document</th>
+<th>What It Covers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>26</td>
+<td><a href="26_AddonPackages.html">Addon Packages</a></td>
+<td>History of the BCG Shared Assets (Enter/Exit) and Photon Integration addons, and what changed in V5.</td>
+</tr>
+<tr>
+<td>27</td>
+<td><a href="27_ScriptsReference.html">Scripts Reference</a></td>
+<td>Every runtime script that ships with RCC, grouped by purpose.</td>
+</tr>
+<tr>
+<td>28</td>
+<td><a href="28_Troubleshooting.html">Troubleshooting</a></td>
+<td>Common problems and how to fix them.</td>
+</tr>
+<tr>
+<td>29</td>
+<td><a href="29_FAQ.html">FAQ</a></td>
+<td>Frequently asked questions.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="a-note-on-this-documentation">A Note on This Documentation</h2>
+<p>RCC has been on the Asset Store since <strong>2014</strong>. The current version is <strong>V5.0.0</strong>, the long-term-support (LTS) release. RCC is in maintenance mode: bug fixes and Unity-compatibility patches only. If you're looking for new features (modular architecture, addon system, runtime-built vehicles), that work happens in <strong>Realistic Car Controller Pro (RCCP)</strong>, a separate product. The two are not interchangeable, and prefabs / scripts from one cannot be imported into the other.</p>
+<p>If you find an error in these docs, please contact support at <strong>bonecrackergames@gmail.com</strong> or post in the Unity Asset Store review section.</p>
+</div>
+<div class="footer">
+Generated from: 00_TableOfContents.md<br>
+Date: 2026-05-22 00:32<br>
+© 2014 - 2026 BoneCracker Games — Realistic Car Controller V5.0.0
+</div>
+</body>
+</html>

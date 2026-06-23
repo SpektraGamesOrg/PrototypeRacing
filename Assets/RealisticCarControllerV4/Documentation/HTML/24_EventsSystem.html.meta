@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: ce21767d1f9776b40bad5e218803b453
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 16296
+  packageName: Realistic Car Controller
+  packageVersion: 5.0.0
+  assetPath: Assets/RealisticCarControllerV4/Documentation/HTML/24_EventsSystem.html
+  uploadId: 920646

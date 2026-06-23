@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: b76406611812b2e47a21bfa6c0373966
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 16296
+  packageName: Realistic Car Controller
+  packageVersion: 5.0.0
+  assetPath: Assets/RealisticCarControllerV4/Documentation/HTML/07_HowToCreateNewVehicles.html
+  uploadId: 920646

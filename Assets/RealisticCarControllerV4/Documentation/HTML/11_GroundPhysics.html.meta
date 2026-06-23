@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: f78ac2c401028dc4cb41d981f8a6e685
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 16296
+  packageName: Realistic Car Controller
+  packageVersion: 5.0.0
+  assetPath: Assets/RealisticCarControllerV4/Documentation/HTML/11_GroundPhysics.html
+  uploadId: 920646

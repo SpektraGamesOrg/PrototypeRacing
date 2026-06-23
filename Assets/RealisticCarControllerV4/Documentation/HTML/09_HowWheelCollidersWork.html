@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>How WheelColliders Work</title>
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    background: #f8f9fa;
+}
+.content {
+    background: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+h1 { color: #2c3e50; margin-top: 0; padding-bottom: 0.3em; border-bottom: 2px solid #eee; }
+h2 { color: #34495e; margin-top: 1.5em; padding-bottom: 0.2em; border-bottom: 1px solid #eee; }
+h3, h4 { color: #34495e; margin-top: 1.2em; }
+h5, h6 { color: #34495e; margin-top: 1.0em; }
+code {
+    background: #f4f4f4;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.9em;
+}
+pre {
+    background: #2d2d2d;
+    color: #f8f8f2;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
+    margin: 1em 0;
+    font-size: 0.9em;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+    color: #f8f8f2;
+    white-space: pre;
+}
+blockquote {
+    border-left: 4px solid #3498db;
+    margin: 1em 0;
+    padding: 0.5em 0 0.5em 20px;
+    color: #555;
+    background: #f9f9f9;
+}
+blockquote p { margin: 0.4em 0; }
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px 12px;
+    text-align: left;
+    vertical-align: top;
+}
+th {
+    background: #f4f4f4;
+    font-weight: bold;
+}
+tr:nth-child(even) { background: #f9f9f9; }
+a { color: #3498db; text-decoration: none; transition: color 0.2s; }
+a:hover { color: #2980b9; text-decoration: underline; }
+ul, ol { margin: 1em 0; padding-left: 30px; }
+li { margin: 0.4em 0; }
+li > ul, li > ol { margin: 0.3em 0; }
+hr { border: none; border-top: 2px solid #eee; margin: 2em 0; }
+p { margin: 1em 0; }
+.footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    color: #999;
+    font-size: 0.9em;
+    text-align: center;
+}
+
+</style>
+</head>
+<body>
+<div class="content">
+<h1 id="how-wheelcolliders-work">How WheelColliders Work</h1>
+<p>The WheelCollider is the most important component in vehicle physics — it's what decides how the wheel grips the road, when it slips, how the suspension absorbs bumps, and how brake / throttle force gets converted into motion. This document explains how Unity's built-in WheelCollider works, what RCC's <code>RCC_WheelCollider</code> adds on top, and how to tune friction so your vehicle drives the way you want.</p>
+<p>You don't need to be a physics expert to follow this. By the end, you'll understand the friction curve diagram, the difference between forward and sideways friction, and what each tuning value does.</p>
+<h2 id="what-a-unity-wheelcollider-is">What a Unity WheelCollider Is</h2>
+<p>Unity's <code>WheelCollider</code> is a special collider that simulates a wheel using a <strong>raycast-based suspension model</strong>. Each frame, the wheel casts a ray down from its mounting point and looks for the ground. When it finds the ground, it:</p>
+<ol>
+<li>Calculates how compressed the suspension is (rest position vs current position).</li>
+<li>Applies a spring force pushing the wheel back to rest position.</li>
+<li>Applies a damper force opposing rapid spring motion.</li>
+<li>Computes the slip — the difference between the wheel's spinning velocity and the surface's velocity beneath it.</li>
+<li>Applies friction force based on slip, using a <strong>friction curve</strong> (more on this below).</li>
+</ol>
+<p>This model is faster and more stable than full mesh-based wheel simulation. The cost is that you can't simulate things like a wheel deforming or a wheel digging into soft ground — for that, you'd need a more advanced wheel system.</p>
+<p>Every WheelCollider has these key serialized fields:</p>
+<ul>
+<li><strong>Mass</strong> — the wheel's mass (not the whole vehicle's).</li>
+<li><strong>Radius</strong> — wheel radius in meters.</li>
+<li><strong>Wheel Damping Rate</strong> — internal wheel rotation damping.</li>
+<li><strong>Suspension Distance</strong> — how far the wheel can travel from rest position.</li>
+<li><strong>Suspension Spring</strong> — spring stiffness, damper, and target position.</li>
+<li><strong>Forward Friction</strong> — friction curve for acceleration / braking direction.</li>
+<li><strong>Sideways Friction</strong> — friction curve for the steer direction.</li>
+</ul>
+<h2 id="the-friction-curve">The Friction Curve</h2>
+<p>The most important concept. A <strong>friction curve</strong> is a graph with <strong>slip</strong> on the X axis and <strong>force</strong> on the Y axis. It's defined by four points:</p>
+<pre><code>Force ↑
+      │       ╭─── extremum (peak grip)
+      │      ╱ 
+      │     ╱   
+      │    ╱     ╲
+      │   ╱       ╲___ asymptote (steady slip)
+      │  ╱            
+      │ ╱             
+      │╱              
+      └──────────────────→ Slip
+       0 → extremumSlip → asymptoteSlip
+</code></pre>
+<ul>
+<li><strong>Extremum Slip</strong> — the slip value at which grip peaks.</li>
+<li><strong>Extremum Value</strong> — the maximum force the tire can apply at peak slip.</li>
+<li><strong>Asymptote Slip</strong> — the slip value at which the tire has fully broken loose.</li>
+<li><strong>Asymptote Value</strong> — the residual force when the tire is sliding freely.</li>
+</ul>
+<p>In plain language: as the wheel starts to slip, grip increases. Past the extremum, grip starts to fall off — this is the tire "breaking loose." At the asymptote, the tire is sliding freely and offers only residual friction.</p>
+<p>Each WheelCollider has <strong>two</strong> of these curves: one for forward direction (acceleration/braking) and one for sideways (steering). They are independent — a tire can grip well sideways but slip forward (a burnout) or grip well forward but slip sideways (an understeer slide).</p>
+<h3 id="stiffness">Stiffness</h3>
+<p>Each friction curve also has a <strong>stiffness</strong> multiplier. Stiffness scales the entire curve. Higher stiffness = more grip across all slip values; lower stiffness = less grip (think wet road, ice).</p>
+<p>RCC uses stiffness as the per-surface mechanism: an asphalt PhysicMaterial might have stiffness 1.0, while ice has 0.3. The shape of the curve stays the same; the magnitude scales.</p>
+<h2 id="what-rcc_wheelcollider-adds">What <code>RCC_WheelCollider</code> Adds</h2>
+<p><code>RCC_WheelCollider</code> sits on the same GameObject as a Unity <code>WheelCollider</code> and adds:</p>
+<h3 id="ground-material-detection">Ground Material Detection</h3>
+<p>Each frame, the component reads the hit collider's <code>PhysicMaterial</code> and looks it up in <code>RCC_GroundMaterials.asset</code>. The matched entry provides:</p>
+<ul>
+<li><code>forwardStiffness</code> and <code>sidewaysStiffness</code> multipliers (applied to the friction curves).</li>
+<li><code>slip</code> baseline.</li>
+<li><code>damp</code> (suspension damper override).</li>
+<li><code>volume</code> for ground audio.</li>
+<li>A particle prefab for dust / dirt / snow.</li>
+<li>An audio clip for the surface.</li>
+<li>An optional custom skidmark style.</li>
+</ul>
+<p>This is how you get different driving feel on different surfaces without writing a single line of code — just paint different materials onto your environment colliders.</p>
+<p>For Unity Terrain, the lookup is different: <code>RCC_WheelCollider</code> reads the splatmap layer index at the wheel's position and matches that to a <code>TerrainFrictions</code> entry. See <strong><a href="11_GroundPhysics.html">11 — Ground Physics</a></strong> for details.</p>
+<h3 id="friction-curve-from-behavior-preset">Friction Curve from Behavior Preset</h3>
+<p>When the active behavior preset's <code>applyExternalWheelFrictions</code> is on, <code>RCC_WheelCollider</code> ignores the values stored on the Unity <code>WheelCollider</code> and instead reads them from the preset. This means switching from Simulator → Drift → Arcade with one call (<code>RCC.SetBehavior(1)</code>) changes every wheel's friction live.</p>
+<p>When the preset doesn't override, <code>RCC_WheelCollider</code> uses the values currently on the Unity WheelCollider — so you can still hand-tune individual wheels.</p>
+<h3 id="audio">Audio</h3>
+<p>The wheel plays a slip / skid sound when its slip exceeds a threshold. Volume scales with slip magnitude. The ground material's <code>volume</code> multiplier and <code>groundSound</code> clip override the default audio. This is what makes asphalt squeals different from gravel rumbles.</p>
+<h3 id="particle-effects">Particle Effects</h3>
+<p>When slipping on a surface that has a <code>groundParticles</code> prefab, the wheel emits dust / dirt / snow particles. The emission rate scales with slip.</p>
+<h3 id="skidmarks">Skidmarks</h3>
+<p>When forward or sideways slip exceeds the skidmark threshold, the wheel writes to the scene's <code>RCC_SkidmarksManager</code>, which draws a mesh strip on the ground. Skidmarks pool — they don't allocate per frame.</p>
+<h3 id="tire-deflation">Tire Deflation</h3>
+<p>If the wheel takes enough damage (collision, sharp object, ground with <code>deflate = true</code>), the tire deflates. Deflated tires have reduced friction stiffness and slightly smaller radius. Repair via <code>RCC.Repair(carController)</code>.</p>
+<h3 id="anti-roll-bar-force">Anti-Roll Bar Force</h3>
+<p>Each wheel knows its sibling on the same axle (FL knows FR, RL knows RR). Each frame, the wheels compute their suspension compression difference and apply a counteracting force — the <strong>anti-roll bar effect</strong>. This reduces body roll in turns. Tune via <code>antiRollFrontHorizontal</code> and <code>antiRollRearHorizontal</code> on <code>RCC_CarControllerV4</code>.</p>
+<h3 id="power--brake--steer--handbrake-flags">Power / Brake / Steer / Handbrake Flags</h3>
+<p>Each wheel has four toggles:</p>
+<ul>
+<li><strong>Is Power Wheel</strong> — receives engine torque.</li>
+<li><strong>Is Brake Wheel</strong> — receives brake torque.</li>
+<li><strong>Is Steer Wheel</strong> — turns with steering input.</li>
+<li><strong>Is Hand Brake Wheel</strong> — receives handbrake torque.</li>
+</ul>
+<p>The defaults are set by the controller's <code>WheelType</code>:</p>
+<ul>
+<li>FWD → front wheels are powered + steered + braked; rear are braked + handbrake.</li>
+<li>RWD → rear wheels are powered + braked; front are steered + braked.</li>
+<li>AWD → all four are powered + braked; front are steered.</li>
+</ul>
+<p>You can override any of these for unusual setups (e.g., a rear-steer forklift, or a front-handbrake hill climber).</p>
+<h2 id="tuning-friction-for-different-driving-feels">Tuning Friction for Different Driving Feels</h2>
+<h3 id="goal-realistic-simulator">Goal: Realistic Simulator</h3>
+<p>You want grip that's predictable, breaks loose gradually, and recovers when the player eases off.</p>
+<pre><code>Forward extremum slip:     0.4
+Forward extremum value:    1.0
+Forward asymptote slip:    0.8
+Forward asymptote value:   0.5
+Forward stiffness:         1.0
+
+Sideways extremum slip:    0.2
+Sideways extremum value:   1.0
+Sideways asymptote slip:   0.5
+Sideways asymptote value:  0.75
+Sideways stiffness:        1.0
+</code></pre>
+<p>This is roughly the default Simulator preset.</p>
+<h3 id="goal-drift">Goal: Drift</h3>
+<p>You want sideways grip to break loose early and stay loose long enough to slide.</p>
+<pre><code>Sideways extremum slip:    0.3   (slip earlier)
+Sideways extremum value:   1.0
+Sideways asymptote slip:   1.0   (long slip range)
+Sideways asymptote value:  0.5   (low residual grip when sliding)
+Sideways stiffness:        1.5   (high overall grip until break)
+</code></pre>
+<p>The car snaps into a slide when you provoke it (handbrake + throttle), then holds the slide while the player counter-steers. Forward grip stays normal so the engine can power through the slide.</p>
+<h3 id="goal-arcade">Goal: Arcade</h3>
+<p>You want lots of grip, predictable turn-in, no spin-outs.</p>
+<pre><code>Sideways extremum slip:    0.2
+Sideways extremum value:   1.0
+Sideways asymptote slip:   0.5
+Sideways asymptote value:  1.0   (high residual — never fully loses grip)
+Sideways stiffness:        1.5
+</code></pre>
+<p>The car turns sharply and never spins. Easier for the player to control without ever feeling truly fast.</p>
+<h3 id="goal-off-road--loose-surface">Goal: Off-Road / Loose Surface</h3>
+<p>Reduce stiffness across all surfaces. Use the per-surface ground material entries to give grass, dirt, and sand low stiffness values (e.g., 0.4) compared to asphalt (1.0).</p>
+<h2 id="the-suspension-spring">The Suspension Spring</h2>
+<p>Aside from friction, the other big tuning lever is <strong>suspension stiffness</strong>.</p>
+<h3 id="suspension-spring">Suspension Spring</h3>
+<ul>
+<li><strong>Spring</strong> — how strong the spring is. Higher = stiffer suspension, less body roll, but worse bump absorption. Default 45000.</li>
+<li><strong>Damper</strong> — damping force opposing rapid spring motion. Higher = less bouncy. Default 2500.</li>
+<li><strong>Target Position</strong> — where the wheel "wants" to be in its travel range. 0 = bottomed out, 1 = fully extended. Default 0.5 (middle).</li>
+</ul>
+<p>Stiffer springs make a car feel "race car" — it grips well in turns but rattles on bumps. Softer springs make it feel "comfort car" — it rides bumps well but rolls more.</p>
+<h3 id="suspension-distance">Suspension Distance</h3>
+<p>How far the wheel can travel. Default 0.2 m (20 cm) for a road car. For an off-road truck, 0.4 m. For a Formula 1 car, 0.05 m.</p>
+<h2 id="common-friction-problems">Common Friction Problems</h2>
+<h3 id="wheels-spin-forever--burn-out-constantly">Wheels Spin Forever / Burn Out Constantly</h3>
+<p>Forward stiffness is too low, or forward friction extremum value is too low. The tire can't grip enough to convert engine torque into motion.</p>
+<p><strong>Fix:</strong> Increase forward stiffness or forward extremum value. Or reduce <code>maxEngineTorque</code> if the engine is over-torqued for the tire grip.</p>
+<h3 id="car-wont-turn--just-pushes-forward-understeer">Car Won't Turn — Just Pushes Forward (Understeer)</h3>
+<p>Sideways grip on the front wheels is too weak relative to the rear.</p>
+<p><strong>Fix:</strong> Increase front sideways stiffness. Or decrease rear sideways stiffness. Or in the active behavior preset, increase <code>sidewaysExtremumValue</code>.</p>
+<h3 id="tail-constantly-swings-out-oversteer">Tail Constantly Swings Out (Oversteer)</h3>
+<p>Sideways grip on the rear is too weak relative to the front.</p>
+<p><strong>Fix:</strong> Increase rear sideways stiffness. Or move COM forward (so weight is on the front wheels). Or reduce <code>maxEngineTorque</code> for RWD cars — too much rear torque overpowers rear grip.</p>
+<h3 id="car-slides-down-hills-at-rest">Car Slides Down Hills at Rest</h3>
+<p>The wheel's <code>WheelDampingRate</code> is too low, or the brake torque doesn't fully hold the wheel.</p>
+<p><strong>Fix:</strong> Increase <code>Wheel Damping Rate</code> to ~3. Make sure the parking brake (handbrake at rest) is applying full brake torque.</p>
+<h3 id="car-bounces-on-bumps">Car Bounces on Bumps</h3>
+<p>Damper is too low relative to spring. The suspension oscillates because nothing absorbs the energy.</p>
+<p><strong>Fix:</strong> Increase the damper value. As a rough rule, damper should be 1/15 to 1/30 of spring (e.g., spring 45000 → damper 1500–3000).</p>
+<h3 id="wheels-visibly-sink-into-geometry">Wheels Visibly Sink Into Geometry</h3>
+<p>The visible wheel mesh isn't following the wheel collider's pose correctly. Usually this means the wheel mesh's pivot isn't at the wheel center.</p>
+<p><strong>Fix:</strong> Re-position the wheel mesh transform so its pivot is at the wheel's center axis. Or run <strong>Tools → BoneCracker Games → Realistic Car Controller → Check Axis Orientation</strong>.</p>
+<h2 id="how-to-read-the-inspector-friction-values">How to Read the Inspector Friction Values</h2>
+<p>When you click a <code>RCC_WheelCollider</code> in the Inspector, you'll see:</p>
+<ul>
+<li><strong>Wheel Model</strong> — the visible wheel mesh transform.</li>
+<li><strong>Wheel Type</strong> — auto-set from the parent controller's <code>WheelType</code>.</li>
+<li><strong>Is Power Wheel / Is Brake Wheel / Is Steer Wheel / Is Hand Brake Wheel</strong> — booleans.</li>
+<li><strong>Camber</strong> — wheel tilt (only relevant if customization is on).</li>
+<li><strong>Cant / Toe / Caster</strong> — alignment values.</li>
+<li><strong>Forward Friction / Sideways Friction</strong> — friction curves.</li>
+<li><strong>Skidmarks</strong> — toggle and threshold.</li>
+<li><strong>Audio</strong> — slip sound clip.</li>
+</ul>
+<p>The friction curves can be edited inline. Click the curve preview to open Unity's animation curve editor.</p>
+<h2 id="performance-note">Performance Note</h2>
+<p>Each <code>WheelCollider</code> raycast is fast but not free. A typical vehicle has 4 WheelColliders. Multiple AI vehicles add up: 20 AI cars × 4 wheels = 80 WheelColliders per frame.</p>
+<p>If you're targeting low-end mobile and seeing frame drops with many AI:</p>
+<ul>
+<li>Reduce the number of active AI vehicles.</li>
+<li>Use the <code>RCC_LOD</code> component to disable wheel updates on far-away vehicles.</li>
+<li>Turn <code>useFixedWheelColliders</code> to <code>false</code> in <code>RCC_Settings</code> to use less-stable but faster wheel colliders.</li>
+<li>Reduce the number of skidmarks (<code>maxMarks</code> on the skidmarks manager).</li>
+</ul>
+<h2 id="next-steps">Next Steps</h2>
+<ul>
+<li><strong><a href="10_BehaviorPresets.html">10 — Behavior Presets</a></strong> — switching friction profiles in bulk.</li>
+<li><strong><a href="11_GroundPhysics.html">11 — Ground Physics</a></strong> — per-surface stiffness configuration.</li>
+<li><strong><a href="08_VehicleInspectorReference.html">08 — Vehicle Inspector Reference</a></strong> — the full controller field reference.</li>
+</ul>
+</div>
+<div class="footer">
+Generated from: 09_HowWheelCollidersWork.md<br>
+Date: 2026-05-22 00:32<br>
+© 2014 - 2026 BoneCracker Games — Realistic Car Controller V5.0.0
+</div>
+</body>
+</html>

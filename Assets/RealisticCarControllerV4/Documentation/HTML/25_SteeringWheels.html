@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Steering Wheel Support (Logitech &amp; Others)</title>
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    background: #f8f9fa;
+}
+.content {
+    background: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+h1 { color: #2c3e50; margin-top: 0; padding-bottom: 0.3em; border-bottom: 2px solid #eee; }
+h2 { color: #34495e; margin-top: 1.5em; padding-bottom: 0.2em; border-bottom: 1px solid #eee; }
+h3, h4 { color: #34495e; margin-top: 1.2em; }
+h5, h6 { color: #34495e; margin-top: 1.0em; }
+code {
+    background: #f4f4f4;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.9em;
+}
+pre {
+    background: #2d2d2d;
+    color: #f8f8f2;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
+    margin: 1em 0;
+    font-size: 0.9em;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+    color: #f8f8f2;
+    white-space: pre;
+}
+blockquote {
+    border-left: 4px solid #3498db;
+    margin: 1em 0;
+    padding: 0.5em 0 0.5em 20px;
+    color: #555;
+    background: #f9f9f9;
+}
+blockquote p { margin: 0.4em 0; }
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px 12px;
+    text-align: left;
+    vertical-align: top;
+}
+th {
+    background: #f4f4f4;
+    font-weight: bold;
+}
+tr:nth-child(even) { background: #f9f9f9; }
+a { color: #3498db; text-decoration: none; transition: color 0.2s; }
+a:hover { color: #2980b9; text-decoration: underline; }
+ul, ol { margin: 1em 0; padding-left: 30px; }
+li { margin: 0.4em 0; }
+li > ul, li > ol { margin: 0.3em 0; }
+hr { border: none; border-top: 2px solid #eee; margin: 2em 0; }
+p { margin: 1em 0; }
+.footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    color: #999;
+    font-size: 0.9em;
+    text-align: center;
+}
+
+</style>
+</head>
+<body>
+<div class="content">
+<h1 id="steering-wheel-support-logitech--others">Steering Wheel Support (Logitech &amp; Others)</h1>
+<p>This document covers using physical steering wheels with RCC: Logitech G29, G27, G923, G920, Thrustmaster T300, Fanatec, and any other USB / Bluetooth steering wheel that exposes itself to the operating system as a generic input device.</p>
+<p>The Unity Input System is what makes this work. RCC doesn't ship Logitech-specific or Thrustmaster-specific code — it works with anything the Input System recognizes.</p>
+<h2 id="will-my-wheel-work">Will My Wheel Work?</h2>
+<p>If your wheel works with other Unity games that use the Input System, it'll work with RCC. To test:</p>
+<ol>
+<li>Plug in the wheel.</li>
+<li>Open Unity.</li>
+<li>Open <strong>Window → Analysis → Input Debugger</strong>.</li>
+<li>Find your wheel in the Devices list.</li>
+</ol>
+<p>If it shows up with named axes (Wheel, Throttle, Brake, Clutch, Stick), you're good. If it doesn't show up, or only shows up as a generic "USB Joystick," you may need drivers.</p>
+<h3 id="wheels-known-to-work">Wheels Known to Work</h3>
+<table>
+<thead>
+<tr>
+<th>Brand</th>
+<th>Models</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Logitech</td>
+<td>G27, G29, G920, G923 (Force Feedback)</td>
+</tr>
+<tr>
+<td>Thrustmaster</td>
+<td>T150, T248, T300, T500</td>
+</tr>
+<tr>
+<td>Fanatec</td>
+<td>CSL, Clubsport (via Fanatec drivers)</td>
+</tr>
+<tr>
+<td>Hori</td>
+<td>Racing Wheel for PlayStation, RAP4 Kai</td>
+</tr>
+</tbody>
+</table>
+<h3 id="wheels-that-may-need-setup">Wheels That May Need Setup</h3>
+<table>
+<thead>
+<tr>
+<th>Brand</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Older Logitech (Driving Force, MOMO)</td>
+<td>Install Logitech G HUB or LGS drivers first.</td>
+</tr>
+<tr>
+<td>Generic USB wheels</td>
+<td>May appear as "Joystick" with no named axes. Manual binding required.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="setting-up-a-logitech-g29--g923">Setting Up a Logitech G29 / G923</h2>
+<p>These are the most common wheels — let's use them as the example.</p>
+<h3 id="step-1--install-drivers">Step 1 — Install Drivers</h3>
+<p>Download and install <strong>Logitech G HUB</strong> from logitech.com. This gives Windows / macOS a recognized driver for the wheel.</p>
+<p>After install:</p>
+<ul>
+<li>Plug in the wheel.</li>
+<li>Open G HUB. Verify the wheel is detected (shown with its model name).</li>
+<li>Calibrate the wheel from G HUB (center, full lock, pedal range).</li>
+</ul>
+<h3 id="step-2--open-the-input-actions-asset">Step 2 — Open the Input Actions Asset</h3>
+<p>In Unity, open:</p>
+<pre><code>Assets/RealisticCarControllerV4/Resources/RCC Assets/RCC_InputActions.inputactions
+</code></pre>
+<p>The Unity Input Actions editor opens.</p>
+<h3 id="step-3--bind-steering-to-the-wheel-axis">Step 3 — Bind Steering to the Wheel Axis</h3>
+<ol>
+<li>Expand the <strong>Vehicle</strong> action map.</li>
+<li>Click <strong>Steer</strong>.</li>
+<li>Add a binding: click <strong>+</strong> next to the action name.</li>
+<li>In the binding settings, click <strong>Path</strong> and search for <code>wheel</code>.</li>
+<li>Pick <strong>Logitech G29 / Steering Wheel</strong> (or whichever path matches your device).</li>
+<li>Save.</li>
+</ol>
+<p>The exact path depends on which version of the Input System you're on. As of Input System 1.5+, Logitech wheels show up under <strong>Other Wheels / [Wheel Name]</strong>.</p>
+<h3 id="step-4--bind-pedals">Step 4 — Bind Pedals</h3>
+<p>Repeat for <strong>Throttle</strong> and <strong>Brake</strong> (and <strong>Clutch</strong> if your wheel has one).</p>
+<p>Each pedal is a separate axis on the wheel device.</p>
+<h3 id="step-5--test">Step 5 — Test</h3>
+<p>Press Play in any demo scene. Turn the wheel — the car should steer. Press throttle / brake pedals — the car should accelerate / brake.</p>
+<p>If steering is reversed (turning left makes the car go right), open the steering action's bindings and <strong>add an Invert processor</strong>. Same for inverted pedals.</p>
+<h2 id="force-feedback">Force Feedback</h2>
+<p>RCC doesn't ship force feedback (FFB) support out of the box. The Unity Input System has experimental FFB APIs, but they're not stable yet for wheels.</p>
+<p>If you need FFB:</p>
+<ol>
+<li>Install the <strong>Logitech G Steering Wheel Plugin for Unity</strong> (search the Asset Store or Logitech's developer site).</li>
+<li>The plugin exposes FFB calls (<code>LogitechGSDK.LogiUpdate()</code>, <code>LogitechGSDK.LogiPlayConstantForce()</code>, etc.).</li>
+<li>Write a bridge script that subscribes to RCC events and triggers FFB effects:</li>
+</ol>
+<pre><code class="language-csharp">void OnEnable() { RCC_Events.OnRCCPlayerCollision += OnCollision; }
+void OnDisable() { RCC_Events.OnRCCPlayerCollision -= OnCollision; }
+
+void OnCollision(RCC_CarControllerV4 vehicle, Collision collision) {
+    // Play a strong constant force pointing in the collision direction
+    LogitechGSDK.LogiPlayConstantForce(0, 100);
+    // ...
+}
+</code></pre>
+<p>This is outside RCC's scope but is well-documented in Logitech's plugin docs.</p>
+<p>For tire grip feedback (the constant tug of the wheel resisting your turn), you'd compute the wheel's slip from <code>RCC_WheelCollider</code> and feed it into FFB. Again, outside RCC's core scope but quite achievable.</p>
+<h2 id="thrustmaster-setup">Thrustmaster Setup</h2>
+<p>Same flow as Logitech:</p>
+<ol>
+<li>Install <strong>Thrustmaster Control Panel</strong> (their official driver).</li>
+<li>Calibrate the wheel in the control panel.</li>
+<li>In Unity's Input Actions asset, bind Steer / Throttle / Brake / Clutch to the wheel's axes (path: <code>&lt;HID&gt;/Thrustmaster T300RS</code>).</li>
+</ol>
+<p>Thrustmaster wheels also support FFB but require their SDK.</p>
+<h2 id="fanatec-setup">Fanatec Setup</h2>
+<ol>
+<li>Install <strong>Fanatec Driver</strong> for your specific wheel.</li>
+<li>The wheel is recognized as a generic HID device — bindings work the same as Logitech and Thrustmaster.</li>
+</ol>
+<p>Fanatec FFB requires the Fanatec SDK.</p>
+<h2 id="pedal-only-devices">Pedal-Only Devices</h2>
+<p>If you have a separate pedals set (Logitech G Pro Pedals, Heusinkveld Sprints, Fanatec Clubsport Pedals), they show up as a separate HID device.</p>
+<p>In the Input Actions asset, bind throttle / brake / clutch to the pedals' specific axes (look for "Pedals" or your device's name in the Input Debugger).</p>
+<h2 id="h-pattern-shifter">H-Pattern Shifter</h2>
+<p>If you have a Logitech Driving Force Shifter or similar h-pattern shifter:</p>
+<ol>
+<li>The shifter is a separate HID device, usually a Logitech Driving Force Shifter.</li>
+<li>Each gear is a separate button.</li>
+<li>Bind each button to your custom action (Gear 1, Gear 2, Gear 3, etc.) — RCC's default action set doesn't have these by name, so you'd add them.</li>
+</ol>
+<p>To engage a specific gear in code:</p>
+<pre><code class="language-csharp">carController.ShiftToGear(2); // shift to 2nd gear
+</code></pre>
+<p>Wire each shifter button to call <code>ShiftToGear</code> with the matching gear index.</p>
+<h2 id="handbrake--e-brake">Handbrake / E-Brake</h2>
+<p>Some racing setups have a separate handbrake lever. Bind the lever axis or button to the <strong>Handbrake</strong> action in the Input Actions asset.</p>
+<h2 id="calibrating-the-steering-range">Calibrating the Steering Range</h2>
+<p>Most wheels are 900° lock-to-lock by default. RCC's vehicles use a smaller effective range — typically 80° (40° in each direction) at low speed. To calibrate:</p>
+<ol>
+<li>In the Input Actions asset, find the <strong>Steer</strong> action.</li>
+<li>Add a <strong>Scale</strong> processor.</li>
+<li>Set the factor to <code>(40 / 450)</code> ≈ <strong>0.089</strong> to map 900° of wheel rotation to 80° of vehicle steer.</li>
+</ol>
+<p>Or, leave the scale at 1.0 and let <code>RCC_CarControllerV4.steerAngleCurve</code> handle the mapping — the curve clamps based on speed.</p>
+<p>Test which feels better for your players.</p>
+<h2 id="dead-zones">Dead Zones</h2>
+<p>Most wheels have a tiny dead zone at center. The Input System's <code>Stick Deadzone</code> processor (default min 0.125, max 0.925) handles this. If you want a more precise dead zone:</p>
+<ol>
+<li>Find your Steer action's binding.</li>
+<li>Add a <strong>Stick Deadzone</strong> processor.</li>
+<li>Set min to ~0.02, max to 1.0.</li>
+</ol>
+<p>Lower min = more precise center. Higher min = less twitchy.</p>
+<h2 id="common-wheel-issues">Common Wheel Issues</h2>
+<h3 id="the-wheel-doesnt-appear-in-the-input-debugger">"The wheel doesn't appear in the Input Debugger"</h3>
+<p>The wheel needs OS-level drivers. Install Logitech G HUB / Thrustmaster Control Panel / Fanatec Driver.</p>
+<p>If drivers are installed and the wheel still doesn't appear, try a different USB port or restart Unity.</p>
+<h3 id="the-wheel-works-but-the-steering-is-too-fast--too-slow">"The wheel works but the steering is too fast / too slow"</h3>
+<p>Adjust the <strong>Scale</strong> processor on the Steer binding. Or adjust <code>RCC_CarControllerV4.steerAngleCurve</code>.</p>
+<h3 id="the-pedals-are-inverted-released--full-throttle">"The pedals are inverted (released = full throttle)"</h3>
+<p>Add an <strong>Invert</strong> processor to the pedal's binding.</p>
+<h3 id="force-feedback-isnt-working">"Force feedback isn't working"</h3>
+<p>RCC doesn't ship FFB. Use Logitech's / Thrustmaster's / Fanatec's official Unity plugin and bridge to RCC events.</p>
+<h3 id="the-clutch-pedal-doesnt-do-anything">"The clutch pedal doesn't do anything"</h3>
+<p>Make sure <code>carController.automaticClutch</code> is <strong>off</strong>. If automatic clutch is on, the controller manages the clutch internally and ignores the player's clutch input.</p>
+<p>Also bind the clutch pedal to the Clutch action in the Input Actions asset (it may not be bound by default).</p>
+<h3 id="rumble--vibration-works-on-a-gamepad-but-not-the-wheel">"Rumble / vibration works on a gamepad but not the wheel"</h3>
+<p>The Input System's <code>Gamepad.SetMotorSpeeds()</code> works on gamepads, not wheels. Wheels use FFB which is a different API entirely.</p>
+<h2 id="useful-resources">Useful Resources</h2>
+<ul>
+<li><a href="https://docs.unity3d.com/Packages/com.unity.inputsystem@latest">Unity Input System documentation</a></li>
+<li><a href="https://www.logitechg.com/en-us/innovation/developer-lab.html">Logitech G Steering Wheel Plugin for Unity</a> — for FFB.</li>
+<li><a href="https://www.thrustmaster.com/developers/">Thrustmaster Developer Resources</a>.</li>
+</ul>
+<h2 id="next-steps">Next Steps</h2>
+<ul>
+<li><strong><a href="16_InputSystem.html">16 — Input System</a></strong> — the general Unity Input System setup.</li>
+<li><strong><a href="17_HowToOverrideInputs.html">17 — Overriding Inputs</a></strong> — feeding custom values bypassing the wheel.</li>
+<li><strong><a href="24_EventsSystem.html">24 — Events System</a></strong> — events to bridge to FFB triggers.</li>
+</ul>
+</div>
+<div class="footer">
+Generated from: 25_SteeringWheels.md<br>
+Date: 2026-05-22 00:32<br>
+© 2014 - 2026 BoneCracker Games — Realistic Car Controller V5.0.0
+</div>
+</body>
+</html>

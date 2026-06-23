@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Customization</title>
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    background: #f8f9fa;
+}
+.content {
+    background: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+h1 { color: #2c3e50; margin-top: 0; padding-bottom: 0.3em; border-bottom: 2px solid #eee; }
+h2 { color: #34495e; margin-top: 1.5em; padding-bottom: 0.2em; border-bottom: 1px solid #eee; }
+h3, h4 { color: #34495e; margin-top: 1.2em; }
+h5, h6 { color: #34495e; margin-top: 1.0em; }
+code {
+    background: #f4f4f4;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.9em;
+}
+pre {
+    background: #2d2d2d;
+    color: #f8f8f2;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
+    margin: 1em 0;
+    font-size: 0.9em;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+    color: #f8f8f2;
+    white-space: pre;
+}
+blockquote {
+    border-left: 4px solid #3498db;
+    margin: 1em 0;
+    padding: 0.5em 0 0.5em 20px;
+    color: #555;
+    background: #f9f9f9;
+}
+blockquote p { margin: 0.4em 0; }
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px 12px;
+    text-align: left;
+    vertical-align: top;
+}
+th {
+    background: #f4f4f4;
+    font-weight: bold;
+}
+tr:nth-child(even) { background: #f9f9f9; }
+a { color: #3498db; text-decoration: none; transition: color 0.2s; }
+a:hover { color: #2980b9; text-decoration: underline; }
+ul, ol { margin: 1em 0; padding-left: 30px; }
+li { margin: 0.4em 0; }
+li > ul, li > ol { margin: 0.3em 0; }
+hr { border: none; border-top: 2px solid #eee; margin: 2em 0; }
+p { margin: 1em 0; }
+.footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    color: #999;
+    font-size: 0.9em;
+    text-align: center;
+}
+
+</style>
+</head>
+<body>
+<div class="content">
+<h1 id="customization">Customization</h1>
+<p>The Customization system lets your player modify a vehicle at runtime — paint color, spoilers, wheels, decals, neon underglow, sirens, suspension stiffness, camber, and engine / brake / handling / speed level upgrades. State persists automatically via <code>PlayerPrefs</code> so the player's customizations survive across sessions.</p>
+<p>This document covers how to enable customization on a vehicle, how each sub-manager works, how to add your own paints / spoilers / wheels, and how to call customization from code.</p>
+<h2 id="what-the-customization-system-provides">What the Customization System Provides</h2>
+<p>The customizer is a collection of <strong>sub-managers</strong>, each handling one customization category. They are:</p>
+<table>
+<thead>
+<tr>
+<th>Sub-Manager</th>
+<th>What It Customizes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>PaintManager</strong></td>
+<td>Body paint color.</td>
+</tr>
+<tr>
+<td><strong>WheelManager</strong></td>
+<td>Wheel rim models.</td>
+</tr>
+<tr>
+<td><strong>SpoilerManager</strong></td>
+<td>Spoiler attachment.</td>
+</tr>
+<tr>
+<td><strong>DecalManager</strong></td>
+<td>Decals on hood / roof / sides.</td>
+</tr>
+<tr>
+<td><strong>NeonManager</strong></td>
+<td>Underglow neon lights.</td>
+</tr>
+<tr>
+<td><strong>SirenManager</strong></td>
+<td>Police-style siren styles.</td>
+</tr>
+<tr>
+<td><strong>UpgradeManager</strong></td>
+<td>Engine / brake / handling / speed level upgrades.</td>
+</tr>
+<tr>
+<td><strong>CustomizationManager</strong></td>
+<td>Camber, toe, suspension stiffness, etc. — per-wheel tuning.</td>
+</tr>
+</tbody>
+</table>
+<p>Each sub-manager is optional. A vehicle that only supports paint customization just has the PaintManager and skips the rest.</p>
+<h2 id="enabling-customization-on-a-vehicle">Enabling Customization on a Vehicle</h2>
+<h3 id="step-1--add-the-rcc_customizer-root">Step 1 — Add the RCC_Customizer Root</h3>
+<p>Open your vehicle prefab. On the root GameObject, click <strong>Add Component</strong> and add <code>RCC_Customizer</code>.</p>
+<h3 id="step-2--add-sub-manager-children">Step 2 — Add Sub-Manager Children</h3>
+<p>For each customization category you want, add a child GameObject under the vehicle and add the matching component:</p>
+<ul>
+<li><code>RCC_Customizer_PaintManager</code></li>
+<li><code>RCC_Customizer_WheelManager</code></li>
+<li><code>RCC_Customizer_SpoilerManager</code></li>
+<li><code>RCC_Customizer_DecalManager</code></li>
+<li><code>RCC_Customizer_NeonManager</code></li>
+<li><code>RCC_Customizer_SirenManager</code></li>
+<li><code>RCC_Customizer_UpgradeManager</code></li>
+</ul>
+<p>The root <code>RCC_Customizer</code> finds these children automatically via <code>GetComponentsInChildren</code>.</p>
+<h3 id="step-3--configure-each-sub-manager">Step 3 — Configure Each Sub-Manager</h3>
+<p>Each sub-manager has its own configuration (described below). For minimum setup, the PaintManager just needs a list of paint locations on the body — the colors are picked at runtime.</p>
+<h2 id="paint-manager">Paint Manager</h2>
+<p>The PaintManager drives the body color of selected paint targets (the body mesh's material, plus optional sub-materials for hood, roof, side panels).</p>
+<h3 id="setup">Setup</h3>
+<ol>
+<li>Add <code>RCC_Customizer_PaintManager</code> as a child of the vehicle.</li>
+<li>In the Inspector, assign <strong>Paint Targets</strong> — the <code>Renderer</code> references for body, hood, roof, etc.</li>
+<li>Set <strong>Default Color</strong> — the color the vehicle starts with.</li>
+</ol>
+<h3 id="runtime">Runtime</h3>
+<pre><code class="language-csharp">RCC_Customizer customizer = vehicle.GetComponentInChildren&lt;RCC_Customizer&gt;();
+customizer.PaintManager.Paint(new Color(1f, 0f, 0f)); // red
+</code></pre>
+<p>The change is immediate and is saved to PlayerPrefs.</p>
+<h3 id="multi-layer-paint">Multi-Layer Paint</h3>
+<p>For vehicles with separate paint layers (e.g., the hood and roof painted independently from the body):</p>
+<ol>
+<li>In the Inspector, expand the Paint Targets list.</li>
+<li>Add one entry per paintable area.</li>
+<li>At runtime, paint each independently:</li>
+</ol>
+<pre><code class="language-csharp">customizer.PaintManager.PaintLayer(0, Color.blue);  // body
+customizer.PaintManager.PaintLayer(1, Color.white); // hood
+</code></pre>
+<p>(Exact API may vary — check the <code>RCC_Customizer_PaintManager.cs</code> file for the method signatures in your version.)</p>
+<h2 id="wheel-manager">Wheel Manager</h2>
+<p>The WheelManager lets you swap the rim model on a vehicle.</p>
+<h3 id="setup_1">Setup</h3>
+<ol>
+<li>Add <code>RCC_Customizer_WheelManager</code> as a child.</li>
+<li>The available wheels are loaded from <code>Resources/RCC Assets/RCC_ChangableWheels.asset</code> — a ScriptableObject with an array of wheel prefab references.</li>
+</ol>
+<h3 id="adding-new-wheels">Adding New Wheels</h3>
+<ol>
+<li>Create a wheel prefab in <code>Assets/RealisticCarControllerV4/Prefabs/Wheels/</code> (or any folder).</li>
+<li>Open <code>RCC_ChangableWheels.asset</code>.</li>
+<li>Add your prefab to the <code>wheels[]</code> array.</li>
+<li>Save.</li>
+</ol>
+<p>The wheel prefab should be just the <strong>rim model</strong> — a tire mesh is usually included on the prefab as well.</p>
+<h3 id="runtime_1">Runtime</h3>
+<pre><code class="language-csharp">customizer.WheelManager.SetWheel(2); // index into RCC_ChangableWheels.wheels
+</code></pre>
+<p>The active wheel index saves to PlayerPrefs and is restored on next vehicle spawn.</p>
+<h2 id="spoiler-manager">Spoiler Manager</h2>
+<p>The SpoilerManager attaches or removes a spoiler from the back of the vehicle.</p>
+<h3 id="setup_2">Setup</h3>
+<ol>
+<li>Add <code>RCC_Customizer_SpoilerManager</code> as a child.</li>
+<li>Assign the <strong>Spoiler Attach Point</strong> — an empty Transform on the back of the vehicle where the spoiler should be parented.</li>
+<li>Add available spoiler prefabs to the <strong>Spoilers</strong> array.</li>
+</ol>
+<h3 id="runtime_2">Runtime</h3>
+<pre><code class="language-csharp">customizer.SpoilerManager.SetSpoiler(0);  // first spoiler
+customizer.SpoilerManager.SetSpoiler(-1); // remove spoiler
+</code></pre>
+<h2 id="decal-manager">Decal Manager</h2>
+<p>The DecalManager applies decal materials to fixed decal locations on the vehicle body (hood, sides, roof).</p>
+<h3 id="setup_3">Setup</h3>
+<ol>
+<li>Add <code>RCC_Customizer_DecalManager</code> as a child.</li>
+<li>Each decal location is a quad sub-mesh on the vehicle body, mapped to a separate material slot. Configure the <strong>Decal Targets</strong> array to point to those material slots.</li>
+<li>Add available decal materials to the <strong>Decals</strong> array.</li>
+</ol>
+<h3 id="runtime_3">Runtime</h3>
+<pre><code class="language-csharp">customizer.DecalManager.SetDecal(slotIndex: 0, decalIndex: 5);
+</code></pre>
+<h2 id="neon-manager">Neon Manager</h2>
+<p>The NeonManager adds an underglow neon light effect to the bottom of the vehicle.</p>
+<h3 id="setup_4">Setup</h3>
+<ol>
+<li>Add <code>RCC_Customizer_NeonManager</code> as a child.</li>
+<li>Assign the <strong>Neon Material</strong> — a special emissive material that's positioned under the vehicle.</li>
+<li>Assign neon color options in the <strong>Colors</strong> array.</li>
+</ol>
+<h3 id="runtime_4">Runtime</h3>
+<pre><code class="language-csharp">customizer.NeonManager.SetNeonColor(Color.magenta);
+customizer.NeonManager.EnableNeon(true);
+</code></pre>
+<h2 id="siren-manager">Siren Manager</h2>
+<p>For police-style vehicles, the SirenManager toggles flashing red/blue lights and optionally a siren audio loop.</p>
+<h3 id="setup_5">Setup</h3>
+<ol>
+<li>Add <code>RCC_Customizer_SirenManager</code> as a child.</li>
+<li>Add an <code>RCC_PoliceSiren</code> component or reference to the sub-manager.</li>
+<li>Configure available siren styles (color combinations, flash patterns).</li>
+</ol>
+<h3 id="runtime_5">Runtime</h3>
+<pre><code class="language-csharp">customizer.SirenManager.SetSiren(true);   // turn on
+customizer.SirenManager.SetSirenStyle(2); // change style
+</code></pre>
+<h2 id="upgrade-manager">Upgrade Manager</h2>
+<p>The UpgradeManager handles four upgrade categories, each with a level (0 = base, higher = more upgraded). It applies the cumulative effect to the vehicle's stats at runtime.</p>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>What It Affects</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Engine</strong></td>
+<td><code>maxEngineTorque</code> — each level increases torque by a configurable amount.</td>
+</tr>
+<tr>
+<td><strong>Brake</strong></td>
+<td><code>brakeTorque</code> — each level increases brake force.</td>
+</tr>
+<tr>
+<td><strong>Handling</strong></td>
+<td>Friction stiffness — each level increases grip.</td>
+</tr>
+<tr>
+<td><strong>Speed</strong></td>
+<td><code>maxspeed</code> — each level increases top speed.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="setup_6">Setup</h3>
+<ol>
+<li>Add <code>RCC_Customizer_UpgradeManager</code> as a child.</li>
+<li>Configure the <strong>Level Multipliers</strong> array for each category (e.g., engine level 1 = ×1.1, level 2 = ×1.2, level 5 = ×1.5).</li>
+</ol>
+<h3 id="runtime_6">Runtime</h3>
+<pre><code class="language-csharp">customizer.UpgradeManager.UpgradeEngine(level: 3);
+customizer.UpgradeManager.UpgradeBrake(level: 2);
+customizer.UpgradeManager.UpgradeHandling(level: 4);
+customizer.UpgradeManager.UpgradeSpeed(level: 5);
+</code></pre>
+<p>Levels persist via PlayerPrefs.</p>
+<h2 id="customization-manager-tuning">Customization Manager (Tuning)</h2>
+<p>The CustomizationManager handles per-wheel tuning — camber, toe-in/out, suspension stiffness, ride height.</p>
+<h3 id="setup_7">Setup</h3>
+<ol>
+<li>Add <code>RCC_Customizer_CustomizationManager</code> as a child.</li>
+<li>The manager references the four <code>RCC_WheelCollider</code> instances on the vehicle.</li>
+</ol>
+<h3 id="runtime_7">Runtime</h3>
+<pre><code class="language-csharp">customizer.CustomizationManager.SetCamber(wheelIndex: 0, angle: -2.5f);
+customizer.CustomizationManager.SetSuspensionDistance(wheelIndex: 0, distance: 0.25f);
+</code></pre>
+<p>This is the "tuning shop" or "garage" panel in a racing game. Often these settings are exposed as sliders in a tuning UI.</p>
+<h2 id="persistence--playerprefs">Persistence — PlayerPrefs</h2>
+<p>By default, every change saves to <code>PlayerPrefs</code> immediately. Keys are namespaced by vehicle name so different vehicles save their own state.</p>
+<p>To <strong>clear</strong> all customization for a vehicle:</p>
+<pre><code class="language-csharp">customizer.ResetLoadout();
+</code></pre>
+<p>To <strong>load</strong> a saved loadout (typically called automatically on spawn):</p>
+<pre><code class="language-csharp">customizer.LoadLoadout();
+</code></pre>
+<p>The loadout data structure is <code>RCC_Customizer_Loadout</code>, a serializable class. You can inspect it or save it elsewhere (e.g., to a server) if PlayerPrefs isn't enough.</p>
+<h2 id="the-customization-demo-scene">The Customization Demo Scene</h2>
+<p>Open <code>RCC_Blank_Customization.unity</code> to see a working example. The scene has:</p>
+<ul>
+<li>A vehicle on a turntable.</li>
+<li>A camera positioned for showroom viewing.</li>
+<li>A <code>Customization</code> UI canvas with buttons for each category.</li>
+<li>A <code>Color Picker</code> for paint.</li>
+</ul>
+<p>Use this as a template for your own garage / customization scene.</p>
+<h2 id="customizing-the-customization-ui">Customizing the Customization UI</h2>
+<p>The UI shown in the demo is <code>RCC_Canvas (AIO)</code>'s customization panel — separately togglable. If you want your own UI:</p>
+<ol>
+<li>Build your UI normally (Canvas, buttons, sliders).</li>
+<li>Wire each button to call the appropriate <code>customizer.XManager.SetX()</code> method.</li>
+<li>Hide / show the customization panel via your game's menu logic.</li>
+</ol>
+<p>The customization sub-managers are pure logic — they don't depend on the included UI. You can drive them from any UI you build.</p>
+<h2 id="common-customization-issues">Common Customization Issues</h2>
+<h3 id="paint-changes-color-but-the-change-doesnt-persist">"Paint changes color but the change doesn't persist"</h3>
+<p>The vehicle prefab needs an <code>RCC_Customizer</code> on the root, and the PaintManager needs to be wired correctly. Also, PlayerPrefs is platform-specific — on iOS it persists, on WebGL it's in browser storage which can be cleared by the user.</p>
+<h3 id="wheel-swap-doesnt-take-effect">"Wheel swap doesn't take effect"</h3>
+<p>The wheel prefab needs to be in the <code>RCC_ChangableWheels.asset</code> array, and the WheelManager's settings need to match the actual wheel hierarchy on the vehicle.</p>
+<h3 id="spoilers-float-in-the-air">"Spoilers float in the air"</h3>
+<p>The spoiler attach point is positioned wrong on the vehicle. Move the empty GameObject to where the spoiler should sit. Each spoiler prefab is parented to this point.</p>
+<h3 id="upgrade-levels-dont-change-vehicle-performance">"Upgrade levels don't change vehicle performance"</h3>
+<p>The UpgradeManager needs the Level Multipliers configured. Without them, every level is ×1.0. Also verify that the vehicle's <code>Override Behavior</code> is on — otherwise the behavior preset can stomp on the upgrade-modified values.</p>
+<h3 id="multi-vehicle-game-shares-customization-between-cars">"Multi-vehicle game shares customization between cars"</h3>
+<p>PlayerPrefs keys are typically namespaced by vehicle name. Make sure each vehicle prefab has a unique name in the Hierarchy / Project — duplicates will share keys.</p>
+<h2 id="building-a-garage-ui-from-scratch">Building a Garage UI from Scratch</h2>
+<p>A typical workflow:</p>
+<ol>
+<li>Set up a separate "garage" scene with a showroom turntable.</li>
+<li>On scene load, instantiate the player's currently-selected vehicle.</li>
+<li>Show a UI with tabs: Paint, Wheels, Spoilers, Decals, Neon, Sirens, Upgrades.</li>
+<li>Each tab calls the appropriate sub-manager method.</li>
+<li>Save the state on exit (or auto-save on each change via PlayerPrefs).</li>
+<li>On scene transition to gameplay, the vehicle prefab loads its saved customization automatically on Awake.</li>
+</ol>
+<p>For a simple example, look at the demo customization scene's UI hierarchy and adapt it.</p>
+<h2 id="next-steps">Next Steps</h2>
+<ul>
+<li><strong><a href="23_ScriptingAPI.html">23 — Scripting API</a></strong> — <code>RCC.SpawnRCC()</code> and registering vehicles.</li>
+<li><strong><a href="24_EventsSystem.html">24 — Events System</a></strong> — events fired on customization changes.</li>
+<li><strong><a href="08_VehicleInspectorReference.html">08 — Vehicle Inspector Reference</a></strong> — the underlying controller fields that upgrades modify.</li>
+</ul>
+</div>
+<div class="footer">
+Generated from: 20_Customization.md<br>
+Date: 2026-05-22 00:32<br>
+© 2014 - 2026 BoneCracker Games — Realistic Car Controller V5.0.0
+</div>
+</body>
+</html>

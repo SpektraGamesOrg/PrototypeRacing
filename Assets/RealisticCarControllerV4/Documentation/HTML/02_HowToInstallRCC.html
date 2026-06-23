@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>How to Install RCC</title>
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    background: #f8f9fa;
+}
+.content {
+    background: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+h1 { color: #2c3e50; margin-top: 0; padding-bottom: 0.3em; border-bottom: 2px solid #eee; }
+h2 { color: #34495e; margin-top: 1.5em; padding-bottom: 0.2em; border-bottom: 1px solid #eee; }
+h3, h4 { color: #34495e; margin-top: 1.2em; }
+h5, h6 { color: #34495e; margin-top: 1.0em; }
+code {
+    background: #f4f4f4;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.9em;
+}
+pre {
+    background: #2d2d2d;
+    color: #f8f8f2;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
+    margin: 1em 0;
+    font-size: 0.9em;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+    color: #f8f8f2;
+    white-space: pre;
+}
+blockquote {
+    border-left: 4px solid #3498db;
+    margin: 1em 0;
+    padding: 0.5em 0 0.5em 20px;
+    color: #555;
+    background: #f9f9f9;
+}
+blockquote p { margin: 0.4em 0; }
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px 12px;
+    text-align: left;
+    vertical-align: top;
+}
+th {
+    background: #f4f4f4;
+    font-weight: bold;
+}
+tr:nth-child(even) { background: #f9f9f9; }
+a { color: #3498db; text-decoration: none; transition: color 0.2s; }
+a:hover { color: #2980b9; text-decoration: underline; }
+ul, ol { margin: 1em 0; padding-left: 30px; }
+li { margin: 0.4em 0; }
+li > ul, li > ol { margin: 0.3em 0; }
+hr { border: none; border-top: 2px solid #eee; margin: 2em 0; }
+p { margin: 1em 0; }
+.footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    color: #999;
+    font-size: 0.9em;
+    text-align: center;
+}
+
+</style>
+</head>
+<body>
+<div class="content">
+<h1 id="how-to-install-rcc">How to Install RCC</h1>
+<p>This document walks you through importing RCC into a Unity project, installing the dependencies, and making sure everything compiles. By the end you should have a project that runs the included demo scenes without errors.</p>
+<p>If you've never imported a Unity Asset Store package before, this document also explains how the Asset Store flow works.</p>
+<h2 id="before-you-install">Before You Install</h2>
+<h3 id="pick-a-unity-version">Pick a Unity Version</h3>
+<p>RCC supports <strong>Unity 2022.3 LTS</strong> and newer, including all 2023.x versions and Unity 6.x LTS. Older versions (2021 and earlier) are <strong>not</strong> supported because RCC depends on the modern Input System package and a few Unity APIs introduced in 2022.</p>
+<p>If you don't have Unity installed, install the latest <strong>Unity LTS</strong> release from the Unity Hub. LTS releases are the most stable — they receive bug fixes and security patches for two years.</p>
+<h3 id="new-project-or-existing-project">New Project or Existing Project?</h3>
+<p>You can import RCC into a brand-new project or into an existing project. Both work fine. If you're new to RCC, we recommend creating a fresh project first so you can drive the demo scenes without anything else in the way.</p>
+<p>To create a new project: open Unity Hub → New Project → <strong>3D (Built-in Render Pipeline)</strong> template → name it something like <code>RCC_Test</code> → Create.</p>
+<p>You can also start with the <strong>URP</strong> or <strong>HDRP</strong> templates if you know you'll be using those — RCC supports all three pipelines. See <strong><a href="22_RenderPipelines.html">22 — URP &amp; HDRP Conversion</a></strong> for pipeline-specific notes.</p>
+<h2 id="dependency-packages">Dependency Packages</h2>
+<p>Before importing RCC, install one dependency through the Unity Package Manager. RCC uses Unity's official Input System package — the old <code>Input.GetAxis()</code> style input is <strong>not</strong> supported.</p>
+<h3 id="installing-the-input-system">Installing the Input System</h3>
+<ol>
+<li>In Unity, open the menu <strong>Window → Package Manager</strong>.</li>
+<li>In the top-left of the Package Manager window, change the dropdown from "In Project" to <strong>"Unity Registry"</strong>.</li>
+<li>In the search box, type <code>Input System</code>.</li>
+<li>Click the package called <strong>Input System</strong> (its identifier is <code>com.unity.inputsystem</code>).</li>
+<li>Click the <strong>Install</strong> button on the right side. Wait for the install to finish.</li>
+</ol>
+<p>Unity will display a dialog asking:</p>
+<blockquote>
+<p><em>"This Project is using the new Input System package but the native platform backends for the new Input System are not enabled in the Player Settings."</em></p>
+</blockquote>
+<p>Click <strong>Yes</strong> to enable the new backends. Unity will restart the editor. This is required — RCC does not work with the legacy Input Manager.</p>
+<p>After the restart, you can verify the Input System is active by opening <strong>Edit → Project Settings → Player → Other Settings</strong> and confirming that <strong>Active Input Handling</strong> is set to either <strong>Input System Package (New)</strong> or <strong>Both</strong>.</p>
+<h3 id="why-both-input-handling">Why Both Input Handling?</h3>
+<p>Some Unity built-in scripts (like the EventSystem in UI Canvases) still expect the old input manager. Setting <strong>Active Input Handling</strong> to <strong>Both</strong> lets the old API silently coexist with RCC's new-input-system code, which avoids confusing errors in third-party assets that haven't migrated yet. If you don't have any such third-party code, "Input System Package (New)" alone is fine.</p>
+<h2 id="importing-the-rcc-package">Importing the RCC Package</h2>
+<h3 id="from-the-asset-store">From the Asset Store</h3>
+<ol>
+<li>Buy or "Open in Unity" RCC from the <strong>Unity Asset Store</strong> in your browser.</li>
+<li>In Unity, open the menu <strong>Window → Package Manager</strong>.</li>
+<li>In the top-left of the Package Manager window, change the dropdown to <strong>"My Assets"</strong>.</li>
+<li>Find <strong>Realistic Car Controller</strong> in the list. Click it.</li>
+<li>Click <strong>Download</strong> (if you haven't yet), then <strong>Import</strong>.</li>
+<li>The Import Unity Package dialog appears showing every file in RCC, all checked.</li>
+<li>Click <strong>Import</strong> at the bottom-right. Wait for the import to complete — typically 30–60 seconds depending on your machine.</li>
+</ol>
+<h3 id="from-a-local-unitypackage-file">From a Local <code>.unitypackage</code> File</h3>
+<p>If you received RCC as a <code>.unitypackage</code> file directly (for example, from a backup):</p>
+<ol>
+<li>In Unity, open the menu <strong>Assets → Import Package → Custom Package…</strong></li>
+<li>Navigate to the <code>.unitypackage</code> file and select it.</li>
+<li>The Import Unity Package dialog appears. Click <strong>Import</strong>.</li>
+</ol>
+<h3 id="what-gets-imported">What Gets Imported</h3>
+<p>After import, the following appears in your project:</p>
+<ul>
+<li><code>Assets/RealisticCarControllerV4/</code> — all RCC scripts, prefabs, scenes, textures, materials, audio, and documentation.</li>
+<li>Optionally <code>Assets/TextMesh Pro/</code> if the dashboard requires it and you don't already have TMP installed.</li>
+</ul>
+<p>RCC does <strong>not</strong> add anything outside the <code>RealisticCarControllerV4</code> folder, so it's easy to remove the package later by deleting that one folder if you ever need to.</p>
+<h2 id="first-time-setup">First-Time Setup</h2>
+<p>After import, RCC runs an automatic setup pass that does the following:</p>
+<ol>
+<li><strong>Welcome window</strong> — opens automatically on first import. It shows the version number and quick links to the documentation, demo scenes, and the welcome scene.</li>
+<li><strong>Layer setup</strong> — RCC adds three custom physics layers to your project: <code>RCC_Vehicle</code>, <code>RCC_WheelCollider</code>, <code>RCC_DetachablePart</code>. These are used to make sure wheel colliders don't collide with the vehicle body and that detachable parts behave correctly. The layers are added with <code>LayerMask</code>-safe slots so they don't overwrite any existing layers in your project.</li>
+<li><strong>Scripting symbols</strong> — RCC adds <code>BCG_URP</code> or <code>BCG_HDRP</code> to your Scripting Define Symbols if you're using URP or HDRP. This happens automatically when you run the Render Pipeline Converter (see <strong><a href="22_RenderPipelines.html">22 — URP &amp; HDRP Conversion</a></strong>) — not on initial import.</li>
+</ol>
+<p>If the Welcome window doesn't appear automatically, you can open it manually at any time: <strong>Tools → BoneCracker Games → Realistic Car Controller → Welcome Window</strong>.</p>
+<h2 id="verifying-the-installation">Verifying the Installation</h2>
+<p>The fastest way to confirm RCC works is to open a demo scene.</p>
+<ol>
+<li>In the Unity Project window, navigate to <code>Assets/RealisticCarControllerV4/Demo Scenes/</code>.</li>
+<li>Double-click <strong>RCC_City.unity</strong> to open it.</li>
+<li>If Unity asks you to save your current scene first, save it.</li>
+<li>Press the <strong>Play</strong> button at the top of the editor.</li>
+</ol>
+<p>You should see a vehicle in a small city environment with a working camera, working speedometer in the corner, and the engine running. Use WASD or the arrow keys to drive. Press <strong>C</strong> to cycle through camera modes.</p>
+<p>If this works, you're done. Skip to <strong><a href="03_FirstLook.html">03 — First Look</a></strong> to learn what each folder contains, or jump to <strong><a href="05_QuickStart.html">05 — Quick Start</a></strong> to start building your own scene.</p>
+<h2 id="common-installation-problems">Common Installation Problems</h2>
+<h3 id="assetsrealisticcarcontrollerv4scriptscsline-error-cs0246-the-type-or-namespace-name-inputaction-could-not-be-found">"Assets/RealisticCarControllerV4/Scripts/...cs(line): error CS0246: The type or namespace name 'InputAction' could not be found"</h3>
+<p>You skipped the Input System install step. Open the Package Manager and install the Input System package. After installing, Unity will ask to restart — click Yes.</p>
+<h3 id="all-compiler-errors-have-to-be-fixed-before-you-can-enter-playmode">"All compiler errors have to be fixed before you can enter playmode!"</h3>
+<p>There are still compile errors. Open the <strong>Console</strong> window (<strong>Window → General → Console</strong>). Look at the first error in the list. If it mentions <code>InputAction</code>, <code>InputActionAsset</code>, or anything starting with <code>UnityEngine.InputSystem</code>, it's the Input System issue described above.</p>
+<p>If the errors reference scripts you don't recognize (something like <code>RCC_PhotonNetwork.cs</code> or <code>RCC_EnterExitVehicle.cs</code>), you may have an older version of RCC with the removed addon scripts still present. Delete the folders <code>Assets/RealisticCarControllerV4/Scripts/Photon PUN 2/</code>, <code>Assets/RealisticCarControllerV4/Scripts/EnterExit/</code>, and <code>Assets/BCG Shared Assets/</code> if they exist.</p>
+<h3 id="rcc_settingsasset-is-missing">"RCC_Settings.asset is missing"</h3>
+<p>This usually means the import didn't finish. Close Unity, delete the <code>Library/</code> folder in your project root, and reopen the project. Unity will rebuild its cache and the asset should appear in <code>Assets/RealisticCarControllerV4/Resources/RCC Assets/RCC_Settings.asset</code>.</p>
+<h3 id="vehicle-in-the-demo-scene-doesnt-move">Vehicle in the Demo Scene Doesn't Move</h3>
+<p>Open <strong>Edit → Project Settings → Player → Other Settings</strong> and check <strong>Active Input Handling</strong>. If it's set to <strong>Input Manager (Old)</strong>, change it to <strong>Input System Package (New)</strong> or <strong>Both</strong>, and restart the editor. The Input System dialog described earlier may have been dismissed without enabling the backends.</p>
+<h3 id="pink-materials--missing-textures">Pink Materials / Missing Textures</h3>
+<p>This is a URP or HDRP issue. RCC ships with Built-in Render Pipeline materials by default. If you imported it into a URP or HDRP project, the materials will appear pink because their shaders don't exist in the new pipeline. The fix is to run the <strong>Render Pipeline Converter</strong>:</p>
+<ol>
+<li>Switch your project to URP or HDRP first via Package Manager.</li>
+<li>Then run <strong>Tools → BoneCracker Games → Realistic Car Controller → Render Pipeline Converter</strong>.</li>
+<li>Click <strong>Convert to URP</strong> or <strong>Convert to HDRP</strong> depending on your project.</li>
+</ol>
+<p>See <strong><a href="22_RenderPipelines.html">22 — URP &amp; HDRP Conversion</a></strong> for the full procedure.</p>
+<h2 id="what-doesnt-need-to-be-installed">What Doesn't Need to Be Installed</h2>
+<p>The following are <strong>not</strong> required:</p>
+<ul>
+<li><strong>NGUI</strong> — was supported historically but is optional. Set <code>RCC_Settings.uiType</code> to <code>UI</code> (the default) for the standard Unity UI dashboard.</li>
+<li><strong>Photon PUN 2</strong> — was supported via a separate Photon Integration Addon but <strong>removed in V5</strong>. RCC no longer ships any Photon code.</li>
+<li><strong>BCG Shared Assets / Enter-Exit</strong> — was supported via a separate addon but <strong>removed in V5</strong>. RCC no longer ships any character or enter/exit code.</li>
+<li><strong>DOTween, Cinemachine, Post Processing</strong> — RCC does not depend on these. You're free to add them yourself if your game uses them, but RCC will work without any of them.</li>
+</ul>
+<h2 id="updating-from-an-older-rcc-version">Updating from an Older RCC Version</h2>
+<p>If you're upgrading from RCC V4.x to V5.0.0, <strong>back up your project first</strong> (Git commit, or copy the whole project folder).</p>
+<ol>
+<li>In the Project window, right-click <code>Assets/RealisticCarControllerV4/</code> and delete it.</li>
+<li>If you also have <code>Assets/BCG Shared Assets/</code>, <code>Assets/Photon/</code>, or any folder added by the old addon packages, delete those too.</li>
+<li>Import the new V5 <code>.unitypackage</code> cleanly.</li>
+<li>Open the Console and resolve any remaining compile errors (typically references to removed addon scripts in your own game code).</li>
+</ol>
+<p>You do not need to reconfigure layers — RCC's layer setup runs again on import and adds the layers if they're missing.</p>
+<h2 id="next-steps">Next Steps</h2>
+<p>After a successful install, go to <strong><a href="03_FirstLook.html">03 — First Look</a></strong> to learn what each folder contains, or skip directly to <strong><a href="05_QuickStart.html">05 — Quick Start</a></strong> to put a vehicle into your own scene.</p>
+</div>
+<div class="footer">
+Generated from: 02_HowToInstallRCC.md<br>
+Date: 2026-05-22 00:32<br>
+© 2014 - 2026 BoneCracker Games — Realistic Car Controller V5.0.0
+</div>
+</body>
+</html>

@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: b58a0e9da3f56544f9639b7e8fcdb463
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 16296
+  packageName: Realistic Car Controller
+  packageVersion: 5.0.0
+  assetPath: Assets/RealisticCarControllerV4/Documentation/HTML/09_HowWheelCollidersWork.html
+  uploadId: 920646

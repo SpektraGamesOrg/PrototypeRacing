@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Scripting API</title>
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    background: #f8f9fa;
+}
+.content {
+    background: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+h1 { color: #2c3e50; margin-top: 0; padding-bottom: 0.3em; border-bottom: 2px solid #eee; }
+h2 { color: #34495e; margin-top: 1.5em; padding-bottom: 0.2em; border-bottom: 1px solid #eee; }
+h3, h4 { color: #34495e; margin-top: 1.2em; }
+h5, h6 { color: #34495e; margin-top: 1.0em; }
+code {
+    background: #f4f4f4;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.9em;
+}
+pre {
+    background: #2d2d2d;
+    color: #f8f8f2;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
+    margin: 1em 0;
+    font-size: 0.9em;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+    color: #f8f8f2;
+    white-space: pre;
+}
+blockquote {
+    border-left: 4px solid #3498db;
+    margin: 1em 0;
+    padding: 0.5em 0 0.5em 20px;
+    color: #555;
+    background: #f9f9f9;
+}
+blockquote p { margin: 0.4em 0; }
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px 12px;
+    text-align: left;
+    vertical-align: top;
+}
+th {
+    background: #f4f4f4;
+    font-weight: bold;
+}
+tr:nth-child(even) { background: #f9f9f9; }
+a { color: #3498db; text-decoration: none; transition: color 0.2s; }
+a:hover { color: #2980b9; text-decoration: underline; }
+ul, ol { margin: 1em 0; padding-left: 30px; }
+li { margin: 0.4em 0; }
+li > ul, li > ol { margin: 0.3em 0; }
+hr { border: none; border-top: 2px solid #eee; margin: 2em 0; }
+p { margin: 1em 0; }
+.footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    color: #999;
+    font-size: 0.9em;
+    text-align: center;
+}
+
+</style>
+</head>
+<body>
+<div class="content">
+<h1 id="scripting-api">Scripting API</h1>
+<p>The static <strong><code>RCC</code></strong> class is RCC's main public API. Every common runtime operation — spawning a vehicle, registering a player, switching cameras, repairing damage, transporting a car — has a method here. This document covers every public method, when to use it, and shows working code examples.</p>
+<p>If you're writing game code that talks to RCC, this is the class you talk to.</p>
+<h2 id="where-the-api-lives">Where the API Lives</h2>
+<pre><code>Assets/RealisticCarControllerV4/Scripts/RCC.cs
+</code></pre>
+<p>It's a plain static class with no instance — call methods directly on the type: <code>RCC.SpawnRCC(...)</code>.</p>
+<h2 id="spawning-vehicles">Spawning Vehicles</h2>
+<h3 id="spawnrcc">SpawnRCC</h3>
+<pre><code class="language-csharp">public static RCC_CarControllerV4 SpawnRCC(
+    RCC_CarControllerV4 vehiclePrefab,
+    Vector3 position,
+    Quaternion rotation,
+    bool registerAsPlayerVehicle,
+    bool isControllable,
+    bool isEngineRunning);
+</code></pre>
+<p>Instantiates a vehicle prefab at the given pose and configures its control / engine state. Returns the spawned instance.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>vehiclePrefab</code></td>
+<td>The prefab to instantiate. Drag in a prefab from <code>Prefabs/Vehicles/</code>.</td>
+</tr>
+<tr>
+<td><code>position</code></td>
+<td>Spawn position.</td>
+</tr>
+<tr>
+<td><code>rotation</code></td>
+<td>Spawn rotation.</td>
+</tr>
+<tr>
+<td><code>registerAsPlayerVehicle</code></td>
+<td>If true, the spawned vehicle becomes the active player. The camera will follow it.</td>
+</tr>
+<tr>
+<td><code>isControllable</code></td>
+<td>If true, accepts player input. If false, the vehicle is inert (good for showroom display).</td>
+</tr>
+<tr>
+<td><code>isEngineRunning</code></td>
+<td>If true, the engine is running at spawn (idling). If false, the engine is off until started manually.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example: Spawn a vehicle from a car selection menu</strong></p>
+<pre><code class="language-csharp">public class CarSelectionDemo : MonoBehaviour {
+    public RCC_CarControllerV4 selectedVehiclePrefab;
+    public Transform spawnPoint;
+
+    public void OnStartButtonPressed() {
+        RCC_CarControllerV4 spawned = RCC.SpawnRCC(
+            selectedVehiclePrefab,
+            spawnPoint.position,
+            spawnPoint.rotation,
+            registerAsPlayerVehicle: true,
+            isControllable: true,
+            isEngineRunning: true);
+        // spawned.gameObject is the spawned GameObject.
+    }
+}
+</code></pre>
+<h2 id="registering-vehicles">Registering Vehicles</h2>
+<h3 id="registerplayervehicle">RegisterPlayerVehicle</h3>
+<p>Three overloads:</p>
+<pre><code class="language-csharp">public static void RegisterPlayerVehicle(RCC_CarControllerV4 vehicle);
+public static void RegisterPlayerVehicle(RCC_CarControllerV4 vehicle, bool isControllable);
+public static void RegisterPlayerVehicle(RCC_CarControllerV4 vehicle, bool isControllable, bool engineState);
+</code></pre>
+<p>Promotes the given vehicle to be the <strong>active player vehicle</strong>. The camera follows it, the input system feeds it, and the HUD reflects its state.</p>
+<p><strong>Example: Switch the player vehicle after a transition</strong></p>
+<pre><code class="language-csharp">RCC.RegisterPlayerVehicle(anotherVehicle, isControllable: true, engineState: true);
+</code></pre>
+<p>The previous player vehicle is de-registered automatically.</p>
+<h3 id="deregisterplayervehicle">DeRegisterPlayerVehicle</h3>
+<pre><code class="language-csharp">public static void DeRegisterPlayerVehicle();
+</code></pre>
+<p>Removes the current player vehicle from active duty. The camera stops following, input stops feeding. Useful at the end of a level or during a cinematic.</p>
+<h2 id="controlling-vehicles">Controlling Vehicles</h2>
+<h3 id="setcontrol">SetControl</h3>
+<pre><code class="language-csharp">public static void SetControl(RCC_CarControllerV4 vehicle, bool isControllable);
+</code></pre>
+<p>Enables / disables player input on a specific vehicle. Useful during pause menus, cutscenes, or before a race countdown.</p>
+<p><strong>Example: Disable control during a 3-2-1 countdown</strong></p>
+<pre><code class="language-csharp">void StartCountdown(RCC_CarControllerV4 vehicle) {
+    RCC.SetControl(vehicle, false);
+    StartCoroutine(CountdownAndGo(vehicle));
+}
+
+IEnumerator CountdownAndGo(RCC_CarControllerV4 vehicle) {
+    yield return new WaitForSeconds(3f);
+    RCC.SetControl(vehicle, true);
+}
+</code></pre>
+<h3 id="setengine">SetEngine</h3>
+<pre><code class="language-csharp">public static void SetEngine(RCC_CarControllerV4 vehicle, bool engineState);
+</code></pre>
+<p>Starts (<code>true</code>) or kills (<code>false</code>) the engine.</p>
+<p><strong>Example: Engine ignition gameplay</strong></p>
+<pre><code class="language-csharp">void OnPlayerEntersCar(RCC_CarControllerV4 vehicle) {
+    RCC.SetEngine(vehicle, false); // engine off — needs key turn
+    StartCoroutine(WaitForKeyTurn(vehicle));
+}
+</code></pre>
+<h2 id="behavior">Behavior</h2>
+<h3 id="setbehavior">SetBehavior</h3>
+<pre><code class="language-csharp">public static void SetBehavior(int behaviorIndex);
+</code></pre>
+<p>Switches the global driving behavior preset. The index is into <code>RCC_Settings.behaviorTypes[]</code>. See <strong><a href="10_BehaviorPresets.html">10 — Behavior Presets</a></strong>.</p>
+<p><strong>Example: Settings menu changes difficulty</strong></p>
+<pre><code class="language-csharp">void OnDifficultyDropdownChanged(int newValue) {
+    RCC.SetBehavior(newValue); // 0 = Realistic, 4 = Arcade
+}
+</code></pre>
+<h2 id="camera">Camera</h2>
+<h3 id="changecamera">ChangeCamera</h3>
+<pre><code class="language-csharp">public static void ChangeCamera();
+</code></pre>
+<p>Cycles the camera mode (TPS → Hood → Wheel → Fixed → Cinematic → Top → TPS).</p>
+<p><strong>Example: A "next camera" button on screen</strong></p>
+<pre><code class="language-csharp">void OnCameraButtonPressed() {
+    RCC.ChangeCamera();
+}
+</code></pre>
+<h2 id="transport--teleport">Transport / Teleport</h2>
+<h3 id="transport">Transport</h3>
+<p>Two overloads:</p>
+<pre><code class="language-csharp">public static void Transport(Vector3 position, Quaternion rotation);
+public static void Transport(RCC_CarControllerV4 vehicle, Vector3 position, Quaternion rotation);
+</code></pre>
+<p>Moves the player vehicle (or a specific vehicle) to a target pose. The vehicle's velocity is zeroed so it doesn't continue moving after the teleport.</p>
+<p><strong>Example: Teleport to a respawn point</strong></p>
+<pre><code class="language-csharp">public void RespawnPlayer() {
+    Transform respawn = GetClosestRespawnPoint();
+    RCC.Transport(respawn.position, respawn.rotation);
+}
+</code></pre>
+<h2 id="skidmarks">Skidmarks</h2>
+<h3 id="cleanskidmarks">CleanSkidmarks</h3>
+<p>Two overloads:</p>
+<pre><code class="language-csharp">public static void CleanSkidmarks();
+public static void CleanSkidmarks(int index);
+</code></pre>
+<p>Clears all skidmarks in the scene, or just the ones for a specific batch index.</p>
+<p><strong>Example: Clear skidmarks each lap</strong></p>
+<pre><code class="language-csharp">void OnLapCompleted() {
+    RCC.CleanSkidmarks();
+}
+</code></pre>
+<h2 id="repair">Repair</h2>
+<h3 id="repair_1">Repair</h3>
+<p>Two overloads:</p>
+<pre><code class="language-csharp">public static void Repair(RCC_CarControllerV4 carController);
+public static void Repair(); // repairs the active player vehicle
+</code></pre>
+<p>Instantly resets damage on a vehicle — mesh deformation, detachable parts, wheel alignment, and broken lights are all restored.</p>
+<p><strong>Example: Repair on driving over a repair zone</strong></p>
+<pre><code class="language-csharp">void OnTriggerEnter(Collider other) {
+    RCC_CarControllerV4 vehicle = other.GetComponentInParent&lt;RCC_CarControllerV4&gt;();
+    if (vehicle != null) {
+        RCC.Repair(vehicle);
+    }
+}
+</code></pre>
+<h2 id="record--replay">Record / Replay</h2>
+<h3 id="startstoprecord">StartStopRecord</h3>
+<pre><code class="language-csharp">public static void StartStopRecord();
+</code></pre>
+<p>Toggles recording on the active player vehicle. If recording is off, starts a new recording; if on, stops it. The recording captures position, rotation, and inputs each frame.</p>
+<h3 id="startstopreplay">StartStopReplay</h3>
+<pre><code class="language-csharp">public static void StartStopReplay();
+</code></pre>
+<p>Plays back the most recently recorded clip.</p>
+<h3 id="stoprecordreplay">StopRecordReplay</h3>
+<pre><code class="language-csharp">public static void StopRecordReplay();
+</code></pre>
+<p>Stops the current recording or replay session.</p>
+<p><strong>Example: A "record my lap" button</strong></p>
+<pre><code class="language-csharp">public void OnRecordButtonPressed() {
+    RCC.StartStopRecord();
+}
+
+public void OnReplayButtonPressed() {
+    RCC.StartStopReplay();
+}
+</code></pre>
+<h2 id="mobile-controller">Mobile Controller</h2>
+<h3 id="setmobilecontroller">SetMobileController</h3>
+<pre><code class="language-csharp">public static void SetMobileController(RCC_Settings.MobileController mobileController);
+</code></pre>
+<p>Switches the mobile input style at runtime.</p>
+<p><strong>Example: Settings menu mobile control toggle</strong></p>
+<pre><code class="language-csharp">public void OnControllerStyleDropdownChanged(int value) {
+    var style = (RCC_Settings.MobileController)value;
+    RCC.SetMobileController(style);
+}
+</code></pre>
+<h2 id="not-yet-implemented-future">Not Yet Implemented (Future)</h2>
+<p>These methods exist as placeholders and currently do nothing. Don't depend on them in production code — their behavior may change:</p>
+<ul>
+<li><code>SetUnits()</code> — placeholder for switching speed units at runtime.</li>
+<li><code>SetAutomaticGear()</code> — placeholder for toggling automatic transmission.</li>
+</ul>
+<p>If you need this functionality today, set the underlying fields directly:</p>
+<pre><code class="language-csharp">RCC_Settings.Instance.units = RCC_Settings.Units.MPH;
+carController.automaticGear = true;
+</code></pre>
+<h2 id="common-api-patterns">Common API Patterns</h2>
+<h3 id="get-the-active-player-vehicle">Get the Active Player Vehicle</h3>
+<pre><code class="language-csharp">RCC_CarControllerV4 player = RCC_SceneManager.Instance.activePlayerVehicle;
+if (player != null) {
+    // do something with the player vehicle
+}
+</code></pre>
+<h3 id="get-all-vehicles-in-the-scene">Get All Vehicles in the Scene</h3>
+<pre><code class="language-csharp">List&lt;RCC_CarControllerV4&gt; all = RCC_SceneManager.Instance.allVehicles;
+foreach (var v in all) {
+    Debug.Log(v.name + &quot; is at &quot; + v.transform.position);
+}
+</code></pre>
+<h3 id="read-vehicle-state">Read Vehicle State</h3>
+<pre><code class="language-csharp">RCC_CarControllerV4 v = RCC_SceneManager.Instance.activePlayerVehicle;
+float speed = v.speed;             // current speed
+float rpm = v.engineRPM;           // current engine RPM
+int gear = v.currentGear;          // current gear index
+bool inReverse = (v.direction == -1);
+bool grounded = v.isGrounded;
+</code></pre>
+<h3 id="read-current-inputs">Read Current Inputs</h3>
+<pre><code class="language-csharp">RCC_Inputs current = RCC_InputManager.Instance.GetInputs();
+float throttle = current.throttleInput;
+float brake = current.brakeInput;
+float steer = current.steerInput;
+</code></pre>
+<h3 id="modify-inputs">Modify Inputs</h3>
+<p>For overriding the player, see <strong><a href="17_HowToOverrideInputs.html">17 — Overriding Inputs</a></strong>.</p>
+<h2 id="whats-not-in-the-static-api">What's Not in the Static API</h2>
+<p>A few operations don't have static helpers on <code>RCC</code> and must be done directly:</p>
+<ul>
+<li><strong>Start / Stop a specific engine</strong> — call <code>carController.StartEngine()</code> or <code>carController.KillEngine()</code> directly.</li>
+<li><strong>Force a specific gear</strong> — call <code>carController.ShiftToGear(int)</code>.</li>
+<li><strong>Toggle indicators</strong> — call <code>carController.SetIndicators(...)</code> or use input events.</li>
+<li><strong>Toggle headlights</strong> — same — use input events.</li>
+</ul>
+<p>The static <code>RCC</code> class is intentionally minimal — it covers the most common operations. For finer control, you have access to every method on the underlying components.</p>
+<h2 id="concurrency-notes">Concurrency Notes</h2>
+<p>All <code>RCC</code> static methods must be called from the <strong>main Unity thread</strong>. Don't call them from background threads or Task / async contexts — Unity throws if you do.</p>
+<p>If you're using async / await in your game code, make sure your continuations come back to the main thread before calling RCC methods (use <code>await UniTask.SwitchToMainThread()</code> if you use UniTask, or post to Unity's main thread via your own dispatcher).</p>
+<h2 id="next-steps">Next Steps</h2>
+<ul>
+<li><strong><a href="24_EventsSystem.html">24 — Events System</a></strong> — listening for events fired by these API calls.</li>
+<li><strong><a href="17_HowToOverrideInputs.html">17 — Overriding Inputs</a></strong> — for AI / replay / network use cases.</li>
+<li><strong><a href="08_VehicleInspectorReference.html">08 — Vehicle Inspector Reference</a></strong> — direct field access on the controller.</li>
+</ul>
+</div>
+<div class="footer">
+Generated from: 23_ScriptingAPI.md<br>
+Date: 2026-05-22 00:32<br>
+© 2014 - 2026 BoneCracker Games — Realistic Car Controller V5.0.0
+</div>
+</body>
+</html>

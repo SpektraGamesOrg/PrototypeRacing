@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Audio System</title>
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    background: #f8f9fa;
+}
+.content {
+    background: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+h1 { color: #2c3e50; margin-top: 0; padding-bottom: 0.3em; border-bottom: 2px solid #eee; }
+h2 { color: #34495e; margin-top: 1.5em; padding-bottom: 0.2em; border-bottom: 1px solid #eee; }
+h3, h4 { color: #34495e; margin-top: 1.2em; }
+h5, h6 { color: #34495e; margin-top: 1.0em; }
+code {
+    background: #f4f4f4;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.9em;
+}
+pre {
+    background: #2d2d2d;
+    color: #f8f8f2;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
+    margin: 1em 0;
+    font-size: 0.9em;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+    color: #f8f8f2;
+    white-space: pre;
+}
+blockquote {
+    border-left: 4px solid #3498db;
+    margin: 1em 0;
+    padding: 0.5em 0 0.5em 20px;
+    color: #555;
+    background: #f9f9f9;
+}
+blockquote p { margin: 0.4em 0; }
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px 12px;
+    text-align: left;
+    vertical-align: top;
+}
+th {
+    background: #f4f4f4;
+    font-weight: bold;
+}
+tr:nth-child(even) { background: #f9f9f9; }
+a { color: #3498db; text-decoration: none; transition: color 0.2s; }
+a:hover { color: #2980b9; text-decoration: underline; }
+ul, ol { margin: 1em 0; padding-left: 30px; }
+li { margin: 0.4em 0; }
+li > ul, li > ol { margin: 0.3em 0; }
+hr { border: none; border-top: 2px solid #eee; margin: 2em 0; }
+p { margin: 1em 0; }
+.footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    color: #999;
+    font-size: 0.9em;
+    text-align: center;
+}
+
+</style>
+</head>
+<body>
+<div class="content">
+<h1 id="audio-system">Audio System</h1>
+<p>This document covers RCC's audio system — engine sounds, gear shifts, crash impacts, exhaust, wind, brake squeal, NOS / turbo, indicator clicks, and surface-specific tire audio. The goal is to teach you what audio sources exist on a vehicle, how to swap in your own clips, and how to configure the audio for different vehicle types (sports car, truck, electric vehicle).</p>
+<h2 id="audio-architecture">Audio Architecture</h2>
+<p>Every vehicle has multiple <code>AudioSource</code> components, each handling a specific category:</p>
+<table>
+<thead>
+<tr>
+<th>Audio Source</th>
+<th>What It Plays</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Engine — low RPM layer</td>
+<td>Engine idle / low-rev sound.</td>
+</tr>
+<tr>
+<td>Engine — mid RPM layer</td>
+<td>Engine mid-range sound.</td>
+</tr>
+<tr>
+<td>Engine — high RPM layer</td>
+<td>Engine high-rev sound.</td>
+</tr>
+<tr>
+<td>Engine Off</td>
+<td>Sound when engine is off (silence or wind only).</td>
+</tr>
+<tr>
+<td>Exhaust</td>
+<td>Exhaust note (often a separate, more directional source).</td>
+</tr>
+<tr>
+<td>Gear Shift</td>
+<td>Plays on each shift.</td>
+</tr>
+<tr>
+<td>Wind</td>
+<td>Continuous, scaled by speed.</td>
+</tr>
+<tr>
+<td>Brake</td>
+<td>Brake squeal at high braking.</td>
+</tr>
+<tr>
+<td>Reverse Beep</td>
+<td>Beeping when reversing (optional).</td>
+</tr>
+<tr>
+<td>Crash</td>
+<td>One-shot on collision.</td>
+</tr>
+<tr>
+<td>Wheel Slip</td>
+<td>One per wheel, plays surface-specific slip sound.</td>
+</tr>
+<tr>
+<td>Wheel Bump</td>
+<td>One per wheel, plays on suspension hits.</td>
+</tr>
+<tr>
+<td>Wheel Deflate</td>
+<td>One-shot when a tire pops.</td>
+</tr>
+<tr>
+<td>NOS</td>
+<td>Boost / nitrous sound.</td>
+</tr>
+<tr>
+<td>Turbo</td>
+<td>Turbocharger whistle.</td>
+</tr>
+<tr>
+<td>Indicator Click</td>
+<td>Tick-tock sound while indicator is on.</td>
+</tr>
+</tbody>
+</table>
+<p>This is more audio sources than you'd think, but Unity handles a few dozen sources per scene with no trouble. The vehicle prefab wires them all to a parent transform; the audio listener (on the camera) hears them.</p>
+<h2 id="engine-sound-layers">Engine Sound Layers</h2>
+<p>The most important audio is the engine. RCC supports <strong>multi-layer crossfading</strong> between up to three audio sources for realistic engine sound. Each layer has a different recording of the engine — low RPM, mid RPM, high RPM — and the system crossfades between them based on current RPM.</p>
+<h3 id="audio-type-setting">Audio Type Setting</h3>
+<p>On <code>RCC_CarControllerV4</code>, the <strong>Audio Type</strong> field controls how many layers are used:</p>
+<ul>
+<li><strong>Off</strong> — no engine audio.</li>
+<li><strong>OneSource</strong> — single layer. Simplest, less realistic. Good for slow-moving / quiet vehicles.</li>
+<li><strong>TwoSource</strong> — two layers (low + high). Decent for most vehicles.</li>
+<li><strong>ThreeSource</strong> — three layers (low + mid + high). Best fidelity, recommended for sports cars and performance vehicles.</li>
+</ul>
+<h3 id="crossfading-math">Crossfading Math</h3>
+<p>In ThreeSource mode, each layer has its own volume curve:</p>
+<ul>
+<li><strong>Low layer</strong>: full volume at idle, fades out around 4000 RPM.</li>
+<li><strong>Mid layer</strong>: starts fading in around 3000 RPM, peaks around 5500 RPM, fades out around 7000 RPM.</li>
+<li><strong>High layer</strong>: starts fading in around 5500 RPM, full volume at redline.</li>
+</ul>
+<p>The result is a smooth blend that sounds like a single continuous engine note across the entire RPM range.</p>
+<h3 id="pitching">Pitching</h3>
+<p>In addition to crossfading, each layer's pitch shifts with RPM. The pitch ratio is configured by <strong>Min Engine Sound Pitch</strong> and <strong>Max Engine Sound Pitch</strong> on the controller (defaults 0.5 and 1.7 — meaning the audio plays at half speed at idle and 1.7× speed at redline).</p>
+<p>Pitching is what makes the engine <em>rev</em> — without it, the audio would feel static.</p>
+<h2 id="swapping-engine-clips">Swapping Engine Clips</h2>
+<p>To use your own engine recording:</p>
+<ol>
+<li>Import your audio clip into the project as <code>.wav</code>, <code>.ogg</code>, or <code>.mp3</code>.</li>
+<li>Set <strong>Load Type</strong> to <strong>Compressed In Memory</strong> for mobile (saves RAM) or <strong>Streaming</strong> for very long clips.</li>
+<li>Set <strong>Force To Mono</strong> if it's a stereo clip (engines are usually mono in vehicle prefabs because they're positioned in 3D space).</li>
+<li>On the vehicle, expand the Audio section.</li>
+<li>Drag your clip into the appropriate field (e.g., <strong>Engine High Audio Clip</strong>).</li>
+</ol>
+<p>For best results, record or source three loops:</p>
+<ul>
+<li><strong>Idle / low</strong> loop, roughly 2–4 seconds long.</li>
+<li><strong>Mid</strong> loop, recorded at constant throttle around 4500 RPM.</li>
+<li><strong>High</strong> loop, recorded near redline (~6500–7000 RPM).</li>
+</ul>
+<p>Each clip should be a clean loop (the end seamlessly connects to the beginning). Tools like Audacity can help you find a good loop point.</p>
+<p>Free engine sound packs are available — search "free game engine sound effects loops" or buy a sound effects library.</p>
+<h2 id="gear-shift-audio">Gear Shift Audio</h2>
+<p>When the gearbox shifts, RCC plays a random clip from <code>RCC_Settings.gearShiftingClips[]</code>. This is an array of variations so successive shifts don't sound identical.</p>
+<p>To add your own:</p>
+<ol>
+<li>Open <code>RCC_Settings.asset</code>.</li>
+<li>Find the <strong>Gear Shifting Clips</strong> array.</li>
+<li>Add elements and drag your clips in.</li>
+</ol>
+<p>The max volume of gear shift audio is <code>maxGearShiftingSoundVolume</code> (default 0.25 — quiet enough to mix below the engine).</p>
+<h2 id="crash-audio">Crash Audio</h2>
+<p>Same pattern as gear shifts — <code>RCC_Settings.crashClips[]</code> is an array of random crash variations.</p>
+<p>The crash is played on <code>OnCollisionEnter</code> when the relative velocity exceeds a threshold. Light scrapes don't trigger a full crash sound — they trigger <code>scratchParticles</code> and a small audio dip. Big impacts trigger the crash clip.</p>
+<p><code>maxCrashSoundVolume</code> in settings controls the max volume (default 1.0).</p>
+<h2 id="wind-audio">Wind Audio</h2>
+<p>Wind noise scales with vehicle speed. At 0 km/h, no wind. At top speed, the wind audio is at <code>maxWindSoundVolume</code> (default 0.1 — wind shouldn't drown out the engine).</p>
+<p>The clip is <code>windClip</code> in <code>RCC_Settings</code>. Replace it with your own if you want a more or less aggressive wind sound.</p>
+<h2 id="brake-audio">Brake Audio</h2>
+<p>When braking hard, RCC plays a brake squeal sound. The clip is <code>brakeClip</code> in settings, max volume <code>maxBrakeSoundVolume</code> (default 0.1 — squeal should be subtle).</p>
+<p>Brake audio is <strong>velocity-modulated</strong>: it doesn't play at all if you're braking from a near-stop, only triggers when there's high relative motion that would generate squeal in reality.</p>
+<h2 id="exhaust-audio">Exhaust Audio</h2>
+<p>The exhaust audio is separate from the engine layers because it's positioned at the tailpipe transform — a listener walking around the car hears the exhaust from behind, not from under the hood.</p>
+<p>Exhaust uses one of the engine layers (typically the high RPM one) but routed through a separate <code>AudioSource</code> positioned at the exhaust outlet.</p>
+<h2 id="surface-specific-tire-audio">Surface-Specific Tire Audio</h2>
+<p>Each wheel has an <code>AudioSource</code> for slip/skid audio. The clip played depends on the current ground material — asphalt squeal, gravel rumble, snow crunch, etc. See <strong><a href="11_GroundPhysics.html">11 — Ground Physics</a></strong> for how surfaces are configured.</p>
+<p>The slip audio volume scales with wheel slip — a heavily-sliding wheel is loud, a barely-slipping wheel is faint.</p>
+<h2 id="bump-audio">Bump Audio</h2>
+<p>When the suspension bottoms out (a big bump, landing from a jump), the wheel plays a <code>bumpClip</code> from <code>RCC_Settings</code>. This is a one-shot — it doesn't loop.</p>
+<h2 id="tire-deflation--flat-tire-audio">Tire Deflation / Flat Tire Audio</h2>
+<p>When a tire deflates, <code>wheelDeflateClip</code> plays once. While driving on a flat, <code>wheelFlatClip</code> loops at the wheel's audio source (a low, rough rumble).</p>
+<p>When the tire is repaired, <code>wheelInflateClip</code> plays once.</p>
+<p>All three are configured in <code>RCC_Settings</code>.</p>
+<h2 id="nos--turbo-audio">NOS / Turbo Audio</h2>
+<p>If your vehicle uses NOS (nitrous):</p>
+<ul>
+<li><strong>NOS Clip</strong> in <code>RCC_Settings</code> plays when boost is engaged.</li>
+<li>The audio fades out when boost is released.</li>
+</ul>
+<p>If your vehicle uses a turbocharger:</p>
+<ul>
+<li><strong>Turbo Clip</strong> plays continuously while the turbo is spooled.</li>
+<li>Volume scales with boost pressure.</li>
+</ul>
+<p>Both are off by default — turn them on per-vehicle by enabling <code>useNOS</code> or <code>useTurbo</code> on <code>RCC_CarControllerV4</code>.</p>
+<h2 id="indicator-clicks">Indicator Clicks</h2>
+<p>When indicator lights are on, RCC plays the <code>indicatorClip</code> from settings at regular intervals (matched to the blink rate). The sound is positioned at the dashboard (so it's "inside the car").</p>
+<p>If you don't want indicator sounds, set the clip to None in settings.</p>
+<h2 id="audio-mixer-group">Audio Mixer Group</h2>
+<p>All RCC audio routes through a single <code>AudioMixerGroup</code> (configured in <code>RCC_Settings.audioMixer</code>). This gives you a single volume slider for "vehicle audio" — set it to taste in your game's settings menu.</p>
+<p>You can replace the default mixer:</p>
+<ol>
+<li>Create a new <code>AudioMixer</code> asset.</li>
+<li>Add a group called "RCC".</li>
+<li>In <code>RCC_Settings.asset</code>, assign the new mixer group to <strong>Audio Mixer</strong>.</li>
+</ol>
+<p>You can also route specific sub-categories through different mixer groups by editing the AudioSource references on the vehicle prefab — but the global setting is the simplest.</p>
+<h2 id="tuning-audio-for-different-vehicle-types">Tuning Audio for Different Vehicle Types</h2>
+<h3 id="sports-car">Sports Car</h3>
+<ul>
+<li>ThreeSource audio for the engine.</li>
+<li>Aggressive pitch range (0.5 to 1.8).</li>
+<li>Crisp, throaty engine recording.</li>
+<li>Loud exhaust note.</li>
+</ul>
+<h3 id="truck--diesel">Truck / Diesel</h3>
+<ul>
+<li>TwoSource audio (diesels have less RPM variation).</li>
+<li>Conservative pitch range (0.7 to 1.3).</li>
+<li>Deep, rumbling engine recording.</li>
+<li>Loud at idle, but doesn't rev high.</li>
+</ul>
+<h3 id="electric-vehicle">Electric Vehicle</h3>
+<ul>
+<li>OneSource audio with a high-pitched whine clip.</li>
+<li>Very low pitch range (0.9 to 1.2).</li>
+<li>Optional "spaceship" sound effects on acceleration.</li>
+<li>No exhaust note.</li>
+</ul>
+<h3 id="motorcycle">Motorcycle</h3>
+<ul>
+<li>ThreeSource audio.</li>
+<li>Wide pitch range (0.4 to 2.0).</li>
+<li>Distinctive bike engine recording.</li>
+<li>Higher revs than cars.</li>
+</ul>
+<h2 id="adding-custom-audio-events">Adding Custom Audio Events</h2>
+<p>You can add your own audio reactions to events through <code>RCC_Events</code>:</p>
+<pre><code class="language-csharp">using UnityEngine;
+
+public class CustomAudio : MonoBehaviour {
+    public AudioSource shiftWooshSound;
+
+    void OnEnable() {
+        RCC_Events.OnGearShiftUp += PlayWoosh;
+    }
+
+    void OnDisable() {
+        RCC_Events.OnGearShiftUp -= PlayWoosh;
+    }
+
+    void PlayWoosh() {
+        shiftWooshSound.Play();
+    }
+}
+</code></pre>
+<p>See <strong><a href="24_EventsSystem.html">24 — Events System</a></strong> for the full event list.</p>
+<h2 id="performance-considerations">Performance Considerations</h2>
+<p>Each active <code>AudioSource</code> costs some CPU and memory bandwidth. A typical vehicle has roughly 10–15 active sources. With 5 vehicles in a scene, that's 50–75 sources — fine for desktop, may push mobile.</p>
+<p>For mobile or VR:</p>
+<ul>
+<li>Disable engine layers you don't need (use OneSource or TwoSource instead of ThreeSource).</li>
+<li>Reduce <strong>AudioSource.priority</strong> on less-important sources so Unity can cull them at the audio listener's distance limit.</li>
+<li>Disable surface-specific audio if you don't need it.</li>
+</ul>
+<h2 id="common-audio-issues">Common Audio Issues</h2>
+<h3 id="i-cant-hear-the-engine">"I can't hear the engine"</h3>
+<p>Check:</p>
+<ol>
+<li>The vehicle has <code>AudioType</code> not set to <code>Off</code>.</li>
+<li>The engine audio clips are assigned in the Inspector.</li>
+<li>The scene has only one <code>AudioListener</code> (on the camera).</li>
+<li>The scene's master volume isn't muted.</li>
+</ol>
+<h3 id="the-engine-sounds-chipmunky--too-high-pitched">"The engine sounds chipmunky / too high-pitched"</h3>
+<p><code>Max Engine Sound Pitch</code> is too high. Drop to 1.5 or 1.6.</p>
+<h3 id="the-engine-sounds-the-same-at-all-rpms">"The engine sounds the same at all RPMs"</h3>
+<p><code>Min Engine Sound Pitch</code> and <code>Max Engine Sound Pitch</code> are too close together. Spread them — e.g., 0.5 to 1.8.</p>
+<h3 id="the-engine-sound-cracks--clicks-during-shifts">"The engine sound cracks / clicks during shifts"</h3>
+<p>The crossfade between layers isn't smooth. Try ThreeSource audio with carefully tuned crossfade curves, or use a single longer engine clip in OneSource mode.</p>
+<h3 id="crash-audio-plays-for-tiny-scrapes">"Crash audio plays for tiny scrapes"</h3>
+<p>The crash volume threshold is too low. The actual threshold is internal to the controller — you may need to scale <code>maxCrashSoundVolume</code> down, or modify the velocity threshold in the controller (advanced).</p>
+<h3 id="audio-is-positional-but-i-want-it-global">"Audio is positional but I want it global"</h3>
+<p>By default, RCC sets each AudioSource's <code>Spatial Blend</code> to ~0.8 (mostly 3D, slightly 2D). To make audio fully 2D (the same in both ears regardless of camera position), set <code>Spatial Blend = 0</code> on the relevant <code>AudioSource</code>.</p>
+<h2 id="next-steps">Next Steps</h2>
+<ul>
+<li><strong><a href="14_LightsSystem.html">14 — Lights System</a></strong> — light setup, including indicator audio.</li>
+<li><strong><a href="11_GroundPhysics.html">11 — Ground Physics</a></strong> — surface-specific tire audio.</li>
+<li><strong><a href="21_RCC_Settings.html">21 — RCC Settings Deep Dive</a></strong> — global audio settings and mixer.</li>
+<li><strong><a href="24_EventsSystem.html">24 — Events System</a></strong> — audio reactions to events.</li>
+</ul>
+</div>
+<div class="footer">
+Generated from: 15_AudioSystem.md<br>
+Date: 2026-05-22 00:32<br>
+© 2014 - 2026 BoneCracker Games — Realistic Car Controller V5.0.0
+</div>
+</body>
+</html>

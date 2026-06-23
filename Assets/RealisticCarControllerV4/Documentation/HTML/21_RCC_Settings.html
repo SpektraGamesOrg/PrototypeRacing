@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>RCC Settings Deep Dive</title>
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    background: #f8f9fa;
+}
+.content {
+    background: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+h1 { color: #2c3e50; margin-top: 0; padding-bottom: 0.3em; border-bottom: 2px solid #eee; }
+h2 { color: #34495e; margin-top: 1.5em; padding-bottom: 0.2em; border-bottom: 1px solid #eee; }
+h3, h4 { color: #34495e; margin-top: 1.2em; }
+h5, h6 { color: #34495e; margin-top: 1.0em; }
+code {
+    background: #f4f4f4;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.9em;
+}
+pre {
+    background: #2d2d2d;
+    color: #f8f8f2;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
+    margin: 1em 0;
+    font-size: 0.9em;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+    color: #f8f8f2;
+    white-space: pre;
+}
+blockquote {
+    border-left: 4px solid #3498db;
+    margin: 1em 0;
+    padding: 0.5em 0 0.5em 20px;
+    color: #555;
+    background: #f9f9f9;
+}
+blockquote p { margin: 0.4em 0; }
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px 12px;
+    text-align: left;
+    vertical-align: top;
+}
+th {
+    background: #f4f4f4;
+    font-weight: bold;
+}
+tr:nth-child(even) { background: #f9f9f9; }
+a { color: #3498db; text-decoration: none; transition: color 0.2s; }
+a:hover { color: #2980b9; text-decoration: underline; }
+ul, ol { margin: 1em 0; padding-left: 30px; }
+li { margin: 0.4em 0; }
+li > ul, li > ol { margin: 0.3em 0; }
+hr { border: none; border-top: 2px solid #eee; margin: 2em 0; }
+p { margin: 1em 0; }
+.footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    color: #999;
+    font-size: 0.9em;
+    text-align: center;
+}
+
+</style>
+</head>
+<body>
+<div class="content">
+<h1 id="rcc-settings-deep-dive">RCC Settings Deep Dive</h1>
+<p><code>RCC_Settings</code> is the <strong>master configuration file</strong> for the entire RCC package. Almost every global tuning option lives in it. This document walks through every section, what each field does, and when you should change it.</p>
+<p>The asset lives at:</p>
+<pre><code>Assets/RealisticCarControllerV4/Resources/RCC Assets/RCC_Settings.asset
+</code></pre>
+<p>You can open it from the Project window, or use the shortcut: <strong>Tools → BoneCracker Games → Realistic Car Controller → Edit RCC Settings</strong>.</p>
+<h2 id="important--runtime-cloning">Important — Runtime Cloning</h2>
+<p>Before you start editing, understand one critical behavior: <strong>in Play mode, <code>RCC_Settings</code> clones itself into a runtime copy</strong>. Changes you make to settings while playing (programmatically or in the Inspector) modify the clone, not the on-disk asset. When you exit Play mode, the clone is discarded.</p>
+<p>This is intentional: it prevents your Play-mode experiments from accidentally being persisted to your project. If you want a change to stick, <strong>exit Play mode and re-apply it to the asset</strong>.</p>
+<p>This was added in commit <code>8b2c8bc</code> (fix for "RCC_Settings runtime changes persisting after exiting Play mode") — it's now an explicitly-supported behavior.</p>
+<h2 id="section-general-settings">Section: General Settings</h2>
+<h3 id="behavior-selected-index">Behavior Selected Index</h3>
+<p>The default behavior preset for new scenes. 0 = first preset, 4 = fifth. See <strong><a href="10_BehaviorPresets.html">10 — Behavior Presets</a></strong>.</p>
+<p>You can switch this at runtime: <code>RCC.SetBehavior(int)</code>.</p>
+<h3 id="override-behavior">Override Behavior</h3>
+<p>When on, the selected preset overrides per-vehicle settings. When off, each vehicle uses its own configured values. Default on.</p>
+<p>If your game has many different vehicle types with different feels (a hatchback that should always feel sluggish vs a sports car that should feel nimble), turn this off.</p>
+<h3 id="override-fps--max-fps">Override FPS / Max FPS</h3>
+<p>When on, RCC caps the application's target frame rate to <code>maxFPS</code>. Default on, max 60.</p>
+<p>Capping FPS is useful because:</p>
+<ul>
+<li>Physics simulation runs more consistently at a stable frame rate.</li>
+<li>Phone battery drain is reduced.</li>
+<li>Heat dissipation on mobile is reduced.</li>
+</ul>
+<p>For a high-end PC release, set max FPS to 144 or unlock it entirely by turning off the override.</p>
+<h3 id="override-fixed-timestep--fixed-time-step">Override Fixed TimeStep / Fixed Time Step</h3>
+<p>When on, RCC sets <code>Time.fixedDeltaTime</code> to the configured value. Default on, value 0.02 (50 Hz physics).</p>
+<p>The default of 50 Hz is a good balance. For mobile, 25 Hz (0.04) is acceptable to save battery. For high-precision simulators, go to 100 Hz (0.01) at the cost of doubled physics work.</p>
+<h3 id="max-angular-velocity">Max Angular Velocity</h3>
+<p>The rigidbody's maximum angular velocity in radians/second. Default 6.</p>
+<p>This is what prevents a vehicle from spinning faster than physically reasonable on a collision. Lower values clamp tighter (less spinning); higher values allow extreme spin.</p>
+<h3 id="use-shortcuts">Use Shortcuts</h3>
+<p>When on, RCC enables editor keyboard shortcuts:</p>
+<ul>
+<li><strong>Shift+E</strong> — toggle in-scene GUI overlay.</li>
+<li><strong>Shift+R</strong> — add an RCC controller to selected GameObject.</li>
+<li><strong>Shift+S</strong> — open RCC Settings.</li>
+</ul>
+<p>Off by default to avoid conflicts with other shortcuts. Turn on if you use these regularly.</p>
+<h2 id="section-behavior-types">Section: Behavior Types</h2>
+<p>The <code>behaviorTypes[]</code> array holds the available driving behavior presets. Each entry is a <code>BehaviorType</code> with fields covering:</p>
+<ul>
+<li>Helper toggles (steering helper, traction helper, ABS, ESP, TCS, counter-steering, etc.).</li>
+<li>Steering type and curve.</li>
+<li>COM assister.</li>
+<li>Steering angle limits at high speed.</li>
+<li>Friction curve parameters (forward and sideways extremum / asymptote slip and value).</li>
+<li>Anti-roll bar forces.</li>
+</ul>
+<p>See <strong><a href="10_BehaviorPresets.html">10 — Behavior Presets</a></strong> for the full explanation of what each preset does.</p>
+<p>To add a new preset, expand the array, add an element, and configure it. Switch to it at runtime via <code>RCC.SetBehavior(newIndex)</code>.</p>
+<h2 id="section-vehicle-defaults">Section: Vehicle Defaults</h2>
+<h3 id="use-fixed-wheel-colliders">Use Fixed Wheel Colliders</h3>
+<p>When on, RCC overrides Unity WheelCollider defaults with values tuned for stable physics (higher mass per wheel collider, etc.). Default on.</p>
+<p>Turn off only if you've manually tuned every wheel collider on every vehicle and don't want RCC overriding.</p>
+<h3 id="lock-and-unlock-cursor">Lock And Unlock Cursor</h3>
+<p>When on, the cursor is locked during gameplay (cursor disappears, mouse motion is delta-mode) and unlocked when paused. Default on.</p>
+<p>Turn off for games that always need a visible cursor (menus, point-and-click sub-games).</p>
+<h3 id="auto-reset">Auto Reset</h3>
+<p>When on, vehicles that end up upside down automatically flip back upright after a few seconds. Default on.</p>
+<p>Turn off for games where flipping is part of the gameplay (destruction derbies, off-road exploration where you might want to call a tow truck).</p>
+<h2 id="section-ui-settings">Section: UI Settings</h2>
+<h3 id="units">Units</h3>
+<p>The speed unit displayed on the dashboard:</p>
+<ul>
+<li><strong>KMH</strong> — kilometers per hour.</li>
+<li><strong>MPH</strong> — miles per hour.</li>
+</ul>
+<p>Default KMH.</p>
+<h3 id="ui-type">UI Type</h3>
+<ul>
+<li><strong>UI</strong> — Unity's built-in UI Canvas (recommended).</li>
+<li><strong>NGUI</strong> — legacy NGUI framework support.</li>
+<li><strong>None</strong> — no dashboard UI.</li>
+</ul>
+<h3 id="use-telemetry">Use Telemetry</h3>
+<p>When on, a telemetry overlay (real-time speed / RPM / gear / wheel slip / forces) appears during gameplay. Default off.</p>
+<p>Mostly for debugging — keep off for shipping builds.</p>
+<h2 id="section-mobile-settings">Section: Mobile Settings</h2>
+<h3 id="mobile-controller-enabled">Mobile Controller Enabled</h3>
+<p>The master switch for mobile input. When on, RCC reads input from the mobile UI instead of the Input System. See <strong><a href="18_MobileSetup.html">18 — Mobile Setup</a></strong>.</p>
+<h3 id="mobile-controller">Mobile Controller</h3>
+<p>The mobile steering style:</p>
+<ul>
+<li><strong>Touch Screen</strong> — buttons for throttle / brake / steering arrows.</li>
+<li><strong>Gyro</strong> — device tilt.</li>
+<li><strong>Steering Wheel</strong> — on-screen wheel.</li>
+<li><strong>Joystick</strong> — on-screen joystick.</li>
+</ul>
+<h3 id="ui-button-sensitivity--ui-button-gravity">UI Button Sensitivity / UI Button Gravity</h3>
+<p>Tuning for the on-screen throttle / brake buttons. See <strong><a href="18_MobileSetup.html">18 — Mobile Setup</a></strong>.</p>
+<h3 id="gyro-sensitivity">Gyro Sensitivity</h3>
+<p>Multiplier on gyroscope-based steering.</p>
+<h2 id="section-lights">Section: Lights</h2>
+<h3 id="use-headbrakereverseindicatorother-lights-as-vertex-lights">Use Head/Brake/Reverse/Indicator/Other Lights As Vertex Lights</h3>
+<p>Toggles converting each light type from pixel to vertex lighting for performance. See <strong><a href="14_LightsSystem.html">14 — Lights System</a></strong>.</p>
+<p>Generally:</p>
+<ul>
+<li>Head lights: pixel (look bad as vertex).</li>
+<li>Brake / Reverse / Indicator: vertex (small lights, cheap).</li>
+</ul>
+<h3 id="lensflare-urp">LensFlare URP</h3>
+<p>Reference to the lens flare asset used for headlights and other lights. RCC ships defaults for Built-in / URP / HDRP.</p>
+<h2 id="section-layers">Section: Layers</h2>
+<h3 id="set-layers">Set Layers</h3>
+<p>When on, RCC auto-assigns custom physics layers to vehicle GameObjects on creation. Default on.</p>
+<h3 id="rcc-layer--wheelcollider-layer--detachable-part-layer--prop-layer">RCC Layer / WheelCollider Layer / Detachable Part Layer / Prop Layer</h3>
+<p>The layer <strong>names</strong> RCC assigns to:</p>
+<ul>
+<li>Main vehicle body: <code>RCC_Vehicle</code>.</li>
+<li>Wheel collider GameObjects: <code>RCC_WheelCollider</code>.</li>
+<li>Detachable parts: <code>RCC_DetachablePart</code>.</li>
+<li>Prop physics objects: <code>RCC_Prop</code>.</li>
+</ul>
+<p>These must match layer names in your project's Tags &amp; Layers. RCC creates them on import; if you rename them in Unity's Tags &amp; Layers, update the strings here to match.</p>
+<h2 id="section-physics-materials">Section: Physics Materials</h2>
+<h3 id="collider-material">Collider Material</h3>
+<p>The <code>PhysicMaterial</code> used on the main vehicle body. Affects how the body slides along walls or other vehicles.</p>
+<p>The default has low friction (so a vehicle scraping a wall doesn't yank to a stop). You can swap in a custom material for game-specific behavior.</p>
+<h2 id="section-prefab-references">Section: Prefab References</h2>
+<p><code>RCC_Settings</code> holds references to many prefabs that RCC instantiates at runtime:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Prefab</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Contact Particles</strong></td>
+<td>Sparks spawned at collision contact points.</td>
+</tr>
+<tr>
+<td><strong>Scratch Particles</strong></td>
+<td>Particles spawned during scraping collisions.</td>
+</tr>
+<tr>
+<td><strong>Wheel Deflate Particles</strong></td>
+<td>Particles when a wheel pops.</td>
+</tr>
+<tr>
+<td><strong>Exhaust Gas</strong></td>
+<td>Smoke prefab for exhausts.</td>
+</tr>
+<tr>
+<td><strong>Skidmarks Manager</strong></td>
+<td>The scene's skidmarks pool.</td>
+</tr>
+<tr>
+<td><strong>Head Lights / Brake Lights / Reverse Lights / Indicator Lights / Interior Lights</strong></td>
+<td>Light component prefabs added when the "Add Lights" menu is used.</td>
+</tr>
+<tr>
+<td><strong>Mirrors</strong></td>
+<td>Side mirror prefab.</td>
+</tr>
+<tr>
+<td><strong>RCC Main Camera</strong></td>
+<td>The follow camera prefab.</td>
+</tr>
+<tr>
+<td><strong>Hood Camera</strong></td>
+<td>The hood camera component prefab.</td>
+</tr>
+<tr>
+<td><strong>Cinematic Camera</strong></td>
+<td>The cinematic camera.</td>
+</tr>
+<tr>
+<td><strong>RCC Canvas</strong></td>
+<td>The HUD canvas prefab.</td>
+</tr>
+<tr>
+<td><strong>RCC Telemetry</strong></td>
+<td>The telemetry overlay prefab.</td>
+</tr>
+</tbody>
+</table>
+<p>Don't change these references unless you've created your own custom versions. The RCC menu items use these references to spawn instances.</p>
+<h2 id="section-particle-effects">Section: Particle Effects</h2>
+<h3 id="dont-use-any-particle-effects">Don't Use Any Particle Effects</h3>
+<p>When on, <strong>all</strong> particle effects are disabled — exhaust smoke, contact sparks, wheel dust, etc. Default off.</p>
+<p>Turn on for performance on low-end mobile.</p>
+<h3 id="dont-use-skidmarks">Don't Use Skidmarks</h3>
+<p>When on, skidmark rendering is disabled. Default off.</p>
+<p>Turn on for low-end mobile or to remove visual clutter.</p>
+<h2 id="section-audio">Section: Audio</h2>
+<h3 id="audio-mixer">Audio Mixer</h3>
+<p>The <code>AudioMixerGroup</code> that all RCC sounds route through. Use this to apply a single volume slider to all vehicle audio in your settings menu.</p>
+<h3 id="shared-audio-clips">Shared Audio Clips</h3>
+<p>Several audio clips used globally:</p>
+<ul>
+<li><strong>Gear Shifting Clips[]</strong> — array of variations played randomly on each gear shift.</li>
+<li><strong>Crash Clips[]</strong> — collision impact variations.</li>
+<li><strong>Reversing Clip</strong> — reverse beep.</li>
+<li><strong>Wind Clip</strong> — wind noise.</li>
+<li><strong>Brake Clip</strong> — brake squeal.</li>
+<li><strong>Wheel Deflate Clip / Inflate Clip / Flat Clip</strong> — tire damage / repair sounds.</li>
+<li><strong>Indicator Clip</strong> — turn signal tick-tock.</li>
+<li><strong>Bump Clip</strong> — suspension hard-hit sound.</li>
+<li><strong>NOS Clip / Turbo Clip</strong> — boost-related audio.</li>
+<li><strong>Blowout Clip[]</strong> — tire blowout variations.</li>
+<li><strong>Exhaust Flame Clips[]</strong> — backfire / flame pop sounds.</li>
+</ul>
+<h3 id="max-volumes">Max Volumes</h3>
+<ul>
+<li><strong>Max Gear Shifting Sound Volume</strong> — default 0.25 (quiet — doesn't overpower engine).</li>
+<li><strong>Max Crash Sound Volume</strong> — default 1.0.</li>
+<li><strong>Max Wind Sound Volume</strong> — default 0.1.</li>
+<li><strong>Max Brake Sound Volume</strong> — default 0.1.</li>
+</ul>
+<p>These cap how loud each category can get regardless of how the audio source's volume curve is configured.</p>
+<h2 id="section-render-pipeline">Section: Render Pipeline</h2>
+<h3 id="hdrp-volume-profile-prefab">HDRP Volume Profile Prefab</h3>
+<p>A reference to an HDRP Volume Profile that ships with RCC. Used by the HDRP path of the Render Pipeline Converter to set up correct lighting volumes.</p>
+<h3 id="default-decal-material--default-neon-material">Default Decal Material / Default Neon Material</h3>
+<p>Materials used by the customization system for decals and neon underglow respectively.</p>
+<h2 id="section-editor-state">Section: Editor State</h2>
+<p>The bottom of the asset has several <code>foldX</code> booleans (Fold General Settings, Fold Behavior Settings, etc.). These store which sections of the Inspector are folded open or closed. <strong>Don't worry about these</strong> — they're cosmetic editor state, not gameplay tuning.</p>
+<h2 id="worked-examples">Worked Examples</h2>
+<h3 id="example-1-making-a-mobile-optimized-build">Example 1: Making a Mobile-Optimized Build</h3>
+<pre><code>Override FPS = on, max 30 (saves battery)
+Override Fixed Time Step = on, value 0.04 (25 Hz physics, halves physics work)
+Mobile Controller Enabled = on
+Mobile Controller = Touch Screen
+Use Brake/Reverse/Indicator Lights As Vertex Lights = on
+Don't Use Any Particle Effects = on
+Don't Use Skidmarks = on
+</code></pre>
+<h3 id="example-2-maxed-out-pc-simulator">Example 2: Maxed-Out PC Simulator</h3>
+<pre><code>Override FPS = off (let it run at monitor refresh rate)
+Override Fixed Time Step = on, value 0.01 (100 Hz physics for crisp feel)
+Behavior Selected Index = 0 (Realistic preset)
+Override Behavior = on
+Use Telemetry = on
+Use Lens Flare = on for all lights
+</code></pre>
+<h3 id="example-3-casual-arcade-racer">Example 3: Casual Arcade Racer</h3>
+<pre><code>Behavior Selected Index = 4 (Arcade preset)
+Auto Reset = on
+Lock And Unlock Cursor = on
+Mobile Controller Enabled = off (desktop)
+Don't Use Skidmarks = off (visible skidmarks for fun)
+</code></pre>
+<h2 id="common-settings-issues">Common Settings Issues</h2>
+<h3 id="my-change-didnt-persist-after-exiting-play-mode">"My change didn't persist after exiting Play mode"</h3>
+<p>By design. Make the change outside Play mode (in Edit mode), or write it to the asset programmatically with <code>EditorUtility.SetDirty()</code>.</p>
+<h3 id="i-added-a-behavior-preset-but-it-doesnt-appear-when-i-press-a-hotkey">"I added a behavior preset but it doesn't appear when I press a hotkey"</h3>
+<p>The hotkey is wired to call <code>RCC.SetBehavior(int)</code> with a fixed index. Update your hotkey wiring to pass the new index, or just call <code>RCC.SetBehavior(N)</code> from your UI.</p>
+<h3 id="the-layer-names-in-rcc_settings-dont-match-my-projects-layers">"The layer names in RCC_Settings don't match my project's layers"</h3>
+<p>RCC creates the layers on import. If you've renamed them in your Tags &amp; Layers, either rename back, or update the strings here to match.</p>
+<h3 id="mobile-mode-is-enabled-but-no-buttons-appear">"Mobile mode is enabled but no buttons appear"</h3>
+<p>You also need the <code>RCC_Canvas (AIO).prefab</code> in the scene. Mobile setting alone changes input source; the UI is separate.</p>
+<h2 id="next-steps">Next Steps</h2>
+<ul>
+<li><strong><a href="10_BehaviorPresets.html">10 — Behavior Presets</a></strong> — what each behavior preset configures.</li>
+<li><strong><a href="14_LightsSystem.html">14 — Lights System</a></strong> — vertex vs pixel lighting details.</li>
+<li><strong><a href="18_MobileSetup.html">18 — Mobile Setup</a></strong> — mobile-specific settings.</li>
+<li><strong><a href="22_RenderPipelines.html">22 — URP &amp; HDRP Conversion</a></strong> — render pipeline assets.</li>
+</ul>
+</div>
+<div class="footer">
+Generated from: 21_RCC_Settings.md<br>
+Date: 2026-05-22 00:32<br>
+© 2014 - 2026 BoneCracker Games — Realistic Car Controller V5.0.0
+</div>
+</body>
+</html>

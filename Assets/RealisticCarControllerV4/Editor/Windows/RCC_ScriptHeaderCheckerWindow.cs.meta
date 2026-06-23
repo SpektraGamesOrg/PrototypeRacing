@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 47bc1a9e2991c894ebf8a0a2a3142e2b
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 16296
+  packageName: Realistic Car Controller
+  packageVersion: 5.0.0
+  assetPath: Assets/RealisticCarControllerV4/Editor/Windows/RCC_ScriptHeaderCheckerWindow.cs
+  uploadId: 920646

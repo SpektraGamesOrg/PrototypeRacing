@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>How the System Works</title>
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    background: #f8f9fa;
+}
+.content {
+    background: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+h1 { color: #2c3e50; margin-top: 0; padding-bottom: 0.3em; border-bottom: 2px solid #eee; }
+h2 { color: #34495e; margin-top: 1.5em; padding-bottom: 0.2em; border-bottom: 1px solid #eee; }
+h3, h4 { color: #34495e; margin-top: 1.2em; }
+h5, h6 { color: #34495e; margin-top: 1.0em; }
+code {
+    background: #f4f4f4;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.9em;
+}
+pre {
+    background: #2d2d2d;
+    color: #f8f8f2;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
+    margin: 1em 0;
+    font-size: 0.9em;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+    color: #f8f8f2;
+    white-space: pre;
+}
+blockquote {
+    border-left: 4px solid #3498db;
+    margin: 1em 0;
+    padding: 0.5em 0 0.5em 20px;
+    color: #555;
+    background: #f9f9f9;
+}
+blockquote p { margin: 0.4em 0; }
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px 12px;
+    text-align: left;
+    vertical-align: top;
+}
+th {
+    background: #f4f4f4;
+    font-weight: bold;
+}
+tr:nth-child(even) { background: #f9f9f9; }
+a { color: #3498db; text-decoration: none; transition: color 0.2s; }
+a:hover { color: #2980b9; text-decoration: underline; }
+ul, ol { margin: 1em 0; padding-left: 30px; }
+li { margin: 0.4em 0; }
+li > ul, li > ol { margin: 0.3em 0; }
+hr { border: none; border-top: 2px solid #eee; margin: 2em 0; }
+p { margin: 1em 0; }
+.footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    color: #999;
+    font-size: 0.9em;
+    text-align: center;
+}
+
+</style>
+</head>
+<body>
+<div class="content">
+<h1 id="how-the-system-works">How the System Works</h1>
+<p>This document explains RCC's architecture at a level useful for someone who wants to <em>use</em> RCC effectively, not someone who wants to rebuild it from scratch. By the end you'll understand which scripts talk to which, where settings come from, and how data flows from a keyboard press all the way to the wheels turning.</p>
+<p>The goal here is to build a mental model. Once you have one, every other document in this set becomes easier to read because you'll know where its pieces fit in.</p>
+<h2 id="the-30-second-version">The 30-Second Version</h2>
+<p>A typical RCC scene has three actors:</p>
+<ol>
+<li><strong>An <code>RCC_SceneManager</code></strong> — a singleton that tracks who the active player vehicle is.</li>
+<li><strong>One or more <code>RCC_CarControllerV4</code></strong> components — one per vehicle in the scene.</li>
+<li><strong>An <code>RCC_Camera</code></strong> — follows whichever vehicle the SceneManager says is the player.</li>
+</ol>
+<p>Each frame:</p>
+<ul>
+<li><code>RCC_InputManager</code> polls the Input System and fills an <code>RCC_Inputs</code> struct (throttle, brake, steer, etc.).</li>
+<li><code>RCC_CarControllerV4</code> reads that struct in <code>FixedUpdate</code>, applies engine torque, gearbox logic, steering angles, suspension forces, and pushes the results into Unity's <code>WheelCollider</code> system.</li>
+<li>The wheels move; <code>RCC_WheelCollider</code> reads the resulting velocity / slip / ground material and updates wheel meshes, audio, particles, and skidmarks.</li>
+<li><code>RCC_Camera</code> interpolates toward the active player vehicle.</li>
+<li><code>RCC_Light</code> updates light intensity (e.g., brake lights brighten when you brake).</li>
+<li>The UI dashboard reads the same <code>speed</code>, <code>engineRPM</code>, and <code>currentGear</code> values and updates the gauges.</li>
+</ul>
+<p>That's the whole loop. Everything else in RCC is supporting infrastructure: settings, customization, damage, AI, etc.</p>
+<h2 id="the-three-singletons-youll-touch">The Three Singletons You'll Touch</h2>
+<p>RCC uses several singletons. Most you'll never see directly, but two are important to know.</p>
+<h3 id="rcc_scenemanager"><code>RCC_SceneManager</code></h3>
+<p>One per scene. Created automatically by the menu item <strong>Create → Managers → Scene Manager</strong>, or auto-spawned the first time <code>RCC_SceneManager.Instance</code> is accessed.</p>
+<p>It exposes:</p>
+<ul>
+<li><code>activePlayerVehicle</code> — the currently controlled vehicle.</li>
+<li><code>activePlayerCamera</code> — the camera following that vehicle.</li>
+<li><code>allVehicles</code> — list of every vehicle in the scene.</li>
+<li><code>RegisterPlayer(vehicle)</code> — promote a vehicle to be the active player.</li>
+<li><code>DeRegisterPlayer()</code> — drop the current player.</li>
+<li><code>SetBehavior(int)</code> — change global driving behavior.</li>
+<li><code>ChangeCamera()</code> — cycle camera mode.</li>
+</ul>
+<p>You never instantiate the SceneManager yourself — touching <code>RCC_SceneManager.Instance</code> creates one if there isn't one already. But you should still drop the Scene Manager prefab into your scene explicitly via the menu, because that way it appears in the Hierarchy where you can inspect it.</p>
+<h3 id="rcc_settings"><code>RCC_Settings</code></h3>
+<p>A <strong>ScriptableObject</strong> singleton (not a MonoBehaviour). The asset lives at:</p>
+<pre><code>Assets/RealisticCarControllerV4/Resources/RCC Assets/RCC_Settings.asset
+</code></pre>
+<p>It loads itself the first time <code>RCC_Settings.Instance</code> is accessed. During Play mode, RCC clones the asset into a runtime copy — this is intentional so that runtime changes (e.g., behavior switching) don't persist to the asset on disk after you exit Play mode. The first time this surprised someone it was treated as a bug; it's now an explicitly-supported design.</p>
+<p><code>RCC_Settings</code> holds:</p>
+<ul>
+<li>Behavior presets (Simulator, Drift, Arcade, Custom).</li>
+<li>FPS / fixedTimeStep / maxAngularVelocity overrides.</li>
+<li>Layer names for vehicle, wheel, detachable parts.</li>
+<li>Prefab references (camera, canvas, telemetry, exhaust gas particles, lens flare).</li>
+<li>Audio mixer routing and shared audio clips (crash, wind, gear shift).</li>
+<li>Mobile controller type (touch / gyro / steering wheel / joystick).</li>
+<li>Optimization toggles (vertex lights, no particles, no skidmarks).</li>
+</ul>
+<p>See <strong><a href="21_RCC_Settings.html">21 — RCC Settings Deep Dive</a></strong> for every field.</p>
+<h2 id="base-class-rcc_core">Base Class: <code>RCC_Core</code></h2>
+<p>Almost every RCC MonoBehaviour inherits from <code>RCC_Core</code> instead of directly from <code>MonoBehaviour</code>. <code>RCC_Core</code> provides two important static accessors:</p>
+<ul>
+<li><code>Settings</code> — gives every component cached access to <code>RCC_Settings.Instance</code> without each component reloading the resource itself.</li>
+<li><code>GroundMaterials</code> — same for <code>RCC_GroundMaterials.Instance</code>.</li>
+</ul>
+<p>It also caches a reference to the parent <code>RCC_CarControllerV4</code> (<code>CarController</code>) — so any wheel, light, exhaust, or detachable part on a vehicle can call <code>CarController</code> from inside <code>OnEnable</code> and get the controller it belongs to. The lookup walks up the transform hierarchy on first access and caches the result. This is the most common foot-gun for new RCC code: <strong>don't re-implement parent lookup, just use <code>CarController</code></strong>.</p>
+<p>There are four classes that are <em>not</em> <code>RCC_Core</code>-derived and inherit <code>MonoBehaviour</code> directly: <code>RCC_TruckTrailer</code>, <code>RCC_Telemetry</code>, <code>RCC_CheckUp</code> (static utility), and <code>RCC_GetBounds</code> (static utility). These are grandfathered exceptions — don't add new ones.</p>
+<h2 id="the-main-vehicle-controller--rcc_carcontrollerv4">The Main Vehicle Controller — <code>RCC_CarControllerV4</code></h2>
+<p>This is the heart of RCC. One per vehicle. About 3,700 lines of code. It has roughly 140 serialized fields organized into the following groups:</p>
+<ul>
+<li><strong>Wheels</strong> — references to the four (or more) wheel transforms and their corresponding <code>RCC_WheelCollider</code> children.</li>
+<li><strong>Steering Wheel</strong> — optional 3D steering wheel mesh in the interior, plus rotation axis.</li>
+<li><strong>Drivetrain</strong> — FWD / RWD / AWD / BIASED, anti-roll bars, brake torque, downforce.</li>
+<li><strong>Engine</strong> — torque curve, RPM range, inertia, rev limiter, exhaust flame.</li>
+<li><strong>Gears</strong> — number of gears, gear ratios, automatic/manual, clutch inertia, shift threshold.</li>
+<li><strong>Steering Assistance</strong> — limiter, counter-steer, sensitivity (all togglable).</li>
+<li><strong>Stability Assists</strong> — ABS, ESP, TCS (all togglable).</li>
+<li><strong>Audio</strong> — engine sound layers (one to three audio sources), exhaust audio, transmission audio.</li>
+<li><strong>Damage</strong> — embedded <code>RCC_Damage</code> data structure (mesh deformation, detachable parts, wheel damage).</li>
+<li><strong>Behavior Override</strong> — per-vehicle override of the global <code>RCC_Settings</code> behavior preset.</li>
+</ul>
+<p>The Inspector groups these into foldouts for clarity. See <strong><a href="08_VehicleInspectorReference.html">08 — Vehicle Inspector Reference</a></strong> for a field-by-field walkthrough.</p>
+<p>In code, <code>RCC_CarControllerV4</code> exposes public methods like:</p>
+<pre><code class="language-csharp">StartEngine();         // Ignite the engine.
+KillEngine();          // Stop the engine.
+ShiftToGear(int);      // Force a specific gear.
+ShiftUp();             // Up one gear.
+ShiftDown();           // Down one gear.
+OverrideInputs(RCC_Inputs);  // Inject custom inputs (used by AI, replay, etc.).
+SetCanControl(bool);   // Enable / disable player input.
+</code></pre>
+<p>Plus dozens of public properties that other systems (UI, lights, damage) read from each frame.</p>
+<h2 id="the-wheels--rcc_wheelcollider">The Wheels — <code>RCC_WheelCollider</code></h2>
+<p>Each wheel on a vehicle is a child GameObject with two components:</p>
+<ol>
+<li>Unity's built-in <code>WheelCollider</code> — provides the raycast-based suspension physics.</li>
+<li>RCC's <code>RCC_WheelCollider</code> — extends it with friction curves, ground detection, audio, particle dust, skidmarks, anti-roll force application, and steer/power/brake distribution flags.</li>
+</ol>
+<p>The "wheel mesh transform" (the visible wheel model) is a separate transform referenced on <code>RCC_CarControllerV4</code>. Each frame, the controller reads the wheel collider's pose and applies it to the mesh transform so the mesh rotates and pitches realistically. This pattern is standard Unity wheel collider usage — RCC just automates the wiring.</p>
+<p>Friction comes from the <strong>active behavior preset</strong> (when <code>overrideBehavior</code> is off on the wheel) or from <strong>per-wheel custom curves</strong> (when it's on). The actual <code>WheelFrictionCurve</code> values that Unity uses are computed in <code>RCC_WheelCollider.Update</code> from a combination of:</p>
+<ul>
+<li>The behavior preset's <code>forwardExtremumSlip</code> / <code>forwardExtremumValue</code> / <code>forwardAsymptoteSlip</code> / <code>forwardAsymptoteValue</code> (and the sideways equivalents).</li>
+<li>The active ground material's <code>forwardStiffness</code> and <code>sidewaysStiffness</code> multipliers.</li>
+<li>Tire deflation state (if a wheel is flat, stiffness reduces).</li>
+</ul>
+<p>See <strong><a href="09_HowWheelCollidersWork.html">09 — How WheelColliders Work</a></strong> for the friction math in detail.</p>
+<h2 id="input-flow">Input Flow</h2>
+<p>Input flows in one direction: from the Input System to the controller. Here's the data path:</p>
+<pre><code>[ Keyboard / Gamepad / Touch ]
+          ↓
+[ RCC_InputActions.inputactions ]  ← the Input System binding asset
+          ↓
+[ RCC_InputManager (singleton, Update) ]
+          ↓
+[ RCC_Inputs struct: throttle, brake, steer, clutch, ... ]
+          ↓
+[ RCC_CarControllerV4.FixedUpdate reads inputs ]
+          ↓
+[ WheelColliders apply torque / brake / steer ]
+          ↓
+[ Vehicle moves ]
+</code></pre>
+<p>On mobile, the path bypasses the Input Manager:</p>
+<pre><code>[ Touch UI buttons / steering wheel / joystick / gyro ]
+          ↓
+[ RCC_MobileButtons (static class) ]
+          ↓
+[ RCC_InputManager reads mobile values instead of Input System ]
+          ↓
+[ Same RCC_Inputs struct as before ]
+          ↓
+[ ... same as before ... ]
+</code></pre>
+<p>If you want to drive the car yourself (AI, replay, network), there's a third path that bypasses <code>RCC_InputManager</code> entirely:</p>
+<pre><code>[ Your code creates an RCC_Inputs struct ]
+          ↓
+[ Your code calls carController.OverrideInputs(myInputs) ]
+          ↓
+[ RCC_CarControllerV4 uses your inputs instead of polling the manager ]
+</code></pre>
+<p>See <strong><a href="16_InputSystem.html">16 — Input System</a></strong> and <strong><a href="17_HowToOverrideInputs.html">17 — Overriding Inputs</a></strong>.</p>
+<h2 id="events-system--rcc_events">Events System — <code>RCC_Events</code></h2>
+<p>Every interesting moment in a vehicle's life triggers a static event on <code>RCC_Events</code>. Examples:</p>
+<ul>
+<li><code>OnRCCPlayerSpawned(RCC_CarControllerV4 vehicle)</code> — fires when a vehicle is registered as the player.</li>
+<li><code>OnRCCPlayerCollision(RCC_CarControllerV4 vehicle, Collision collision)</code> — fires inside the vehicle's <code>OnCollisionEnter</code>.</li>
+<li><code>OnGearShiftUp()</code> — fires when the gearbox upshifts.</li>
+<li><code>OnIndicatorLeft()</code> — fires when the left turn signal is toggled.</li>
+<li><code>OnStartStopEngine()</code> — fires when the engine ignition is pressed.</li>
+</ul>
+<p>This is the <strong>preferred way to integrate your game code with RCC</strong>. Subscribe to the events you care about in <code>OnEnable</code>, unsubscribe in <code>OnDisable</code>, do your custom logic in the handler. You don't need to modify any RCC scripts — your code lives alongside.</p>
+<p>See <strong><a href="24_EventsSystem.html">24 — Events System</a></strong> for the full list and code examples.</p>
+<h2 id="cameras">Cameras</h2>
+<p>The camera system is a per-player single component (<code>RCC_Camera</code>) that has multiple modes:</p>
+<ul>
+<li><strong>TPS</strong> — third-person follow camera.</li>
+<li><strong>Hood</strong> — first-person from a hood anchor inside the vehicle.</li>
+<li><strong>Wheel</strong> — close-up on a wheel for cinematic shots.</li>
+<li><strong>Fixed</strong> — a scene-wide singleton anchor point.</li>
+<li><strong>Cinematic</strong> — a scene-wide singleton that automatically orbits.</li>
+<li><strong>Top-down</strong> — orthographic-style high angle.</li>
+</ul>
+<p>You cycle modes with the <code>ChangeCamera</code> input (default <code>C</code>) or by calling <code>RCC.ChangeCamera()</code> in code. <code>RCC_Camera</code> finds the active player vehicle from <code>RCC_SceneManager.activePlayerVehicle</code> automatically.</p>
+<h2 id="lights">Lights</h2>
+<p>Each light on a vehicle is a child GameObject with both a Unity <code>Light</code> component and an <code>RCC_Light</code> component. <code>RCC_Light</code> knows whether it's a headlight, brake light, reverse light, indicator, or interior light, and updates its intensity each frame based on what the parent vehicle is doing:</p>
+<ul>
+<li>Brake lights brighten when <code>carController.brakeInput &gt; 0</code>.</li>
+<li>Reverse lights turn on when <code>carController.direction == -1</code>.</li>
+<li>Indicator lights blink at a configurable interval when the corresponding input is toggled.</li>
+</ul>
+<p><code>RCC_Light</code> also handles <strong>render-pipeline differences</strong> — light intensity in lumens on HDRP, in unitless on URP, etc. — so you don't need three different vehicle prefabs for the three pipelines.</p>
+<h2 id="damage">Damage</h2>
+<p>Damage is <strong>embedded as a field</strong> on <code>RCC_CarControllerV4</code> (not a separate component). The field is <code>damage</code>, of type <code>RCC_Damage</code>, marked <code>[System.Serializable]</code>. Inside it:</p>
+<ul>
+<li><strong>Mesh deformation</strong> — uses an octree (<code>RCC_Octree</code>) to spatially query vertices near a collision contact point and pushes them inward.</li>
+<li><strong>Detachable parts</strong> — child GameObjects with <code>RCC_DetachablePart</code> components. On enough damage their <code>ConfigurableJoint</code> breaks, the part falls off, and a physics rigidbody takes over.</li>
+<li><strong>Wheel damage</strong> — the wheel transform can shift away from its rest position, and at extreme damage the wheel pops off entirely.</li>
+<li><strong>Light damage</strong> — at high damage, lights stop emitting.</li>
+</ul>
+<p><code>RCC.Repair(carController)</code> resets all of the above instantly. See <strong><a href="12_DamageSystem.html">12 — Damage System</a></strong>.</p>
+<h2 id="customization">Customization</h2>
+<p>The Customization system is opt-in. To use it, your vehicle prefab needs an <code>RCC_Customizer</code> component, plus child GameObjects for each sub-manager (PaintManager, SpoilerManager, WheelManager, UpgradeManager, DecalManager, NeonManager, SirenManager, CustomizationManager). Each sub-manager reads from its corresponding <code>Customizer_*</code> data class (paint colors available, spoiler prefabs available, wheel prefabs available, etc.).</p>
+<p>Loadouts persist via <code>PlayerPrefs</code> — when the player chooses a new paint or wheel, the change is written immediately. On vehicle spawn, the customizer reads the saved state and applies it.</p>
+<p>See <strong><a href="20_Customization.html">20 — Customization</a></strong>.</p>
+<h2 id="ai">AI</h2>
+<p>The AI driver is <code>RCC_AICarController</code>. It uses the <strong>same <code>OverrideInputs()</code> path</strong> as any other external controller — internally it computes throttle, brake, and steer values based on the next waypoint, then injects them. You don't need separate "physics for AI" — AI uses the same physics as the player.</p>
+<p>Waypoints are placed in a scene under an <code>RCC_AIWaypointsContainer</code>. An AI vehicle's <code>targetContainer</code> field points to that container, and the AI cycles through waypoints in order. Optional <code>RCC_AIBrakeZone</code> triggers tell the AI to slow down for sharp corners.</p>
+<p>See <strong><a href="19_AISystem.html">19 — AI System</a></strong>.</p>
+<h2 id="ground-materials">Ground Materials</h2>
+<p>When a wheel touches a surface, <code>RCC_WheelCollider</code> reads the surface's <code>PhysicMaterial</code> (or, for Unity Terrain, the active splatmap layer at that point) and looks it up in <code>RCC_GroundMaterials.asset</code>. The lookup returns a <code>GroundMaterialFrictions</code> entry containing:</p>
+<ul>
+<li><code>forwardStiffness</code> and <code>sidewaysStiffness</code> — multipliers on the friction curve.</li>
+<li><code>slip</code> — base slip target.</li>
+<li><code>damp</code> — damping force.</li>
+<li><code>volume</code> — audio volume scalar for the wheel's slip sound.</li>
+<li><code>groundParticles</code> — particle prefab for dust / dirt / snow effects.</li>
+<li><code>groundSound</code> — audio clip for this surface.</li>
+<li><code>skidmark</code> — optional custom skidmark style.</li>
+<li><code>deflate</code> — if true, tires can deflate on this surface (used for puncturing terrain like nails).</li>
+</ul>
+<p>Add a new surface by adding a new entry to <code>RCC_GroundMaterials.asset</code> and assigning the corresponding <code>PhysicMaterial</code> to your collider. See <strong><a href="11_GroundPhysics.html">11 — Ground Physics</a></strong>.</p>
+<h2 id="render-pipelines">Render Pipelines</h2>
+<p>RCC works on Built-in, URP, and HDRP via two compile-time defines:</p>
+<ul>
+<li><code>BCG_URP</code> — set when the project uses URP.</li>
+<li><code>BCG_HDRP</code> — set when the project uses HDRP.</li>
+</ul>
+<p>Sixteen RCC scripts have code paths that branch on these defines. The differences are mostly:</p>
+<ul>
+<li><strong>Light intensity units</strong> — Built-in uses unitless intensity, URP uses a similar 0–8 scale, HDRP uses lumens (much larger numbers).</li>
+<li><strong>Lens flare API</strong> — Built-in uses <code>LensFlare</code>, URP uses <code>LensFlareComponentSRP</code>, HDRP also uses <code>LensFlareComponentSRP</code> but with different defaults.</li>
+<li><strong>Decal API</strong> — Built-in uses Projector; HDRP uses <code>DecalProjector</code>.</li>
+</ul>
+<p>The Render Pipeline Converter (<strong>Tools → BoneCracker Games → Realistic Car Controller → Render Pipeline Converter</strong>) handles all of this automatically when you switch pipelines. See <strong><a href="22_RenderPipelines.html">22 — URP &amp; HDRP Conversion</a></strong>.</p>
+<h2 id="things-you-should-not-try-to-change">Things You Should <em>Not</em> Try to Change</h2>
+<p>A few patterns in RCC are intentional and important — changing them will break compatibility with users' projects and isn't necessary for any normal use case:</p>
+<ul>
+<li><strong>Global namespace.</strong> Every class is in the global namespace (no <code>namespace BoneCrackerGames {}</code> wrapper). This is load-bearing — existing customer projects reference these classes by their unqualified names.</li>
+<li><strong><code>RCC_</code> prefix.</strong> Every class, every public field, every public method starts with <code>RCC_</code> or is a member of a class that does. This is the asset's identity.</li>
+<li><strong>No <code>.asmdef</code> files.</strong> All RCC scripts live in the default <code>Assembly-CSharp</code>. Adding assembly definitions would speed up compile time but breaks user projects that have already taken dependencies on the monolithic assembly.</li>
+<li><strong>Embedded <code>RCC_Damage</code></strong> (not a separate component). It's a <code>[System.Serializable]</code> field on the controller, not a <code>MonoBehaviour</code>. This is by design — separating it would require touching every existing vehicle prefab.</li>
+</ul>
+<p>If you need to extend RCC, <strong>subscribe to <code>RCC_Events</code> from your own scripts</strong> or use the <code>OverrideInputs()</code> path. Don't modify the RCC scripts directly unless you're prepared to redo your changes on every update.</p>
+<h2 id="where-to-go-next">Where to Go Next</h2>
+<p>Now that you have the mental model, the rest of the documentation makes more sense. Some good next reads:</p>
+<ul>
+<li><strong><a href="08_VehicleInspectorReference.html">08 — Vehicle Inspector Reference</a></strong> — every field on the main controller.</li>
+<li><strong><a href="23_ScriptingAPI.html">23 — Scripting API</a></strong> — every public <code>RCC</code> static method.</li>
+<li><strong><a href="24_EventsSystem.html">24 — Events System</a></strong> — the event hub.</li>
+<li><strong><a href="16_InputSystem.html">16 — Input System</a></strong> — how input is configured.</li>
+</ul>
+<p>Or just pick whatever feature you're about to use from the <strong><a href="00_TableOfContents.html">Table of Contents</a></strong>.</p>
+</div>
+<div class="footer">
+Generated from: 06_HowTheSystemWorks.md<br>
+Date: 2026-05-22 00:32<br>
+© 2014 - 2026 BoneCracker Games — Realistic Car Controller V5.0.0
+</div>
+</body>
+</html>

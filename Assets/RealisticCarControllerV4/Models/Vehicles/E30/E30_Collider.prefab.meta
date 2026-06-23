@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: a2b7352f69264f7479b179923578e413
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 16296
+  packageName: Realistic Car Controller
+  packageVersion: 5.0.0
+  assetPath: Assets/RealisticCarControllerV4/Models/Vehicles/E30/E30_Collider.prefab
+  uploadId: 920646

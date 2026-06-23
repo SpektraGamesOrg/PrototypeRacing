@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Scripts Reference</title>
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    background: #f8f9fa;
+}
+.content {
+    background: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+h1 { color: #2c3e50; margin-top: 0; padding-bottom: 0.3em; border-bottom: 2px solid #eee; }
+h2 { color: #34495e; margin-top: 1.5em; padding-bottom: 0.2em; border-bottom: 1px solid #eee; }
+h3, h4 { color: #34495e; margin-top: 1.2em; }
+h5, h6 { color: #34495e; margin-top: 1.0em; }
+code {
+    background: #f4f4f4;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.9em;
+}
+pre {
+    background: #2d2d2d;
+    color: #f8f8f2;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
+    margin: 1em 0;
+    font-size: 0.9em;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+    color: #f8f8f2;
+    white-space: pre;
+}
+blockquote {
+    border-left: 4px solid #3498db;
+    margin: 1em 0;
+    padding: 0.5em 0 0.5em 20px;
+    color: #555;
+    background: #f9f9f9;
+}
+blockquote p { margin: 0.4em 0; }
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px 12px;
+    text-align: left;
+    vertical-align: top;
+}
+th {
+    background: #f4f4f4;
+    font-weight: bold;
+}
+tr:nth-child(even) { background: #f9f9f9; }
+a { color: #3498db; text-decoration: none; transition: color 0.2s; }
+a:hover { color: #2980b9; text-decoration: underline; }
+ul, ol { margin: 1em 0; padding-left: 30px; }
+li { margin: 0.4em 0; }
+li > ul, li > ol { margin: 0.3em 0; }
+hr { border: none; border-top: 2px solid #eee; margin: 2em 0; }
+p { margin: 1em 0; }
+.footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    color: #999;
+    font-size: 0.9em;
+    text-align: center;
+}
+
+</style>
+</head>
+<body>
+<div class="content">
+<h1 id="scripts-reference">Scripts Reference</h1>
+<p>This document lists every runtime script that ships with RCC, organized by folder, with a one-paragraph explanation of what each does. Use it when you need to find which script is responsible for which behavior, or when you're spelunking the codebase before extending something.</p>
+<p>For inspector field details on the main controller, see <strong><a href="08_VehicleInspectorReference.html">08 — Vehicle Inspector Reference</a></strong>. For the public API on the <code>RCC</code> static class, see <strong><a href="23_ScriptingAPI.html">23 — Scripting API</a></strong>.</p>
+<p>Total: <strong>125 runtime scripts + 44 editor scripts = 169 C# files</strong>.</p>
+<h2 id="scripts--core"><code>Scripts/</code> — Core</h2>
+<table>
+<thead>
+<tr>
+<th>Script</th>
+<th>What It Does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>RCC.cs</strong></td>
+<td>The static public API. Methods like <code>SpawnRCC()</code>, <code>SetBehavior()</code>, <code>Repair()</code>, <code>Transport()</code>. Use this from your game code.</td>
+</tr>
+<tr>
+<td><strong>RCC_Core.cs</strong></td>
+<td>Base class for almost every RCC component. Provides cached <code>Settings</code>, <code>GroundMaterials</code>, and <code>CarController</code> accessors.</td>
+</tr>
+<tr>
+<td><strong>RCC_Singleton.cs</strong></td>
+<td>Generic thread-safe singleton base class. <code>RCC_SceneManager</code>, <code>RCC_InputManager</code>, <code>RCC_SkidmarksManager</code> etc. inherit from this.</td>
+</tr>
+<tr>
+<td><strong>RCC_CarControllerV4.cs</strong></td>
+<td>The main vehicle controller. ~3,700 lines. Wheels, suspension, engine, gearbox, steering, audio, damage. Every vehicle uses this.</td>
+</tr>
+<tr>
+<td><strong>RCC_WheelCollider.cs</strong></td>
+<td>Wraps Unity's <code>WheelCollider</code> with friction curves, ground detection, audio, particles, skidmarks.</td>
+</tr>
+<tr>
+<td><strong>RCC_SceneManager.cs</strong></td>
+<td>Scene-wide singleton tracking the active player vehicle and camera. Handles <code>RegisterPlayer</code>, <code>SetBehavior</code>, <code>ChangeCamera</code>.</td>
+</tr>
+<tr>
+<td><strong>RCC_Events.cs</strong></td>
+<td>Static event hub. Subscribe to vehicle / AI / camera / input events here.</td>
+</tr>
+<tr>
+<td><strong>RCC_Damage.cs</strong></td>
+<td>Embedded as a field on <code>RCC_CarControllerV4</code>. Mesh deformation, detachable parts, wheel damage, light damage.</td>
+</tr>
+<tr>
+<td><strong>RCC_Octree.cs</strong></td>
+<td>Spatial octree used by <code>RCC_Damage</code> to find vertices near a collision point.</td>
+</tr>
+<tr>
+<td><strong>RCC_Light.cs</strong></td>
+<td>Vehicle light component. Headlight, brake, reverse, indicator, interior. Handles render-pipeline differences.</td>
+</tr>
+<tr>
+<td><strong>RCC_Exhaust.cs</strong></td>
+<td>Exhaust smoke + flame particle emitter. Reads engine state from the parent controller.</td>
+</tr>
+<tr>
+<td><strong>RCC_DetachablePart.cs</strong></td>
+<td>A body part (hood, door, bumper) that can break off on damage via a <code>ConfigurableJoint</code>.</td>
+</tr>
+<tr>
+<td><strong>RCC_Recorder.cs</strong></td>
+<td>Records vehicle position / rotation / inputs each frame and plays them back as a replay.</td>
+</tr>
+<tr>
+<td><strong>RCC_Mirror.cs</strong></td>
+<td>Side mirror with a render-camera that draws the reflection.</td>
+</tr>
+<tr>
+<td><strong>RCC_Skidmarks.cs</strong></td>
+<td>A single wheel's skidmark mesh strip.</td>
+</tr>
+<tr>
+<td><strong>RCC_SkidmarksManager.cs</strong></td>
+<td>Pooled skidmark renderer. One per scene. Manages all skidmark meshes.</td>
+</tr>
+<tr>
+<td><strong>RCC_LOD.cs</strong></td>
+<td>LOD switch — disables expensive updates on far-away vehicles.</td>
+</tr>
+<tr>
+<td><strong>RCC_Caliper.cs</strong></td>
+<td>Rotates a brake caliper transform to match the wheel's rotation.</td>
+</tr>
+<tr>
+<td><strong>RCC_PoliceSiren.cs</strong></td>
+<td>Police-style flashing lights + audio loop.</td>
+</tr>
+<tr>
+<td><strong>RCC_SpeedLimiter.cs</strong></td>
+<td>Per-vehicle speed cap. Adds dictionary-based drag to enforce a max speed.</td>
+</tr>
+<tr>
+<td><strong>RCC_TrailerAttachPoint.cs</strong></td>
+<td>Hitch point on a towing vehicle. Used to attach trailers.</td>
+</tr>
+<tr>
+<td><strong>RCC_TruckTrailer.cs</strong></td>
+<td>A trailer that can be attached to a towing vehicle. Inherits from <code>MonoBehaviour</code> (not <code>RCC_Core</code>).</td>
+</tr>
+<tr>
+<td><strong>RCC_SetLayer.cs</strong></td>
+<td>Utility — recursively sets a layer on a GameObject hierarchy.</td>
+</tr>
+<tr>
+<td><strong>RCC_ColorPickerBySliders.cs</strong></td>
+<td>UI color picker (R/G/B sliders). Used by the customization paint demo.</td>
+</tr>
+<tr>
+<td><strong>RCC_GetBounds.cs</strong></td>
+<td>Static utility class. Computes combined renderer bounds for a hierarchy.</td>
+</tr>
+<tr>
+<td><strong>RCC_CheckUp.cs</strong></td>
+<td>Static utility class. Editor pre-play sanity checks (verifies layers exist, etc.).</td>
+</tr>
+<tr>
+<td><strong>RCC_Joint.cs</strong></td>
+<td><code>[System.Serializable]</code> data class for <code>ConfigurableJoint</code> settings used by detachable parts.</td>
+</tr>
+<tr>
+<td><strong>RCC_Emission.cs</strong></td>
+<td><code>[System.Serializable]</code> data class for material emission color and intensity (used by lights).</td>
+</tr>
+<tr>
+<td><strong>RCC_Version.cs</strong></td>
+<td>Holds the version string. Update this when releasing a new version.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="scriptsai"><code>Scripts/AI/</code></h2>
+<table>
+<thead>
+<tr>
+<th>Script</th>
+<th>What It Does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>RCC_AICarController.cs</strong></td>
+<td>The waypoint AI driver. Uses <code>OverrideInputs</code> to steer toward the next waypoint. Supports Following Waypoints, Chase Player, Random modes.</td>
+</tr>
+<tr>
+<td><strong>RCC_AIWaypointsContainer.cs</strong></td>
+<td>Container for a series of waypoints. Held in a single GameObject; children are the individual waypoints.</td>
+</tr>
+<tr>
+<td><strong>RCC_AIBrakeZonesContainer.cs</strong></td>
+<td>Container for brake zones. Sister to the waypoints container.</td>
+</tr>
+<tr>
+<td><strong>RCC_AIBrakeZone.cs</strong></td>
+<td>A trigger volume that forces nearby AI to slow down.</td>
+</tr>
+<tr>
+<td><strong>RCC_Waypoint.cs</strong></td>
+<td>A single waypoint. Has a target speed and a pass radius.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="scriptscamera"><code>Scripts/Camera/</code></h2>
+<table>
+<thead>
+<tr>
+<th>Script</th>
+<th>What It Does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>RCC_Camera.cs</strong></td>
+<td>The main player follow camera. Handles TPS / Hood / Wheel / Fixed / Cinematic / Top modes.</td>
+</tr>
+<tr>
+<td><strong>RCC_HoodCamera.cs</strong></td>
+<td>Anchor point on a vehicle for first-person hood view.</td>
+</tr>
+<tr>
+<td><strong>RCC_WheelCamera.cs</strong></td>
+<td>Anchor point on a vehicle for close-up wheel view.</td>
+</tr>
+<tr>
+<td><strong>RCC_FixedCamera.cs</strong></td>
+<td>Scene-wide anchor for a fixed camera angle.</td>
+</tr>
+<tr>
+<td><strong>RCC_CinematicCamera.cs</strong></td>
+<td>Singleton cinematic camera. Orbits the player vehicle with automatic angle changes.</td>
+</tr>
+<tr>
+<td><strong>RCC_ShowroomCamera.cs</strong></td>
+<td>Camera used in the car-selection demo. Stays on a turntable.</td>
+</tr>
+<tr>
+<td><strong>RCC_CameraCarSelection.cs</strong></td>
+<td>Drives the showroom camera during car selection.</td>
+</tr>
+<tr>
+<td><strong>RCC_FOVForCinematicCamera.cs</strong></td>
+<td>Animates FOV on the cinematic camera.</td>
+</tr>
+<tr>
+<td><strong>RCC_MainCameraProvider.cs</strong></td>
+<td>Provides a reference to the active player camera. Used by other systems that need to know where the camera is.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="scriptscustomization-25-scripts"><code>Scripts/Customization/</code> (25 scripts)</h2>
+<table>
+<thead>
+<tr>
+<th>Script</th>
+<th>What It Does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>RCC_Customizer.cs</strong></td>
+<td>Root component of the customization system. Lives on the vehicle and hosts the sub-managers.</td>
+</tr>
+<tr>
+<td><strong>RCC_Customizer_PaintManager.cs</strong></td>
+<td>Sub-manager — body paint color.</td>
+</tr>
+<tr>
+<td><strong>RCC_Customizer_WheelManager.cs</strong></td>
+<td>Sub-manager — wheel rim swap.</td>
+</tr>
+<tr>
+<td><strong>RCC_Customizer_SpoilerManager.cs</strong></td>
+<td>Sub-manager — spoiler attach / detach.</td>
+</tr>
+<tr>
+<td><strong>RCC_Customizer_DecalManager.cs</strong></td>
+<td>Sub-manager — decals on the body.</td>
+</tr>
+<tr>
+<td><strong>RCC_Customizer_NeonManager.cs</strong></td>
+<td>Sub-manager — underglow neon lights.</td>
+</tr>
+<tr>
+<td><strong>RCC_Customizer_SirenManager.cs</strong></td>
+<td>Sub-manager — emergency-vehicle siren style.</td>
+</tr>
+<tr>
+<td><strong>RCC_Customizer_UpgradeManager.cs</strong></td>
+<td>Sub-manager — engine, brake, handling, speed level upgrades.</td>
+</tr>
+<tr>
+<td><strong>RCC_Customizer_CustomizationManager.cs</strong></td>
+<td>Sub-manager — per-wheel tuning (camber, suspension stiffness).</td>
+</tr>
+<tr>
+<td><strong>RCC_CustomizationManager.cs</strong></td>
+<td>Scene-wide customization coordinator. Singleton.</td>
+</tr>
+<tr>
+<td><strong>RCC_CustomizationData.cs</strong></td>
+<td><code>[System.Serializable]</code> per-vehicle customization data.</td>
+</tr>
+<tr>
+<td><strong>RCC_CustomizationDemo.cs</strong></td>
+<td>Demo scene UI script for showcasing customization.</td>
+</tr>
+<tr>
+<td><strong>RCC_CustomizationTrigger.cs</strong></td>
+<td>A trigger volume that opens the customization menu when entered.</td>
+</tr>
+<tr>
+<td><strong>RCC_CustomizationSetups.cs</strong></td>
+<td>ScriptableObject holding prefab references for customization sub-managers.</td>
+</tr>
+<tr>
+<td><strong>RCC_Customizer_Loadout.cs</strong></td>
+<td><code>[System.Serializable]</code> save/load state for a vehicle's customization.</td>
+</tr>
+<tr>
+<td><strong>RCC_Customization_API.cs</strong></td>
+<td>A simplified API for game code that doesn't want to talk to individual sub-managers.</td>
+</tr>
+<tr>
+<td>Plus per-feature data classes</td>
+<td><code>RCC_Customizer_Decals</code>, <code>RCC_Customizer_Neons</code>, <code>RCC_Customizer_Spoilers</code>, etc. — these are the data containers, not behavior.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="scriptsinputs"><code>Scripts/Inputs/</code></h2>
+<table>
+<thead>
+<tr>
+<th>Script</th>
+<th>What It Does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>RCC_InputManager.cs</strong></td>
+<td>Singleton that polls the Unity Input System and fills the <code>RCC_Inputs</code> struct each frame.</td>
+</tr>
+<tr>
+<td><strong>RCC_InputActions.cs</strong></td>
+<td>Auto-generated wrapper around the <code>RCC_InputActions.inputactions</code> asset. Don't edit directly.</td>
+</tr>
+<tr>
+<td><strong>RCC_MobileButtons.cs</strong></td>
+<td>Static class holding mobile UI input state. The mobile canvas writes to this; the input manager reads from it.</td>
+</tr>
+<tr>
+<td><strong>RCC_Inputs.cs</strong></td>
+<td><code>[System.Serializable]</code> struct holding throttle, brake, steer, clutch, handbrake, boost, gear input, camera orbit, scroll.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="scriptsscriptableobjects"><code>Scripts/ScriptableObjects/</code></h2>
+<table>
+<thead>
+<tr>
+<th>Script</th>
+<th>What It Does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>RCC_Settings.cs</strong></td>
+<td>The master settings ScriptableObject. Behavior presets, FPS overrides, prefab references, audio clips.</td>
+</tr>
+<tr>
+<td><strong>RCC_InitialSettings.cs</strong></td>
+<td>Default values applied when the setup wizard creates a new vehicle.</td>
+</tr>
+<tr>
+<td><strong>RCC_GroundMaterials.cs</strong></td>
+<td>Per-surface friction, audio, particles. Both PhysicMaterial and terrain splatmap variants.</td>
+</tr>
+<tr>
+<td><strong>RCC_DemoVehicles.cs</strong></td>
+<td>Array of demo vehicle prefabs (used by the car-selection demo).</td>
+</tr>
+<tr>
+<td><strong>RCC_ChangableWheels.cs</strong></td>
+<td>Array of wheel prefabs available in the customization wheel-swap menu.</td>
+</tr>
+<tr>
+<td><strong>RCC_Records.cs</strong></td>
+<td>Recorded replay clips.</td>
+</tr>
+<tr>
+<td><strong>RCC_AssetPaths.cs</strong></td>
+<td>Editor-only constant asset paths.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="scriptsui-23-scripts"><code>Scripts/UI/</code> (23 scripts)</h2>
+<table>
+<thead>
+<tr>
+<th>Script</th>
+<th>What It Does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>RCC_UI_DashboardDisplay.cs</strong></td>
+<td>Speedometer, RPM gauge, gear indicator. The main dashboard widget.</td>
+</tr>
+<tr>
+<td><strong>RCC_UI_Controller.cs</strong></td>
+<td>Touch button (throttle / brake). Reads input → writes to <code>RCC_MobileButtons</code>.</td>
+</tr>
+<tr>
+<td><strong>RCC_UI_Joystick.cs</strong></td>
+<td>Touch joystick for steering.</td>
+</tr>
+<tr>
+<td><strong>RCC_UI_SteeringWheelController.cs</strong></td>
+<td>On-screen steering wheel widget.</td>
+</tr>
+<tr>
+<td><strong>RCC_UI_Canvas_Customizer.cs</strong></td>
+<td>UI canvas for the customization screen.</td>
+</tr>
+<tr>
+<td><strong>RCC_UI_Wheel.cs</strong>, <strong>RCC_UI_Spoiler.cs</strong>, <strong>RCC_UI_Decal.cs</strong>, <strong>RCC_UI_Neon.cs</strong>, <strong>RCC_UI_Siren.cs</strong>, <strong>RCC_UI_Upgrade.cs</strong>, <strong>RCC_UI_Color.cs</strong></td>
+<td>Per-customization-category UI panels.</td>
+</tr>
+<tr>
+<td><strong>RCC_UI_Drag.cs</strong></td>
+<td>Drag-to-move UI element.</td>
+</tr>
+<tr>
+<td><strong>RCC_UI_Tooltip.cs</strong></td>
+<td>Tooltip popup.</td>
+</tr>
+<tr>
+<td><strong>RCC_UI_LevelButton.cs</strong></td>
+<td>Level-up button for upgrades.</td>
+</tr>
+<tr>
+<td><strong>RCC_UI_DashboardButton.cs</strong></td>
+<td>Bound dashboard buttons (camera, headlights, etc.).</td>
+</tr>
+<tr>
+<td><strong>RCC_UI_SliderTextReader.cs</strong></td>
+<td>Reads a slider value and displays it as text.</td>
+</tr>
+<tr>
+<td><strong>RCC_UI_DecalSetLocation.cs</strong></td>
+<td>Lets the player drag a decal to a body location.</td>
+</tr>
+<tr>
+<td><strong>RCC_UI_ShowroomCameraDrag.cs</strong></td>
+<td>Drag to rotate the showroom camera.</td>
+</tr>
+<tr>
+<td><strong>RCC_UI_ControlsPanel.cs</strong></td>
+<td>The controls help overlay (shows key bindings).</td>
+</tr>
+<tr>
+<td><strong>RCC_UI_CustomizationSlider.cs</strong></td>
+<td>Numeric slider used in tuning UI.</td>
+</tr>
+<tr>
+<td><strong>RCC_DashboardObjects.cs</strong></td>
+<td>Container for dashboard widget references.</td>
+</tr>
+<tr>
+<td><strong>RCC_DashboardColors.cs</strong></td>
+<td>Color theme for the dashboard.</td>
+</tr>
+<tr>
+<td><strong>RCC_DashboardInputs.cs</strong></td>
+<td>Reads inputs for the dashboard widget.</td>
+</tr>
+<tr>
+<td><strong>RCC_InfoLabel.cs</strong></td>
+<td>Multi-line text label used for telemetry / debug output.</td>
+</tr>
+<tr>
+<td><strong>RCC_Telemetry.cs</strong></td>
+<td>The telemetry overlay. Shows speed, RPM, gear, wheel slip, forces.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="scriptsothers-16-scripts"><code>Scripts/Others/</code> (16 scripts)</h2>
+<table>
+<thead>
+<tr>
+<th>Script</th>
+<th>What It Does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>RCC_Demo.cs</strong></td>
+<td>Demo scene controller. Wires up UI buttons in the demo scenes.</td>
+</tr>
+<tr>
+<td><strong>RCC_AIO.cs</strong></td>
+<td>"All in one" demo controller — toggles every feature in the AIO scene.</td>
+</tr>
+<tr>
+<td><strong>RCC_APIExample.cs</strong></td>
+<td>Demo UI showing every public <code>RCC</code> API call.</td>
+</tr>
+<tr>
+<td><strong>RCC_CarSelectionExample.cs</strong></td>
+<td>Car selection menu logic.</td>
+</tr>
+<tr>
+<td><strong>RCC_OverrideInputsExample.cs</strong></td>
+<td>Example of pumping custom inputs into a vehicle.</td>
+</tr>
+<tr>
+<td><strong>RCC_LevelLoader.cs</strong></td>
+<td>Loads scenes preserving the selected vehicle.</td>
+</tr>
+<tr>
+<td><strong>RCC_Spawner.cs</strong></td>
+<td>Places a vehicle at scene start.</td>
+</tr>
+<tr>
+<td><strong>RCC_Teleporter.cs</strong></td>
+<td>Trigger volume that teleports a vehicle.</td>
+</tr>
+<tr>
+<td><strong>RCC_RepairStation.cs</strong></td>
+<td>Trigger volume that repairs a vehicle's damage.</td>
+</tr>
+<tr>
+<td><strong>RCC_FuelStation.cs</strong></td>
+<td>Trigger volume that refuels a vehicle.</td>
+</tr>
+<tr>
+<td><strong>RCC_CrashHammer.cs</strong></td>
+<td>Animated crash hazard (a hammer that swings).</td>
+</tr>
+<tr>
+<td><strong>RCC_CrashPress.cs</strong></td>
+<td>Animated crash hazard (a press that drops).</td>
+</tr>
+<tr>
+<td><strong>RCC_CrashShredder.cs</strong></td>
+<td>Animated crash hazard (a shredder that grinds).</td>
+</tr>
+<tr>
+<td><strong>RCC_CharacterController.cs</strong></td>
+<td>Very basic third-person character used by some demos. Not a full character system.</td>
+</tr>
+<tr>
+<td><strong>RCC_Prop.cs</strong></td>
+<td>Simple physics prop that vehicles can knock around.</td>
+</tr>
+<tr>
+<td><strong>RCC_ShadowRotConst.cs</strong></td>
+<td>Constrains shadow rotation.</td>
+</tr>
+<tr>
+<td><strong>RCC_SuspensionArm.cs</strong></td>
+<td>Visual-only suspension arm that follows wheel motion.</td>
+</tr>
+<tr>
+<td><strong>RCC_Useless.cs</strong></td>
+<td>Placeholder / experimental. Safe to ignore.</td>
+</tr>
+<tr>
+<td><strong>RCC_PlayerPrefsX.cs</strong></td>
+<td>Extended PlayerPrefs helper (saves vectors, colors, arrays). Used by the customization system.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="editor--editor-only-code-44-scripts"><code>Editor/</code> — Editor-Only Code (44 scripts)</h2>
+<h3 id="editorcomponents--custom-inspectors"><code>Editor/Components/</code> — Custom Inspectors</h3>
+<table>
+<thead>
+<tr>
+<th>Script</th>
+<th>What It Does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>RCC_CarControllerV4_Editor.cs</strong></td>
+<td>Custom inspector for the main controller. Organizes 140+ fields into foldouts.</td>
+</tr>
+<tr>
+<td><strong>RCC_WheelCollider_Editor.cs</strong></td>
+<td>Custom inspector for wheel colliders.</td>
+</tr>
+<tr>
+<td><strong>RCC_Camera_Editor.cs</strong></td>
+<td>Custom inspector for the camera.</td>
+</tr>
+<tr>
+<td><strong>RCC_Light_Editor.cs</strong></td>
+<td>Custom inspector for vehicle lights.</td>
+</tr>
+<tr>
+<td><strong>RCC_SceneManager_Editor.cs</strong></td>
+<td>Custom inspector for the scene manager.</td>
+</tr>
+<tr>
+<td><strong>RCC_AICarController_Editor.cs</strong></td>
+<td>Custom inspector for AI controller.</td>
+</tr>
+<tr>
+<td><strong>RCC_AIWaypointsContainer_Editor.cs</strong></td>
+<td>Custom inspector for waypoints container. Lets you click in the scene to add waypoints.</td>
+</tr>
+<tr>
+<td><strong>RCC_AIBrakeZonesContainer_Editor.cs</strong></td>
+<td>Custom inspector for brake zones container.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="editorcustomization--customizer-inspectors"><code>Editor/Customization/</code> — Customizer Inspectors</h3>
+<p>12 custom inspectors for each customization sub-manager (PaintManager, SpoilerManager, WheelManager, etc.) and the upgrade types.</p>
+<h3 id="editorinitload--package-install-hooks"><code>Editor/InitLoad/</code> — Package Install Hooks</h3>
+<table>
+<thead>
+<tr>
+<th>Script</th>
+<th>What It Does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>RCC_InitLoad.cs</strong></td>
+<td>Runs after package import. Triggers other init scripts.</td>
+</tr>
+<tr>
+<td><strong>RCC_Installation.cs</strong></td>
+<td>Sets up layers, tags, and shows the welcome window on first import.</td>
+</tr>
+<tr>
+<td><strong>RCC_CheckBeforePlay.cs</strong></td>
+<td>Pre-play sanity checks. Warns if required components are missing.</td>
+</tr>
+<tr>
+<td><strong>RCC_InputSystemVersionChecker.cs</strong></td>
+<td>Warns if the Input System package isn't installed.</td>
+</tr>
+<tr>
+<td><strong>RCC_SetScriptingSymbol.cs</strong></td>
+<td>Sets / unsets <code>BCG_URP</code>, <code>BCG_HDRP</code>, etc. defines.</td>
+</tr>
+<tr>
+<td><strong>RCC_InitLoadHappyMessage.cs</strong></td>
+<td>Shows a friendly welcome message after first install.</td>
+</tr>
+<tr>
+<td><strong>RCC_UpgradeWindow.cs</strong></td>
+<td>Handles V4 → V5 upgrade migration.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="editorscriptableobjects--so-inspectors"><code>Editor/ScriptableObjects/</code> — SO Inspectors</h3>
+<table>
+<thead>
+<tr>
+<th>Script</th>
+<th>What It Does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>RCC_Settings_Editor.cs</strong></td>
+<td>Custom inspector for RCC_Settings — organizes all the global settings.</td>
+</tr>
+<tr>
+<td><strong>RCC_GroundMaterials_Editor.cs</strong></td>
+<td>Custom inspector for ground materials.</td>
+</tr>
+<tr>
+<td><strong>RCC_Records_Editor.cs</strong></td>
+<td>Custom inspector for recorded replay clips.</td>
+</tr>
+<tr>
+<td><strong>RCC_FixAxisWindow.cs</strong></td>
+<td>A tool window for fixing wheel axis orientation.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="editorwindows--editor-windows"><code>Editor/Windows/</code> — Editor Windows</h3>
+<table>
+<thead>
+<tr>
+<th>Script</th>
+<th>What It Does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>RCC_EditorWindows.cs</strong></td>
+<td>Defines every menu item under <code>Tools → BoneCracker Games → Realistic Car Controller</code>.</td>
+</tr>
+<tr>
+<td><strong>RCC_WelcomeWindow.cs</strong></td>
+<td>The welcome dialog. Shows version and quick links.</td>
+</tr>
+<tr>
+<td><strong>RCC_RenderPipelineConverterWindow.cs</strong></td>
+<td>Converts materials and shaders between Built-in / URP / HDRP.</td>
+</tr>
+<tr>
+<td><strong>RCC_QuickVehicleSetupWizardWindow.cs</strong></td>
+<td>The new-vehicle setup wizard.</td>
+</tr>
+<tr>
+<td><strong>RCC_CreateNewVehicle.cs</strong></td>
+<td>Helper functions used by the wizard.</td>
+</tr>
+<tr>
+<td><strong>RCC_DetectPossibleWheels.cs</strong></td>
+<td>Auto-detects wheel transforms in a hierarchy.</td>
+</tr>
+<tr>
+<td><strong>RCC_PopupWindow_PossibleWheels.cs</strong></td>
+<td>Popup UI for the wheel detector.</td>
+</tr>
+<tr>
+<td><strong>RCC_CheckAxisOrientation.cs</strong></td>
+<td>Tool for fixing wheel rotation axes.</td>
+</tr>
+<tr>
+<td><strong>RCC_AIO_SetupWindow.cs</strong></td>
+<td>Setup tool for the AIO demo scene.</td>
+</tr>
+<tr>
+<td><strong>RCC_AssetRenamer.cs</strong></td>
+<td>Bulk rename utility for RCC assets.</td>
+</tr>
+<tr>
+<td><strong>RCC_SceneGUI.cs</strong></td>
+<td>In-scene GUI overlay (toggled with Shift+E).</td>
+</tr>
+<tr>
+<td><strong>RCC_ScriptHeaderCheckerWindow.cs</strong></td>
+<td>Finds files missing the standard RCC copyright header.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="editor-root"><code>Editor/</code> Root</h3>
+<table>
+<thead>
+<tr>
+<th>Script</th>
+<th>What It Does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>RCC_AssetUtilities.cs</strong></td>
+<td>Asset path constants and helpers used by editor code.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="reading-the-source">Reading the Source</h2>
+<p>If you want to understand a specific feature in depth, the best approach is:</p>
+<ol>
+<li><strong>Find the script in this reference.</strong></li>
+<li><strong>Open it in your IDE.</strong> Visual Studio Code, Rider, or Visual Studio all work fine.</li>
+<li><strong>Read the public surface first.</strong> The <code>[Tooltip]</code> and <code>[Header]</code> attributes plus XML comments explain most things.</li>
+<li><strong>Follow references.</strong> Right-click a method → Find All References to see who calls it.</li>
+</ol>
+<p>The whole codebase is in the global namespace with no <code>.asmdef</code> files, which is intentional — it makes the source easy to navigate without IDE configuration.</p>
+<h2 id="next-steps">Next Steps</h2>
+<ul>
+<li><strong><a href="06_HowTheSystemWorks.html">06 — How the System Works</a></strong> — high-level architecture.</li>
+<li><strong><a href="23_ScriptingAPI.html">23 — Scripting API</a></strong> — public API surface.</li>
+<li><strong><a href="24_EventsSystem.html">24 — Events System</a></strong> — events to extend RCC without modifying its source.</li>
+</ul>
+</div>
+<div class="footer">
+Generated from: 27_ScriptsReference.md<br>
+Date: 2026-05-22 00:32<br>
+© 2014 - 2026 BoneCracker Games — Realistic Car Controller V5.0.0
+</div>
+</body>
+</html>

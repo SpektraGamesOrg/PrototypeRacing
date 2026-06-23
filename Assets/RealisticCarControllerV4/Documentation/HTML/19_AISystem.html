@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>AI System</title>
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    background: #f8f9fa;
+}
+.content {
+    background: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+h1 { color: #2c3e50; margin-top: 0; padding-bottom: 0.3em; border-bottom: 2px solid #eee; }
+h2 { color: #34495e; margin-top: 1.5em; padding-bottom: 0.2em; border-bottom: 1px solid #eee; }
+h3, h4 { color: #34495e; margin-top: 1.2em; }
+h5, h6 { color: #34495e; margin-top: 1.0em; }
+code {
+    background: #f4f4f4;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.9em;
+}
+pre {
+    background: #2d2d2d;
+    color: #f8f8f2;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
+    margin: 1em 0;
+    font-size: 0.9em;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+    color: #f8f8f2;
+    white-space: pre;
+}
+blockquote {
+    border-left: 4px solid #3498db;
+    margin: 1em 0;
+    padding: 0.5em 0 0.5em 20px;
+    color: #555;
+    background: #f9f9f9;
+}
+blockquote p { margin: 0.4em 0; }
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px 12px;
+    text-align: left;
+    vertical-align: top;
+}
+th {
+    background: #f4f4f4;
+    font-weight: bold;
+}
+tr:nth-child(even) { background: #f9f9f9; }
+a { color: #3498db; text-decoration: none; transition: color 0.2s; }
+a:hover { color: #2980b9; text-decoration: underline; }
+ul, ol { margin: 1em 0; padding-left: 30px; }
+li { margin: 0.4em 0; }
+li > ul, li > ol { margin: 0.3em 0; }
+hr { border: none; border-top: 2px solid #eee; margin: 2em 0; }
+p { margin: 1em 0; }
+.footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    color: #999;
+    font-size: 0.9em;
+    text-align: center;
+}
+
+</style>
+</head>
+<body>
+<div class="content">
+<h1 id="ai-system">AI System</h1>
+<p>This document covers RCC's built-in AI driver: how it works, how to add AI vehicles to your scene, how to lay out waypoint paths for them to follow, and how to tune the AI for different driving styles (race opponents, traffic, chase vehicles).</p>
+<p>The AI system is a useful starting point that handles the common cases. If you need radically different AI behavior (formation driving, swarm AI, advanced racing line optimization), you'll probably want to build on top of <strong><a href="17_HowToOverrideInputs.html">17 — Overriding Inputs</a></strong> instead.</p>
+<h2 id="how-rcc-ai-works">How RCC AI Works</h2>
+<p><code>RCC_AICarController</code> is a <code>MonoBehaviour</code> you add to a vehicle. Each frame, it:</p>
+<ol>
+<li>Looks at the <strong>next waypoint</strong> to drive toward.</li>
+<li>Computes the heading angle from the vehicle to the waypoint.</li>
+<li>Sets <code>steerInput</code> to turn toward the waypoint.</li>
+<li>Sets <code>throttleInput</code> based on distance and current speed.</li>
+<li>Slows down if the next waypoint is at a sharper angle than the vehicle can handle.</li>
+<li>Calls <code>OverrideInputs()</code> on the parent vehicle controller.</li>
+</ol>
+<p>This is the same <code>OverrideInputs</code> path you'd use for your own custom AI — the built-in AI just does the math for you.</p>
+<p>The AI also handles:</p>
+<ul>
+<li><strong>Brake zones</strong> — pre-placed triggers in the scene that force the AI to slow down regardless of waypoint distance.</li>
+<li><strong>Obstacle avoidance</strong> — raycasts from the front of the vehicle that detect obstacles and steer around them.</li>
+<li><strong>Mode switching</strong> — three modes: Following Waypoints, Chase Player, Random.</li>
+<li><strong>Stuck detection</strong> — if the AI hasn't moved in a few seconds, it reverses briefly to free itself.</li>
+</ul>
+<h2 id="ai-driving-modes">AI Driving Modes</h2>
+<p>The AI has three top-level modes, switched via the <strong>Navigation Mode</strong> enum on <code>RCC_AICarController</code>:</p>
+<h3 id="following-waypoints">Following Waypoints</h3>
+<p>The default mode. The AI cycles through waypoints in a <code>RCC_AIWaypointsContainer</code> in order. When it reaches a waypoint, it advances to the next. At the last waypoint, it loops back to the first (for a closed track) or stops (for a one-way path, configurable).</p>
+<p>Use this for <strong>traffic AI</strong> (AI cars driving around a city) and <strong>race opponents</strong>.</p>
+<h3 id="chase-player">Chase Player</h3>
+<p>The AI ignores waypoints and instead drives toward the active player vehicle. It uses the same steering and throttle logic but its target is the player rather than a static waypoint.</p>
+<p>Use this for <strong>chase scenarios</strong> — police pursuit, enemies, etc.</p>
+<h3 id="random">Random</h3>
+<p>The AI ignores waypoints and chooses a random direction every few seconds. Useful for <strong>panicked NPCs</strong> or <strong>wildlife-like behavior</strong>.</p>
+<h2 id="adding-an-ai-vehicle-to-a-scene">Adding an AI Vehicle to a Scene</h2>
+<p>The fastest path:</p>
+<h3 id="step-1--drag-in-an-ai-configured-prefab">Step 1 — Drag In an AI-Configured Prefab</h3>
+<p>Use <code>Prefabs/Vehicles/Skyline (AI Chaser).prefab</code> — it's pre-configured as an AI vehicle. Drag it into your scene.</p>
+<h3 id="step-2--configure-the-target">Step 2 — Configure the Target</h3>
+<p>Click the AI vehicle. In its <code>RCC_AICarController</code> Inspector:</p>
+<ul>
+<li><strong>Navigation Mode</strong> — set to <strong>Following Waypoints</strong> (or whichever mode you want).</li>
+<li><strong>Waypoints Container</strong> — drag in an <code>RCC_AIWaypointsContainer</code> from your scene (see below).</li>
+</ul>
+<h3 id="step-3--press-play">Step 3 — Press Play</h3>
+<p>The AI vehicle should start driving along your waypoints automatically.</p>
+<h2 id="building-a-waypoint-path">Building a Waypoint Path</h2>
+<p>A waypoint path is a list of empty GameObjects in the scene, each marking a position the AI should drive to. They live as children of a container GameObject that holds the <code>RCC_AIWaypointsContainer</code> component.</p>
+<h3 id="add-a-waypoint-container">Add a Waypoint Container</h3>
+<p>Menu: <strong>Tools → BoneCracker Games → Realistic Car Controller → Create → Add AI Waypoints Container To Scene</strong>.</p>
+<p>A new GameObject called <code>RCC_AIWaypointsContainer</code> appears in the Hierarchy with the container component on it.</p>
+<h3 id="add-waypoints">Add Waypoints</h3>
+<ol>
+<li>Select the container.</li>
+<li>In the Inspector, click <strong>Add Waypoint</strong> (or use the in-scene controls).</li>
+<li>Move the new waypoint to where you want it. The waypoints are typed as <code>RCC_Waypoint</code> — small markers with a position and an optional target speed.</li>
+<li>Repeat to build the path.</li>
+</ol>
+<p>Each waypoint has:</p>
+<ul>
+<li><strong>Target Speed</strong> — the speed the AI should target at this waypoint (km/h).</li>
+<li><strong>Pass Radius</strong> — the AI considers itself "at" the waypoint when within this distance. Default 8 m.</li>
+</ul>
+<p>For a racing track, set <code>targetSpeed</code> to a high value (e.g., 200) on straights and a lower value (e.g., 60) on sharp turns. The AI will slow down naturally for the corners.</p>
+<h3 id="path-layout-tips">Path Layout Tips</h3>
+<ul>
+<li><strong>Place waypoints in the center of the lane.</strong> AI vehicles aim for the waypoint, so off-center waypoints mean off-center driving.</li>
+<li><strong>Space waypoints based on speed.</strong> A waypoint every ~20 m is fine for slow streets; every ~50 m for highways. Too many waypoints close together causes the AI to "weave" between them.</li>
+<li><strong>Add waypoints at corner entry, apex, and exit.</strong> This gives the AI three reference points around a turn, making it follow a smoother racing line.</li>
+<li><strong>Close the loop</strong> for repeating tracks. Place the last waypoint near the first so the loop is seamless.</li>
+</ul>
+<h2 id="brake-zones">Brake Zones</h2>
+<p>Sometimes the AI needs to slow down beyond what the waypoint target speeds suggest — e.g., a sharp blind corner. A <strong>brake zone</strong> is a trigger volume that forces the AI to brake while inside.</p>
+<h3 id="add-a-brake-zone-container">Add a Brake Zone Container</h3>
+<p>Menu: <strong>Tools → BoneCracker Games → Realistic Car Controller → Create → Add AI Brake Zones Container To Scene</strong>.</p>
+<h3 id="add-brake-zones">Add Brake Zones</h3>
+<p>The container holds individual <code>RCC_AIBrakeZone</code> triggers. Each brake zone is a box-shaped trigger volume.</p>
+<ol>
+<li>Select the container.</li>
+<li>Click <strong>Add Brake Zone</strong> (or place a child GameObject yourself with <code>RCC_AIBrakeZone</code> and a BoxCollider set to trigger).</li>
+<li>Resize the box collider to cover the area where AI should brake.</li>
+<li>Set the brake zone's <strong>Target Speed</strong> — what speed the AI should target while inside.</li>
+</ol>
+<p>Place brake zones at:</p>
+<ul>
+<li>Corner entries.</li>
+<li>Areas before pedestrian crossings.</li>
+<li>Hairpin turns where you want extra slowdown beyond waypoint targets.</li>
+</ul>
+<h2 id="configuring-ai-behavior">Configuring AI Behavior</h2>
+<p>The <code>RCC_AICarController</code> component has many tunables. The most useful:</p>
+<h3 id="speed">Speed</h3>
+<ul>
+<li><strong>Max Speed</strong> — top speed the AI will target. Default 100 km/h. Lower for traffic, higher for racing.</li>
+<li><strong>Min Speed</strong> — minimum speed in normal driving. The AI won't slow below this unless it's stopping for an obstacle.</li>
+</ul>
+<h3 id="steering">Steering</h3>
+<ul>
+<li><strong>Steering Speed</strong> — how fast the AI can rotate the wheel. Higher = snappier corner entry. Default 8.</li>
+<li><strong>Detect Steering Helper</strong> — when on, the AI uses RCC's steering helper to smooth its inputs (matches the player feel).</li>
+</ul>
+<h3 id="brake">Brake</h3>
+<ul>
+<li><strong>Brake Threshold Speed</strong> — speed delta that triggers braking. If the AI is going much faster than the target, it brakes hard.</li>
+<li><strong>Lookahead Distance</strong> — how far ahead the AI checks for upcoming sharp turns. Higher = anticipates earlier, brakes earlier.</li>
+</ul>
+<h3 id="obstacle-avoidance">Obstacle Avoidance</h3>
+<ul>
+<li><strong>Use Obstacle Avoidance</strong> — toggle the raycast-based avoidance.</li>
+<li><strong>Ray Distance</strong> — how far ahead obstacle rays cast. Default 5 m.</li>
+<li><strong>Raycast Layers</strong> — which layers to count as obstacles.</li>
+</ul>
+<h3 id="stuck-detection">Stuck Detection</h3>
+<ul>
+<li><strong>Stuck Time</strong> — seconds of no movement before reversing. Default 3.</li>
+<li><strong>Reverse Time</strong> — how long to reverse before trying forward again. Default 1.5.</li>
+</ul>
+<h2 id="chase-mode">Chase Mode</h2>
+<p>For police / enemy / hunter AI:</p>
+<ol>
+<li>Set <strong>Navigation Mode</strong> to <strong>Chase Player</strong>.</li>
+<li>The AI automatically targets the active player vehicle (<code>RCC_SceneManager.Instance.activePlayerVehicle</code>).</li>
+<li>No waypoints needed — chase ignores them.</li>
+</ol>
+<p>If you want the AI to chase a specific vehicle (not the registered player), set the <strong>Target Chase</strong> field on <code>RCC_AICarController</code> to that vehicle's <code>RCC_CarControllerV4</code>.</p>
+<p>For more aggressive chase behavior, set:</p>
+<ul>
+<li><strong>Aggressive</strong> to true.</li>
+<li><strong>Max Speed</strong> higher than the player.</li>
+<li>Reduce <strong>Brake Threshold Speed</strong> (the AI won't slow down for turns as much).</li>
+</ul>
+<h2 id="race-mode">Race Mode</h2>
+<p>For racing opponents:</p>
+<ol>
+<li>Use <strong>Following Waypoints</strong> mode.</li>
+<li>Build a closed loop of waypoints around your track.</li>
+<li>Set high <code>targetSpeed</code> values on straights, low values at corner entries.</li>
+<li>Add brake zones at the slowest turns for extra safety.</li>
+<li>Tune <strong>Steering Speed</strong> higher (10–12) for snappy turn-ins.</li>
+</ol>
+<h2 id="multiple-ai-vehicles">Multiple AI Vehicles</h2>
+<p>You can have many AI vehicles in a scene. Performance depends on:</p>
+<ul>
+<li>Number of active AI (each runs an Update / FixedUpdate cycle).</li>
+<li>Number of wheel colliders per AI (4 wheels per vehicle).</li>
+<li>Distance from the player (consider LOD for far vehicles).</li>
+</ul>
+<p>A typical desktop game can handle 30–50 AI vehicles. Mobile drops to 5–15 depending on the device.</p>
+<h3 id="spawning-ai-programmatically">Spawning AI Programmatically</h3>
+<pre><code class="language-csharp">public class SpawnTraffic : MonoBehaviour {
+    public RCC_CarControllerV4 trafficVehiclePrefab;
+    public RCC_AIWaypointsContainer waypoints;
+    public Transform[] spawnPoints;
+
+    void Start() {
+        for (int i = 0; i &lt; spawnPoints.Length; i++) {
+            RCC_CarControllerV4 vehicle = RCC.SpawnRCC(
+                trafficVehiclePrefab,
+                spawnPoints[i].position,
+                spawnPoints[i].rotation,
+                registerAsPlayerVehicle: false,
+                isControllable: false,
+                isEngineRunning: true);
+
+            RCC_AICarController ai = vehicle.GetComponent&lt;RCC_AICarController&gt;();
+            ai.waypointsContainer = waypoints;
+            ai.navigationMode = RCC_AICarController.NavigationMode.FollowWaypoints;
+        }
+    }
+}
+</code></pre>
+<p>(Exact field names may vary — check <code>RCC_AICarController.cs</code> for your version.)</p>
+<h2 id="ai-events">AI Events</h2>
+<p>Subscribe to AI spawn/destroy via <code>RCC_Events</code>:</p>
+<pre><code class="language-csharp">void OnEnable()  { RCC_Events.OnRCCAISpawned += HandleAISpawned; }
+void OnDisable() { RCC_Events.OnRCCAISpawned -= HandleAISpawned; }
+
+void HandleAISpawned(RCC_AICarController ai) {
+    // Add to a minimap, hostile list, etc.
+}
+</code></pre>
+<p>See <strong><a href="24_EventsSystem.html">24 — Events System</a></strong>.</p>
+<h2 id="custom-ai">Custom AI</h2>
+<p>If you need behavior the built-in AI doesn't support, <strong>don't modify <code>RCC_AICarController</code></strong> — write your own AI script and use Override Inputs. See <strong><a href="17_HowToOverrideInputs.html">17 — Overriding Inputs</a></strong> for the pattern.</p>
+<p>A custom AI script lives alongside your vehicle. It can:</p>
+<ul>
+<li>Read sensor data (raycasts, physics queries).</li>
+<li>Compute desired inputs via any logic (rule-based, behavior tree, ML model).</li>
+<li>Feed inputs via <code>OverrideInputs()</code>.</li>
+</ul>
+<p>Your custom AI plays nicely with everything else (events, damage, customization) because the underlying vehicle is still standard RCC.</p>
+<h2 id="common-ai-issues">Common AI Issues</h2>
+<h3 id="ai-ignores-my-waypoints">"AI ignores my waypoints"</h3>
+<p>Check that the AI vehicle's <strong>Waypoints Container</strong> field is assigned. Also check that <strong>Navigation Mode</strong> is set to <strong>Following Waypoints</strong>.</p>
+<h3 id="ai-keeps-driving-in-circles-around-a-waypoint">"AI keeps driving in circles around a waypoint"</h3>
+<p>The waypoint's <strong>Pass Radius</strong> is too small — the AI thinks it's not close enough and keeps trying to approach. Increase the pass radius to 8–15 m.</p>
+<h3 id="ai-rams-into-walls-at-corners">"AI rams into walls at corners"</h3>
+<p>Either the waypoint at the corner is too aggressive (<code>targetSpeed</code> is too high) or the AI doesn't have enough lookahead. Add a brake zone before the corner, or increase <strong>Lookahead Distance</strong>.</p>
+<h3 id="ai-cars-get-stuck-on-each-other">"AI cars get stuck on each other"</h3>
+<p>Multiple AI vehicles all chasing the same waypoint can collide. The built-in obstacle avoidance helps but isn't perfect. For dense traffic, consider lower max speed, lower steering speed, and slightly offset waypoints per vehicle.</p>
+<h3 id="ai-keeps-spinning-out">"AI keeps spinning out"</h3>
+<p>The AI's friction tuning may not match the player's. Try setting the AI vehicle's <strong>Override Behavior</strong> flag to true and configuring per-vehicle friction values manually. Or reduce <strong>Steering Speed</strong> so the AI doesn't snap the wheel.</p>
+<h3 id="chase-ai-loses-the-player">"Chase AI loses the player"</h3>
+<p>The AI's <strong>Max Speed</strong> is lower than the player's. Increase it. Or check that <strong>Target Chase</strong> points to the right vehicle (active player or a specific one).</p>
+<h2 id="next-steps">Next Steps</h2>
+<ul>
+<li><strong><a href="17_HowToOverrideInputs.html">17 — Overriding Inputs</a></strong> — the foundation the AI is built on.</li>
+<li><strong><a href="24_EventsSystem.html">24 — Events System</a></strong> — AI events.</li>
+<li><strong><a href="23_ScriptingAPI.html">23 — Scripting API</a></strong> — spawning vehicles at runtime.</li>
+</ul>
+</div>
+<div class="footer">
+Generated from: 19_AISystem.md<br>
+Date: 2026-05-22 00:32<br>
+© 2014 - 2026 BoneCracker Games — Realistic Car Controller V5.0.0
+</div>
+</body>
+</html>

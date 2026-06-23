@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>First Look — What You Got</title>
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    background: #f8f9fa;
+}
+.content {
+    background: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+h1 { color: #2c3e50; margin-top: 0; padding-bottom: 0.3em; border-bottom: 2px solid #eee; }
+h2 { color: #34495e; margin-top: 1.5em; padding-bottom: 0.2em; border-bottom: 1px solid #eee; }
+h3, h4 { color: #34495e; margin-top: 1.2em; }
+h5, h6 { color: #34495e; margin-top: 1.0em; }
+code {
+    background: #f4f4f4;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.9em;
+}
+pre {
+    background: #2d2d2d;
+    color: #f8f8f2;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
+    margin: 1em 0;
+    font-size: 0.9em;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+    color: #f8f8f2;
+    white-space: pre;
+}
+blockquote {
+    border-left: 4px solid #3498db;
+    margin: 1em 0;
+    padding: 0.5em 0 0.5em 20px;
+    color: #555;
+    background: #f9f9f9;
+}
+blockquote p { margin: 0.4em 0; }
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px 12px;
+    text-align: left;
+    vertical-align: top;
+}
+th {
+    background: #f4f4f4;
+    font-weight: bold;
+}
+tr:nth-child(even) { background: #f9f9f9; }
+a { color: #3498db; text-decoration: none; transition: color 0.2s; }
+a:hover { color: #2980b9; text-decoration: underline; }
+ul, ol { margin: 1em 0; padding-left: 30px; }
+li { margin: 0.4em 0; }
+li > ul, li > ol { margin: 0.3em 0; }
+hr { border: none; border-top: 2px solid #eee; margin: 2em 0; }
+p { margin: 1em 0; }
+.footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    color: #999;
+    font-size: 0.9em;
+    text-align: center;
+}
+
+</style>
+</head>
+<body>
+<div class="content">
+<h1 id="first-look--what-you-got">First Look — What You Got</h1>
+<p>This document gives you a guided tour of the RCC folder after import. You don't need to memorize all of it — just know enough that when you're looking for a wheel prefab, a settings asset, or a particular script, you know where to find it.</p>
+<p>Everything that ships with RCC lives under a single folder:</p>
+<pre><code>Assets/RealisticCarControllerV4/
+</code></pre>
+<p>The asset will never write outside this folder during normal use. If you ever need to remove RCC from a project, deleting that folder is enough.</p>
+<h2 id="folder-layout">Folder Layout</h2>
+<p>Here is the top-level contents of <code>Assets/RealisticCarControllerV4/</code>:</p>
+<pre><code>RealisticCarControllerV4/
+├── Demo Scenes/       (11 scenes that demonstrate every feature)
+├── Documentation/     (HTML-format documentation that ships with the package)
+├── Editor/            (custom inspectors, wizards, menu items — editor-only code)
+├── Materials/         (default materials for vehicles, environments, UI)
+├── Models/            (3D models for the demo cars, trailers, environments)
+├── Prefabs/           (vehicle prefabs, wheel prefabs, UI canvas prefabs, crashers)
+├── Resources/         (singleton ScriptableObjects loaded at runtime)
+├── Scripts/           (runtime C# code — 125 files)
+├── Settings/          (URP / HDRP profile assets shipped for those pipelines)
+├── Sounds/            (engine, gear shift, crash, wind, exhaust audio clips)
+├── Textures/          (vehicle albedo / normal / metallic maps, UI sprites)
+└── Welcome/           (the welcome window opens this scene on first install)
+</code></pre>
+<p>The two most important folders to know are <strong>Prefabs/</strong> (where the cars live) and <strong>Scripts/</strong> (where the code lives). The rest you generally don't need to open unless you're customizing visuals.</p>
+<h2 id="vehicles">Vehicles</h2>
+<h3 id="prefabsvehicles"><code>Prefabs/Vehicles/</code></h3>
+<p>This is where the playable vehicle prefabs live. RCC ships <strong>12</strong> of them:</p>
+<table>
+<thead>
+<tr>
+<th>Prefab</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CTR.prefab</code></td>
+<td>Caterham-style sports car.</td>
+</tr>
+<tr>
+<td><code>Coupe.prefab</code></td>
+<td>Generic coupe.</td>
+</tr>
+<tr>
+<td><code>F1.prefab</code></td>
+<td>Formula-1-style open-wheel race car.</td>
+</tr>
+<tr>
+<td><code>Jeep.prefab</code></td>
+<td>Off-road SUV.</td>
+</tr>
+<tr>
+<td><code>M3_E36.prefab</code></td>
+<td>BMW M3 E36 style.</td>
+</tr>
+<tr>
+<td><code>M3_E46_New.prefab</code></td>
+<td>BMW M3 E46 style.</td>
+</tr>
+<tr>
+<td><code>M5_E30.prefab</code></td>
+<td>BMW M5 E30 style.</td>
+</tr>
+<tr>
+<td><code>Muscle.prefab</code></td>
+<td>American muscle car.</td>
+</tr>
+<tr>
+<td><code>Pickup.prefab</code></td>
+<td>Pickup truck.</td>
+</tr>
+<tr>
+<td><code>Skyline.prefab</code></td>
+<td>Nissan Skyline style.</td>
+</tr>
+<tr>
+<td><code>Skyline (AI Chaser).prefab</code></td>
+<td>Skyline configured as an AI chaser.</td>
+</tr>
+<tr>
+<td><code>Truck.prefab</code></td>
+<td>Semi-trailer truck.</td>
+</tr>
+</tbody>
+</table>
+<p>These are not just art — every one is fully configured: wheel colliders set up, lights wired, audio clips assigned, engine torque curves tuned, gear ratios chosen. You can drop any of them into a scene and it will drive immediately.</p>
+<h3 id="prefabswheels"><code>Prefabs/Wheels/</code></h3>
+<p>Seven wheel models (rim + tire) you can mix and match. The Customization system uses these to let the player swap wheels at runtime.</p>
+<h3 id="prefabscrashers"><code>Prefabs/Crashers/</code></h3>
+<p>Eleven prefabs for crash testing and stunts: ramps, jumps, walls, breakaway props. Useful for demo scenes and for testing damage.</p>
+<h3 id="prefabsui"><code>Prefabs/UI/</code></h3>
+<p>Four UI canvas prefabs:</p>
+<table>
+<thead>
+<tr>
+<th>Canvas Prefab</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>RCC_Canvas.prefab</code></td>
+<td>Plain HUD: speedometer, RPM gauge, gear indicator.</td>
+</tr>
+<tr>
+<td><code>RCC_Canvas (AIO).prefab</code></td>
+<td>"All in one" — full mobile UI with touch buttons, steering wheel, and HUD.</td>
+</tr>
+<tr>
+<td><code>RCC_Canvas (API).prefab</code></td>
+<td>The demo UI used by <code>RCC_APIExample</code> to expose buttons for every runtime API call.</td>
+</tr>
+<tr>
+<td><code>RCC_Canvas (Telemetry).prefab</code></td>
+<td>A telemetry overlay showing speed, RPM, gear, wheel slip, and forces in real time.</td>
+</tr>
+</tbody>
+</table>
+<p>Drop one of these into your scene to get a working HUD. The mobile canvas auto-detects platform — on desktop the touch buttons hide; on mobile they show.</p>
+<h2 id="scripts">Scripts</h2>
+<h3 id="scripts_1"><code>Scripts/</code></h3>
+<p>The root <code>Scripts/</code> folder holds the main runtime classes. Some of the most important ones:</p>
+<ul>
+<li><strong><code>RCC.cs</code></strong> — the static public API. This is the class you call from your game code (e.g., <code>RCC.SpawnRCC()</code>, <code>RCC.SetBehavior()</code>). See <strong><a href="23_ScriptingAPI.html">23 — Scripting API</a></strong>.</li>
+<li><strong><code>RCC_Core.cs</code></strong> — base class for every RCC component. Holds static accessors for <code>RCC_Settings</code> and <code>RCC_GroundMaterials</code> and a cached lookup of the parent vehicle controller.</li>
+<li><strong><code>RCC_CarControllerV4.cs</code></strong> — the main vehicle controller, ~3,700 lines. Every car uses this. See <strong><a href="08_VehicleInspectorReference.html">08 — Vehicle Inspector Reference</a></strong>.</li>
+<li><strong><code>RCC_WheelCollider.cs</code></strong> — wraps Unity's <code>WheelCollider</code> to add friction curves, ground detection, audio, particle effects, and skidmarks. See <strong><a href="09_HowWheelCollidersWork.html">09 — How WheelColliders Work</a></strong>.</li>
+<li><strong><code>RCC_Events.cs</code></strong> — static event hub. Subscribe to vehicle spawn, AI spawn, collision, indicator toggle, etc. See <strong><a href="24_EventsSystem.html">24 — Events System</a></strong>.</li>
+<li><strong><code>RCC_Light.cs</code></strong> — vehicle light component (headlight, brake, reverse, indicator). See <strong><a href="14_LightsSystem.html">14 — Lights System</a></strong>.</li>
+<li><strong><code>RCC_Damage.cs</code></strong> — mesh deformation, detachable parts, wheel damage. Embedded inside <code>RCC_CarControllerV4</code>, not a separate component.</li>
+<li><strong><code>RCC_SceneManager.cs</code></strong> — singleton that tracks the active player vehicle, the active camera, and all RCC vehicles in the scene.</li>
+<li><strong><code>RCC_Singleton.cs</code></strong> — base class for thread-safe singletons (used by <code>RCC_SceneManager</code>, <code>RCC_InputManager</code>, <code>RCC_SkidmarksManager</code>, and others).</li>
+</ul>
+<h3 id="scriptsai"><code>Scripts/AI/</code></h3>
+<p>The waypoint AI system. Five files: <code>RCC_AICarController</code>, <code>RCC_AIWaypointsContainer</code>, <code>RCC_AIBrakeZonesContainer</code>, <code>RCC_AIBrakeZone</code>, <code>RCC_Waypoint</code>. See <strong><a href="19_AISystem.html">19 — AI System</a></strong>.</p>
+<h3 id="scriptscamera"><code>Scripts/Camera/</code></h3>
+<p>Nine camera scripts. <code>RCC_Camera</code> is the main one (per-player follow camera with multiple modes). <code>RCC_HoodCamera</code> and <code>RCC_WheelCamera</code> attach to anchor points inside a vehicle prefab. <code>RCC_FixedCamera</code> and <code>RCC_CinematicCamera</code> are scene-wide singletons. See <strong><a href="13_CameraSystem.html">13 — Camera System</a></strong>.</p>
+<h3 id="scriptscustomization"><code>Scripts/Customization/</code></h3>
+<p>Twenty-five files covering paint, spoiler, wheel, decal, neon, siren, and upgrade managers. See <strong><a href="20_Customization.html">20 — Customization</a></strong>.</p>
+<h3 id="scriptsinputs"><code>Scripts/Inputs/</code></h3>
+<p>Four input files:</p>
+<ul>
+<li><code>RCC_InputManager.cs</code> — singleton that polls the Input System and exposes a <code>RCC_Inputs</code> struct each frame.</li>
+<li><code>RCC_InputActions.cs</code> — auto-generated from <code>RCC_InputActions.inputactions</code>.</li>
+<li><code>RCC_MobileButtons.cs</code> — static class storing the mobile UI's current input values.</li>
+<li><code>RCC_Inputs.cs</code> — the input struct (throttle, brake, steer, clutch, etc.).</li>
+</ul>
+<p>See <strong><a href="16_InputSystem.html">16 — Input System</a></strong>.</p>
+<h3 id="scriptsscriptableobjects"><code>Scripts/ScriptableObjects/</code></h3>
+<p>Seven ScriptableObject classes. Their corresponding <code>.asset</code> files live under <code>Resources/RCC Assets/</code>. The most important is <strong><code>RCC_Settings</code></strong> — the master configuration file for the whole package. See <strong><a href="21_RCC_Settings.html">21 — RCC Settings Deep Dive</a></strong>.</p>
+<h3 id="scriptsui"><code>Scripts/UI/</code></h3>
+<p>Twenty-three UI classes. Dashboard widgets, the steering wheel UI, joystick, touch buttons, color picker, telemetry overlay, customization UI panels. Most of these don't need direct interaction — they hook into a <code>RCC_Canvas</code> prefab and read from the active player vehicle automatically.</p>
+<h3 id="scriptsothers"><code>Scripts/Others/</code></h3>
+<p>Sixteen miscellaneous scripts:</p>
+<ul>
+<li><strong><code>RCC_Demo.cs</code></strong> — used in the demo scenes to wire up buttons.</li>
+<li><strong><code>RCC_AIO.cs</code></strong> — used by the "all-in-one" demo scene to enable every feature.</li>
+<li><strong><code>RCC_APIExample.cs</code></strong> — example UI showing every public <code>RCC</code> API call.</li>
+<li><strong><code>RCC_CarSelectionExample.cs</code></strong> — car selection menu example.</li>
+<li><strong><code>RCC_OverrideInputsExample.cs</code></strong> — example of pumping custom inputs into a vehicle.</li>
+<li><strong><code>RCC_LevelLoader.cs</code></strong> — loads scenes preserving the selected vehicle.</li>
+<li><strong><code>RCC_Spawner.cs</code></strong> — places a vehicle at scene start.</li>
+<li><strong><code>RCC_Teleporter.cs</code></strong> — trigger volume that teleports a vehicle.</li>
+<li><strong><code>RCC_RepairStation.cs</code></strong> — trigger volume that repairs a vehicle's damage.</li>
+<li><strong><code>RCC_FuelStation.cs</code></strong> — trigger volume that refuels a vehicle.</li>
+<li><strong><code>RCC_CrashHammer.cs</code></strong>, <strong><code>RCC_CrashPress.cs</code></strong>, <strong><code>RCC_CrashShredder.cs</code></strong> — animated hazards for damage testing.</li>
+<li><strong><code>RCC_CharacterController.cs</code></strong> — a very minimal third-person character used by some demos (not a full character system).</li>
+<li><strong><code>RCC_Prop.cs</code></strong> — simple physics prop that vehicles can knock around.</li>
+</ul>
+<h2 id="editor-code">Editor Code</h2>
+<h3 id="editorcomponents"><code>Editor/Components/</code></h3>
+<p>Eight custom inspectors. Each one wraps a runtime component so that the Inspector shows clean, organized fields instead of Unity's raw default layout. For example, the <code>RCC_CarControllerV4</code> inspector groups fields into Wheels, Engine, Gears, Steering, Audio, Damage, etc., with foldouts.</p>
+<h3 id="editorinitload"><code>Editor/InitLoad/</code></h3>
+<p>Scripts that run on package import: layer setup, scripting symbol setup, input system check, install verification.</p>
+<h3 id="editorwindows"><code>Editor/Windows/</code></h3>
+<p>Twelve editor windows. The ones you'll use most often:</p>
+<ul>
+<li><strong><code>RCC_EditorWindows.cs</code></strong> — defines every menu item under <code>Tools → BoneCracker Games → Realistic Car Controller</code>.</li>
+<li><strong><code>RCC_WelcomeWindow.cs</code></strong> — the welcome dialog that opens on first import.</li>
+<li><strong><code>RCC_QuickVehicleSetupWizardWindow.cs</code></strong> — the wizard that turns a 3D model into a working RCC vehicle. See <strong><a href="07_HowToCreateNewVehicles.html">07 — Creating New Vehicles</a></strong>.</li>
+<li><strong><code>RCC_CreateNewVehicle.cs</code></strong> — utility for the wizard.</li>
+<li><strong><code>RCC_RenderPipelineConverterWindow.cs</code></strong> — converts materials between Built-in / URP / HDRP. See <strong><a href="22_RenderPipelines.html">22 — URP &amp; HDRP Conversion</a></strong>.</li>
+</ul>
+<h2 id="resources">Resources</h2>
+<h3 id="resourcesrcc-assets"><code>Resources/RCC Assets/</code></h3>
+<p>This is where all the ScriptableObject singletons live. RCC scripts load them at runtime using <code>Resources.Load("RCC Assets/&lt;name&gt;")</code>. Don't move or rename them.</p>
+<table>
+<thead>
+<tr>
+<th>Asset</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>RCC_Settings.asset</code></td>
+<td>Master configuration. Behavior presets, FPS / fixedTimeStep overrides, layer names, audio mixer, prefab references, mobile controller type. See <strong><a href="21_RCC_Settings.html">21 — RCC Settings Deep Dive</a></strong>.</td>
+</tr>
+<tr>
+<td><code>RCC_InitialSettings.asset</code></td>
+<td>Default values applied when the setup wizard creates a new vehicle (mass, drag, suspension spring/damper, friction curves).</td>
+</tr>
+<tr>
+<td><code>RCC_GroundMaterials.asset</code></td>
+<td>Per-surface friction, audio, and particles. See <strong><a href="11_GroundPhysics.html">11 — Ground Physics</a></strong>.</td>
+</tr>
+<tr>
+<td><code>RCC_DemoVehicles.asset</code></td>
+<td>Array of the 12 demo car prefabs, used by the car selection demo.</td>
+</tr>
+<tr>
+<td><code>RCC_ChangableWheels.asset</code></td>
+<td>Wheel prefabs available in the customization wheel swap menu.</td>
+</tr>
+<tr>
+<td><code>RCC_Records.asset</code></td>
+<td>Recorded replay clips (for <code>RCC.StartStopReplay()</code>).</td>
+</tr>
+<tr>
+<td><code>RCC_CustomizationSetups.asset</code></td>
+<td>Prefab references for the customization sub-managers.</td>
+</tr>
+<tr>
+<td><code>RCC_InputActions.inputactions</code></td>
+<td>The Unity Input System binding file (keyboard, gamepad, mobile).</td>
+</tr>
+</tbody>
+</table>
+<h3 id="resourcesrcc_windowskinguiskin"><code>Resources/RCC_WindowSkin.guiskin</code></h3>
+<p>A custom IMGUI skin used by the RCC editor windows and inspectors. Don't delete it — the editor tooling depends on it.</p>
+<h2 id="documentation">Documentation</h2>
+<h3 id="documentationhtml"><code>Documentation/HTML/</code></h3>
+<p>In-package HTML documentation. RCC's Welcome window has an "Open Documentation" button that opens these in your default browser. The HTML is generated from the same Markdown source you're reading now (under <code>Docs/Markdown/</code> at the project root, which is dev-side and not part of the shipped package).</p>
+<h2 id="demo-scenes">Demo Scenes</h2>
+<h3 id="demo-scenes_1"><code>Demo Scenes/</code></h3>
+<p>Eleven scenes covering every major feature. The full walkthrough is in <strong><a href="04_DemoScenes.html">04 — Demo Scenes</a></strong>, but a quick summary:</p>
+<table>
+<thead>
+<tr>
+<th>Scene</th>
+<th>What It Shows</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>RCC_Blank.unity</code></td>
+<td>Empty scene with a Scene Manager, UI canvas, and the basic setup.</td>
+</tr>
+<tr>
+<td><code>RCC_Blank_API.unity</code></td>
+<td>Demonstrates the runtime <code>RCC</code> API.</td>
+</tr>
+<tr>
+<td><code>RCC_Blank_Customization.unity</code></td>
+<td>Showroom for the customization system.</td>
+</tr>
+<tr>
+<td><code>RCC_Blank_OverrideInputs.unity</code></td>
+<td>Demonstrates pumping custom inputs into a vehicle.</td>
+</tr>
+<tr>
+<td><code>RCC_City.unity</code></td>
+<td>The "main" playable scene — a small city with one vehicle.</td>
+</tr>
+<tr>
+<td><code>RCC_City_AIO.unity</code></td>
+<td>"All in one" — every feature toggled on in a city environment.</td>
+</tr>
+<tr>
+<td><code>RCC_City_CarSelection.unity</code></td>
+<td>A car selection menu in the same scene.</td>
+</tr>
+<tr>
+<td><code>RCC_City_CarSelectionWithLoadScene.unity</code></td>
+<td>Selects a car, then loads a separate gameplay scene.</td>
+</tr>
+<tr>
+<td><code>RCC_City_CarSelectionWithLoadedScene.unity</code></td>
+<td>The "loaded scene" half of the pair above.</td>
+</tr>
+<tr>
+<td><code>RCC_Damage.unity</code></td>
+<td>Damage demonstration arena with crashers.</td>
+</tr>
+<tr>
+<td><code>RCC_Multiple_Terrain.unity</code></td>
+<td>Off-road terrain with multiple surfaces and ground material switching.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="what-you-can-safely-modify">What You Can Safely Modify</h2>
+<p>You can change any <strong>asset</strong> (textures, materials, models, sounds) freely — they're project files like any other.</p>
+<p>You can change <code>RCC_Settings.asset</code> and <code>RCC_GroundMaterials.asset</code> to tune your game — but make a backup of the originals before doing so (Git is the easiest way), because updating RCC in the future will overwrite them.</p>
+<p>You can change <strong>runtime scripts</strong> (the <code>.cs</code> files), but doing so makes updates messy because future RCC versions overwrite the scripts when you re-import. If you want to extend RCC behavior, <strong>prefer subscribing to <code>RCC_Events</code> from your own scripts</strong> instead of modifying RCC code directly. See <strong><a href="24_EventsSystem.html">24 — Events System</a></strong> for the pattern.</p>
+<h2 id="next-steps">Next Steps</h2>
+<p>You now know where everything lives. Continue with <strong><a href="04_DemoScenes.html">04 — Demo Scenes</a></strong> to see RCC in action, or jump to <strong><a href="05_QuickStart.html">05 — Quick Start</a></strong> to drop a vehicle into your own scene.</p>
+</div>
+<div class="footer">
+Generated from: 03_FirstLook.md<br>
+Date: 2026-05-22 00:32<br>
+© 2014 - 2026 BoneCracker Games — Realistic Car Controller V5.0.0
+</div>
+</body>
+</html>

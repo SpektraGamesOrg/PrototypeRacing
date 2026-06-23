@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Damage System</title>
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    background: #f8f9fa;
+}
+.content {
+    background: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+h1 { color: #2c3e50; margin-top: 0; padding-bottom: 0.3em; border-bottom: 2px solid #eee; }
+h2 { color: #34495e; margin-top: 1.5em; padding-bottom: 0.2em; border-bottom: 1px solid #eee; }
+h3, h4 { color: #34495e; margin-top: 1.2em; }
+h5, h6 { color: #34495e; margin-top: 1.0em; }
+code {
+    background: #f4f4f4;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.9em;
+}
+pre {
+    background: #2d2d2d;
+    color: #f8f8f2;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
+    margin: 1em 0;
+    font-size: 0.9em;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+    color: #f8f8f2;
+    white-space: pre;
+}
+blockquote {
+    border-left: 4px solid #3498db;
+    margin: 1em 0;
+    padding: 0.5em 0 0.5em 20px;
+    color: #555;
+    background: #f9f9f9;
+}
+blockquote p { margin: 0.4em 0; }
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px 12px;
+    text-align: left;
+    vertical-align: top;
+}
+th {
+    background: #f4f4f4;
+    font-weight: bold;
+}
+tr:nth-child(even) { background: #f9f9f9; }
+a { color: #3498db; text-decoration: none; transition: color 0.2s; }
+a:hover { color: #2980b9; text-decoration: underline; }
+ul, ol { margin: 1em 0; padding-left: 30px; }
+li { margin: 0.4em 0; }
+li > ul, li > ol { margin: 0.3em 0; }
+hr { border: none; border-top: 2px solid #eee; margin: 2em 0; }
+p { margin: 1em 0; }
+.footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    color: #999;
+    font-size: 0.9em;
+    text-align: center;
+}
+
+</style>
+</head>
+<body>
+<div class="content">
+<h1 id="damage-system">Damage System</h1>
+<p>RCC has a comprehensive damage system that handles mesh deformation, detachable body parts, wheel damage, and broken lights. This document explains how each piece works, how to configure it, and how to extend it for your own gameplay (e.g., destruction derbies, demolition modes, vehicular combat).</p>
+<p>The damage system is <strong>embedded</strong> into <code>RCC_CarControllerV4</code> rather than being a separate component — the field is <code>damage</code> of type <code>RCC_Damage</code>, marked <code>[System.Serializable]</code>. This is by design and is the source of one common confusion: you can't add a "Damage" component, because it's already part of the controller.</p>
+<h2 id="what-damage-affects">What Damage Affects</h2>
+<p>When a vehicle takes damage, four visible things change:</p>
+<ol>
+<li><strong>Mesh deformation</strong> — vertices on the body push inward at collision contact points.</li>
+<li><strong>Detachable parts</strong> — hoods, doors, bumpers can break off and become physics objects.</li>
+<li><strong>Wheel damage</strong> — wheels can shift out of alignment or pop off entirely.</li>
+<li><strong>Light damage</strong> — bulbs stop emitting light.</li>
+</ol>
+<p>Each is configurable independently. You can enable all of them, or just the parts you want.</p>
+<h2 id="enabling-damage">Enabling Damage</h2>
+<p>The top-level toggle is <strong>Use Damage</strong> in the <code>RCC_Damage</code> section of the Inspector. When off, no damage is processed (the vehicle is invincible). When on, damage accumulates from collisions.</p>
+<p>By default this is on. To make a vehicle invincible (e.g., a tutorial mode or a "ghost car"), uncheck it.</p>
+<h2 id="damage-sensitivity">Damage Sensitivity</h2>
+<p>Three fields control how easily the vehicle takes damage:</p>
+<ul>
+<li><strong>Damage Multiplier</strong> — global scalar. Default 1.0. Higher = more damage per collision.</li>
+<li><strong>Max Damage</strong> — the cap on accumulated damage. Once reached, mesh deformation stops at the cap. Default 100.</li>
+<li><strong>Use Mesh Deformation</strong> — if false, only part / wheel / light damage processes; mesh stays intact.</li>
+</ul>
+<p>For a destruction derby game, increase <code>Damage Multiplier</code> to 2–3. For a casual driving game where minor scrapes shouldn't be visible, decrease it to 0.5.</p>
+<h2 id="mesh-deformation">Mesh Deformation</h2>
+<p>When the vehicle hits something hard enough, the affected body mesh has its vertices pushed inward from the collision point. The deformation depth scales with collision force.</p>
+<h3 id="how-it-works">How It Works</h3>
+<ol>
+<li>On <code>OnCollisionEnter</code>, the controller reads each <code>ContactPoint</code>.</li>
+<li>For each contact, it builds a query: "find every vertex within deformation radius of this point."</li>
+<li>The query is served by an <code>RCC_Octree</code> — a spatial data structure built from the body mesh's vertices at startup. Octree queries are O(log N) instead of O(N), which matters for high-poly cars.</li>
+<li>Found vertices are displaced inward along the collision normal, scaled by force and damage multiplier.</li>
+<li>The mesh is marked dirty and Unity re-uploads it to the GPU.</li>
+</ol>
+<h3 id="configuration">Configuration</h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>What It Does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Use Mesh Deformation</strong></td>
+<td>Enable deformation.</td>
+</tr>
+<tr>
+<td><strong>Damage Radius</strong></td>
+<td>How wide the deformation effect is per contact point.</td>
+</tr>
+<tr>
+<td><strong>Deformation Vertices Damage Multiplier</strong></td>
+<td>Per-vertex displacement scalar.</td>
+</tr>
+<tr>
+<td><strong>Original Meshes Pose</strong></td>
+<td>A pre-recorded list of rest positions for all body vertices. Recreated by clicking <strong>Recalculate Original Meshes</strong>.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="recalculate-original-meshes">"Recalculate Original Meshes"</h3>
+<p>If you change the vehicle's body mesh, you must regenerate the octree and the rest pose. Click <strong>Recalculate Original Meshes</strong> in the damage section. This is also necessary after attaching new detachable parts or changing the vehicle's hierarchy.</p>
+<h3 id="mesh-deformation-caveats">Mesh Deformation Caveats</h3>
+<ul>
+<li>Only <strong>child meshes of the vehicle</strong> that have a <code>MeshFilter</code> and a <code>MeshRenderer</code> get deformation. Skinned meshes (SkinnedMeshRenderer) are not deformed — this is a Unity limitation, not RCC's.</li>
+<li>Deformation is <strong>non-reversible by default</strong>, but <code>RCC.Repair()</code> resets all vertices to their rest pose. To repair without repair, set <code>damage.repairNow = true</code>.</li>
+<li>Mesh deformation has a performance cost proportional to the polygon count of the deformed mesh. Very high-poly meshes (50k+ verts) may stutter on mobile.</li>
+</ul>
+<h2 id="detachable-parts">Detachable Parts</h2>
+<p>A "detachable part" is a body part (hood, door, bumper, mirror) that can break off the vehicle on enough damage and become a separate physics object.</p>
+<h3 id="setup">Setup</h3>
+<ol>
+<li>Create the body part as a separate child GameObject under the vehicle root.</li>
+<li>Position it at the rest location.</li>
+<li>Add a <code>Rigidbody</code> component (keep it kinematic for now — the controller will un-kinematic it on break).</li>
+<li>Add a <code>Collider</code> (BoxCollider or MeshCollider).</li>
+<li>Add a <code>ConfigurableJoint</code> component connecting it to the vehicle's Rigidbody.</li>
+<li>Add an <code>RCC_DetachablePart</code> component.</li>
+</ol>
+<p>The <code>ConfigurableJoint</code> is what holds the part to the body — when its <code>breakForce</code> is exceeded, Unity breaks the joint and the part becomes free.</p>
+<h3 id="rcc_detachablepart-configuration"><code>RCC_DetachablePart</code> Configuration</h3>
+<ul>
+<li><strong>Joint Type</strong> — Hood, Trunk, Door, Bumper, etc. Affects which animation plays during damage.</li>
+<li><strong>Break Force</strong> — How much force (N) the joint can withstand before breaking. Default 6000.</li>
+<li><strong>Break Torque</strong> — How much torque (Nm) before breaking.</li>
+<li><strong>Strength</strong> — Multiplier on the part's HP. Higher = more resistant.</li>
+</ul>
+<p>When the part breaks, the joint is removed, the rigidbody becomes non-kinematic, and gravity takes over.</p>
+<h3 id="reattaching-parts-on-repair">Reattaching Parts on Repair</h3>
+<p><code>RCC.Repair(carController)</code> re-parents broken parts back to the vehicle, restores their kinematic state, and recreates the joint. The part returns to its rest pose.</p>
+<h3 id="built-in-detachable-part-examples">Built-in Detachable Part Examples</h3>
+<p>Open one of the demo vehicle prefabs (e.g., <code>M3_E46_New.prefab</code>) and look at its children. You'll find pre-configured detachable parts for the hood and bumpers. Use these as a template when adding your own.</p>
+<h2 id="wheel-damage">Wheel Damage</h2>
+<p>Wheels can shift out of alignment or pop off entirely.</p>
+<h3 id="how-it-works_1">How It Works</h3>
+<p>When the wheel takes a strong sideways impact:</p>
+<ol>
+<li>The wheel's pivot transform shifts away from its rest position.</li>
+<li>The wheel collider remains at its original position (the visible wheel pivots away from the physics wheel).</li>
+<li>At high damage, the wheel is "popped off" — the wheel mesh is detached and falls as a rigidbody.</li>
+</ol>
+<h3 id="configuration_1">Configuration</h3>
+<ul>
+<li><strong>Use Wheel Damage</strong> — Enable wheel damage.</li>
+<li><strong>Wheel Damage Radius</strong> — How far from the wheel a collision counts as wheel damage.</li>
+<li><strong>Wheel Damage Multiplier</strong> — How easily the wheel takes damage.</li>
+<li><strong>Wheel Detach Multiplier</strong> — How quickly the wheel pops off vs just shifting.</li>
+</ul>
+<h3 id="repair">Repair</h3>
+<p><code>RCC.Repair()</code> resets each wheel transform to its rest pose and reattaches any popped-off wheels.</p>
+<h2 id="light-damage">Light Damage</h2>
+<p>When the vehicle is damaged enough at the front (where headlights are) or back (brake/reverse lights), individual lights can be marked broken and stop emitting.</p>
+<h3 id="how-it-works_2">How It Works</h3>
+<p>The <code>RCC_Damage</code> system tracks each <code>RCC_Light</code> component on the vehicle and assigns it a damage score based on impacts in its vicinity. When the score exceeds a threshold, the light's intensity is forced to 0 and a small visible "broken bulb" effect plays (configured in the light's prefab — see <strong><a href="14_LightsSystem.html">14 — Lights System</a></strong>).</p>
+<h3 id="configuration_2">Configuration</h3>
+<ul>
+<li><strong>Use Light Damage</strong> — Enable light damage.</li>
+<li><strong>Light Damage Radius</strong> — How far from a light a collision counts.</li>
+<li><strong>Light Damage Multiplier</strong> — How easily lights break.</li>
+</ul>
+<h3 id="repair_1">Repair</h3>
+<p><code>RCC.Repair()</code> restores all lights to their original intensity.</p>
+<h2 id="repairing">Repairing</h2>
+<p>There are three ways to repair a vehicle:</p>
+<h3 id="1-repair-now-direct">1. Repair Now (Direct)</h3>
+<p>In code:</p>
+<pre><code class="language-csharp">carController.damage.repairNow = true;
+</code></pre>
+<p>This triggers a full repair in the next FixedUpdate.</p>
+<h3 id="2-public-api">2. Public API</h3>
+<pre><code class="language-csharp">RCC.Repair(carController);   // Repair a specific vehicle.
+RCC.Repair();                 // Repair the active player vehicle.
+</code></pre>
+<p>Both call the same code path.</p>
+<h3 id="3-repair-station-prefab">3. Repair Station Prefab</h3>
+<p>Drop the <code>RCC_RepairStation</code> prefab into your scene. It's a trigger volume — when the player drives into it, the vehicle repairs automatically. You can edit the visual appearance of the trigger volume to look like a gas-station-style repair booth, a wrench icon on the ground, or whatever fits your art style.</p>
+<p>The repair station's logic is in <code>Scripts/Others/RCC_RepairStation.cs</code> — a few dozen lines you can adapt for any custom repair logic (e.g., charge the player money on repair).</p>
+<h2 id="damage-events">Damage Events</h2>
+<p>Subscribe to collision events through <code>RCC_Events</code>:</p>
+<pre><code class="language-csharp">using UnityEngine;
+
+public class DamageLogger : MonoBehaviour {
+    void OnEnable()  { RCC_Events.OnRCCPlayerCollision += HandleCollision; }
+    void OnDisable() { RCC_Events.OnRCCPlayerCollision -= HandleCollision; }
+
+    void HandleCollision(RCC_CarControllerV4 vehicle, Collision collision) {
+        float impactSpeed = collision.relativeVelocity.magnitude;
+        Debug.Log($&quot;Crashed at {impactSpeed:F1} m/s into {collision.gameObject.name}&quot;);
+        // Subtract score, play sound, etc.
+    }
+}
+</code></pre>
+<p>The event fires inside <code>RCC_CarControllerV4.OnCollisionEnter</code>. The collision parameter is Unity's standard <code>Collision</code> struct, so you have access to contact points, relative velocity, the other collider, etc.</p>
+<h2 id="damage-state-queries">Damage State Queries</h2>
+<p>In your own game code, you may want to know whether the player has taken too much damage (e.g., to fail a mission, or to disable the vehicle until repaired):</p>
+<pre><code class="language-csharp">RCC_CarControllerV4 vehicle = RCC_SceneManager.Instance.activePlayerVehicle;
+if (vehicle != null) {
+    float currentDamage = vehicle.damage.totalDamage;
+    float maxDamage = vehicle.damage.maxDamage;
+    float damagePercent = currentDamage / maxDamage;
+    if (damagePercent &gt;= 1.0f) {
+        // Vehicle is fully damaged.
+    }
+}
+</code></pre>
+<p>(Field names may vary slightly — check <code>RCC_Damage.cs</code> for the actual field your version exposes.)</p>
+<h2 id="tuning-damage-feel">Tuning Damage Feel</h2>
+<p>The damage system has many knobs. Here are the most useful tuning levers in order of impact:</p>
+<ol>
+<li><strong>Damage Multiplier</strong> — overall sensitivity. Adjust this first.</li>
+<li><strong>Damage Radius</strong> — how local each impact's deformation is. Larger = wider dents.</li>
+<li><strong>Detachable Part Break Force</strong> — when parts come off. Lower for action games, higher for sim.</li>
+<li><strong>Wheel Damage Multiplier</strong> — how easily wheels go out of alignment.</li>
+<li><strong>Light Damage Multiplier</strong> — how easily lights break.</li>
+</ol>
+<p>For a <strong>destruction derby</strong> game, set:</p>
+<ul>
+<li>Damage Multiplier: 2.0–3.0</li>
+<li>Detachable Break Force: 3000 (low — parts fly off easily)</li>
+<li>Wheel Detach Multiplier: 2.0 (wheels pop off on big hits)</li>
+</ul>
+<p>For a <strong>casual driving</strong> game, set:</p>
+<ul>
+<li>Damage Multiplier: 0.3–0.5</li>
+<li>Detachable Break Force: 12000 (high — parts rarely break)</li>
+<li>Wheel Detach Multiplier: 0.5 (wheels almost never pop off)</li>
+</ul>
+<p>For a <strong>simulator</strong>, leave defaults — they're tuned for realistic feel.</p>
+<h2 id="performance-considerations">Performance Considerations</h2>
+<p>Damage processing has two costs:</p>
+<ol>
+<li><strong>Octree build at startup</strong> — proportional to total vehicle vertices. ~10 ms for a 10k-vertex car. One-time only.</li>
+<li><strong>Per-collision deformation</strong> — proportional to vertices within damage radius. Usually negligible (&lt;1 ms).</li>
+</ol>
+<p>Detachable parts and broken wheels create runtime rigidbodies — Unity-default physics objects. A vehicle with 5 broken parts is roughly equivalent in cost to a vehicle with 5 child rigidbodies, which is fine on desktop and acceptable on mobile.</p>
+<p>If you have many damaged vehicles in a scene (e.g., a wrecking yard environment), consider disabling damage on background vehicles and only enabling it on the active player + AI opponents.</p>
+<h2 id="common-damage-issues">Common Damage Issues</h2>
+<h3 id="mesh-deformation-doesnt-work">"Mesh deformation doesn't work"</h3>
+<p>Most common: the body mesh is a <code>SkinnedMeshRenderer</code> instead of a <code>MeshRenderer</code>. Skinned meshes can't be deformed by RCC. Convert the body to a static mesh (right-click the mesh asset → Re-Import with skinning disabled).</p>
+<p>Second most common: <code>Recalculate Original Meshes</code> hasn't been clicked since the prefab was modified. Click it and try again.</p>
+<h3 id="detachable-parts-fall-off-too-easily--too-hard">"Detachable parts fall off too easily / too hard"</h3>
+<p>Adjust <code>Break Force</code> on each <code>ConfigurableJoint</code>. Test at intentional impact speeds (e.g., drive into a wall at 30 km/h) until breakaway threshold feels right.</p>
+<h3 id="the-wheels-look-broken-after-a-small-bump">"The wheels look broken after a small bump"</h3>
+<p><code>Wheel Damage Multiplier</code> is too high. Lower it.</p>
+<h3 id="i-clicked-repair-but-the-parts-didnt-come-back">"I clicked Repair but the parts didn't come back"</h3>
+<p>The detachable parts need to be children of the vehicle when Repair is called. If a part has been completely destroyed (e.g., its GameObject was destroyed by an explosion in your own code), it can't be restored. The repair only resets parts that are still in the scene.</p>
+<h2 id="next-steps">Next Steps</h2>
+<ul>
+<li><strong><a href="14_LightsSystem.html">14 — Lights System</a></strong> — light configuration including damage.</li>
+<li><strong><a href="24_EventsSystem.html">24 — Events System</a></strong> — subscribing to collision events.</li>
+<li><strong><a href="23_ScriptingAPI.html">23 — Scripting API</a></strong> — <code>RCC.Repair()</code> and related calls.</li>
+</ul>
+</div>
+<div class="footer">
+Generated from: 12_DamageSystem.md<br>
+Date: 2026-05-22 00:32<br>
+© 2014 - 2026 BoneCracker Games — Realistic Car Controller V5.0.0
+</div>
+</body>
+</html>

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: a92e53a6daa23554ab3fb85993b8b10d
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 16296
+  packageName: Realistic Car Controller
+  packageVersion: 5.0.0
+  assetPath: Assets/RealisticCarControllerV4/Shaders/URP/URP shaders will be stored
+    here.txt
+  uploadId: 920646

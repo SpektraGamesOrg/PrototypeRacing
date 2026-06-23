@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Vehicle Inspector Reference</title>
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    background: #f8f9fa;
+}
+.content {
+    background: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+h1 { color: #2c3e50; margin-top: 0; padding-bottom: 0.3em; border-bottom: 2px solid #eee; }
+h2 { color: #34495e; margin-top: 1.5em; padding-bottom: 0.2em; border-bottom: 1px solid #eee; }
+h3, h4 { color: #34495e; margin-top: 1.2em; }
+h5, h6 { color: #34495e; margin-top: 1.0em; }
+code {
+    background: #f4f4f4;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.9em;
+}
+pre {
+    background: #2d2d2d;
+    color: #f8f8f2;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
+    margin: 1em 0;
+    font-size: 0.9em;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+    color: #f8f8f2;
+    white-space: pre;
+}
+blockquote {
+    border-left: 4px solid #3498db;
+    margin: 1em 0;
+    padding: 0.5em 0 0.5em 20px;
+    color: #555;
+    background: #f9f9f9;
+}
+blockquote p { margin: 0.4em 0; }
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px 12px;
+    text-align: left;
+    vertical-align: top;
+}
+th {
+    background: #f4f4f4;
+    font-weight: bold;
+}
+tr:nth-child(even) { background: #f9f9f9; }
+a { color: #3498db; text-decoration: none; transition: color 0.2s; }
+a:hover { color: #2980b9; text-decoration: underline; }
+ul, ol { margin: 1em 0; padding-left: 30px; }
+li { margin: 0.4em 0; }
+li > ul, li > ol { margin: 0.3em 0; }
+hr { border: none; border-top: 2px solid #eee; margin: 2em 0; }
+p { margin: 1em 0; }
+.footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    color: #999;
+    font-size: 0.9em;
+    text-align: center;
+}
+
+</style>
+</head>
+<body>
+<div class="content">
+<h1 id="vehicle-inspector-reference">Vehicle Inspector Reference</h1>
+<p>This document walks through every section on the <code>RCC_CarControllerV4</code> Inspector. The Inspector has roughly 140 serialized fields organized into foldout groups. We'll cover them in the order they appear so you can scroll through your own car's Inspector and follow along.</p>
+<p>This is a <strong>reference document</strong> — read the section you need and skip the rest. If you're new to RCC, you don't need to memorize all of it. Most fields have sensible defaults and you'll change maybe a dozen during normal tuning.</p>
+<p>If you don't have a vehicle to look at, open <code>Assets/RealisticCarControllerV4/Prefabs/Vehicles/M3_E46_New.prefab</code> and follow along.</p>
+<h2 id="top-level-toggles">Top-Level Toggles</h2>
+<p>These three checkboxes appear at the very top, above all foldouts.</p>
+<h3 id="can-control">Can Control</h3>
+<p>Whether the vehicle accepts inputs from <code>RCC_InputManager</code>. Turn this <strong>off</strong> to lock the car (e.g., during a cutscene, before a race countdown, or when paused). The engine keeps running and physics keep working — only player inputs are ignored.</p>
+<p>In code: <code>carController.SetCanControl(false)</code>.</p>
+<h3 id="is-grounded">Is Grounded</h3>
+<p>A live status indicator showing whether <strong>at least one wheel</strong> is touching the ground. Don't edit this — it's set automatically each frame. Useful in your own scripts: <code>if (carController.isGrounded) { ... }</code>.</p>
+<h3 id="override-behavior">Override Behavior</h3>
+<p>When <strong>off</strong> (default), the vehicle inherits its driving feel from the active behavior preset in <code>RCC_Settings</code>. When <strong>on</strong>, the vehicle ignores the global preset and uses the fields configured on this individual controller.</p>
+<p>Use this when one specific vehicle in your scene needs to behave differently from the rest — for example, a tank that should always be in a "heavy slow" mode regardless of what the global behavior is. For normal use, leave it off and switch behaviors globally via <code>RCC.SetBehavior()</code>.</p>
+<h3 id="override-inputs">Override Inputs</h3>
+<p>When <strong>on</strong>, the vehicle ignores the InputManager and only accepts inputs from <code>OverrideInputs(RCC_Inputs)</code>. This is the AI / replay / networked-vehicle path. Don't enable this for a player vehicle. See <strong><a href="17_HowToOverrideInputs.html">17 — Overriding Inputs</a></strong>.</p>
+<h2 id="wheels">Wheels</h2>
+<p>This foldout groups everything related to wheels.</p>
+<h3 id="frontleftwheeltransform--frontrightwheeltransform--rearleftwheeltransform--rearrightwheeltransform">FrontLeftWheelTransform / FrontRightWheelTransform / RearLeftWheelTransform / RearRightWheelTransform</h3>
+<p>The four <strong>visible wheel mesh</strong> transforms. The controller rotates and pitches these each frame to match the underlying wheel collider's pose. If you swap a wheel model, drag the new transform here.</p>
+<h3 id="extrarearwheelstransform">ExtraRearWheelsTransform[]</h3>
+<p>For vehicles with more than 4 wheels (trucks, 6-wheelers). Drag the extra wheel meshes into this array. Set <code>hasExtraWheels = true</code> for these to be processed.</p>
+<h3 id="frontleftwheelcollider--frontrightwheelcollider--rearleftwheelcollider--rearrightwheelcollider">FrontLeftWheelCollider / FrontRightWheelCollider / RearLeftWheelCollider / RearRightWheelCollider</h3>
+<p>The four <code>RCC_WheelCollider</code> components on the wheel collider child GameObjects. These are the physics colliders, not the visible wheels. The wizard creates and assigns these automatically.</p>
+<h3 id="extrarearwheelscollider">ExtraRearWheelsCollider[]</h3>
+<p>Same as above for the extra wheels.</p>
+<h3 id="has-extra-wheels">Has Extra Wheels</h3>
+<p>Toggle on when your vehicle has more than 4 wheels.</p>
+<h3 id="override-all-wheels">Override All Wheels</h3>
+<p>When on, certain wheel settings (like the friction curve override on the wheel collider) apply uniformly to every wheel. When off, you can configure each wheel individually. Off by default.</p>
+<h3 id="powered-wheels">Powered Wheels</h3>
+<p>The count of wheels that actually receive engine torque. Used to divide the engine's total torque among them. For a 4-wheel-drive car with <code>WheelType.AWD</code>, this is 4; for a rear-wheel-drive car (<code>RWD</code>), it's 2.</p>
+<h2 id="steering-wheel-interior">Steering Wheel (Interior)</h2>
+<p>Optional, only relevant if your car has a visible 3D steering wheel mesh inside the cockpit.</p>
+<h3 id="steeringwheel">SteeringWheel</h3>
+<p>The 3D steering wheel mesh transform.</p>
+<h3 id="steering-wheel-rotate-around">Steering Wheel Rotate Around</h3>
+<p>Which local axis the wheel rotates around. Most vehicles use <strong>ZAxis</strong>; if your model is oriented unusually, switch to X or Y.</p>
+<h3 id="steering-wheel-angle-multiplier">Steering Wheel Angle Multiplier</h3>
+<p>How many degrees the visible wheel rotates per unit of input. Higher = more visible rotation. Default 11 (suitable for sports cars). Use 15+ for trucks with deeper steering racks.</p>
+<h2 id="drivetrain">Drivetrain</h2>
+<h3 id="wheel-type-choise-fwd--rwd--awd--biased">Wheel Type Choise (FWD / RWD / AWD / BIASED)</h3>
+<p>How engine torque is distributed:</p>
+<ul>
+<li><strong>FWD</strong> — Front-wheel drive. Front wheels get all torque.</li>
+<li><strong>RWD</strong> — Rear-wheel drive. Rear wheels get all torque. The most common setup for performance cars.</li>
+<li><strong>AWD</strong> — All-wheel drive. Torque split evenly across all powered wheels.</li>
+<li><strong>BIASED</strong> — All-wheel drive with adjustable front/rear bias.</li>
+</ul>
+<p>For BIASED, additional sub-fields appear letting you control the front/rear torque ratio.</p>
+<h2 id="ai--external-controller">AI / External Controller</h2>
+<h3 id="external-controller">External Controller</h3>
+<p>When on, the controller doesn't auto-start the engine on Awake and doesn't apply player input. This flag is set automatically when an AI script attaches to the vehicle. You normally don't toggle this manually.</p>
+<h2 id="steering-configuration">Steering Configuration</h2>
+<h3 id="steering-type">Steering Type</h3>
+<p>How the max steering angle is calculated:</p>
+<ul>
+<li><strong>Curve</strong> — Looked up from <code>steerAngleCurve</code> based on speed. Recommended for most vehicles.</li>
+<li><strong>Simple</strong> — Linearly interpolates between <code>steerAngle</code> (low speed) and <code>highspeedsteerAngle</code> (high speed).</li>
+<li><strong>Constant</strong> — Always uses <code>steerAngle</code>, ignoring speed.</li>
+</ul>
+<h3 id="steer-angle-curve">Steer Angle Curve</h3>
+<p>The curve mapping vehicle speed (x-axis, km/h) to max steering angle (y-axis, degrees). Default starts at 40° at 0 km/h, drops to 10° at 120 km/h, and 7° at 200 km/h. This is what makes high-speed steering feel realistic — at 200 km/h, full lock wouldn't work the same as at 30 km/h.</p>
+<h3 id="steer-angle">Steer Angle</h3>
+<p>Maximum steering angle at low speed. Used by <strong>Constant</strong> and <strong>Simple</strong> steering modes.</p>
+<h3 id="highspeed-steer-angle">Highspeed Steer Angle</h3>
+<p>Steering angle at high speed (<code>highspeedsteerAngleAtspeed</code> km/h and above). Used by <strong>Simple</strong> mode.</p>
+<h3 id="highspeed-steer-angle-at-speed">Highspeed Steer Angle At Speed</h3>
+<p>The speed (km/h) at which <code>highspeedsteerAngle</code> is fully applied. Default 120 km/h.</p>
+<h3 id="anti-roll-front-horizontal--rear-horizontal">Anti Roll Front Horizontal / Rear Horizontal</h3>
+<p>Lateral anti-roll bar force in Newtons. Higher values reduce body roll in turns and make the car feel stiffer. Default 1000 N. For a heavy SUV, try 2000–5000.</p>
+<h3 id="anti-roll-vertical">Anti Roll Vertical</h3>
+<p>Additional vertical anti-roll force for high-COM vehicles like monster trucks. Default 0.</p>
+<h2 id="vehicle-configuration">Vehicle Configuration</h2>
+<h3 id="com">COM</h3>
+<p>The transform used as the center of mass. RCC reads <code>COM.localPosition</code> and applies it to the Rigidbody's <code>centerOfMass</code>. Moving this transform live in the Scene view immediately shifts the car's handling.</p>
+<h3 id="com-assister">COM Assister</h3>
+<p>Dynamically shifts COM at runtime based on the vehicle's rotation:</p>
+<ul>
+<li><strong>Off</strong> — Static COM.</li>
+<li><strong>Slight</strong> — Small COM shift opposite to roll. Improves stability in turns.</li>
+<li><strong>Medium</strong> — Larger shift.</li>
+<li><strong>Opposite</strong> — Shifts COM the <em>opposite</em> way (rarely useful, simulates a high-COM vehicle).</li>
+</ul>
+<h3 id="brake-torque">Brake Torque</h3>
+<p>Maximum brake torque per wheel in Nm. Default 2000 Nm. Higher = stronger brakes.</p>
+<h3 id="down-force">Down Force</h3>
+<p>Aerodynamic downforce coefficient multiplied by speed. Default 25. Higher values pin the car to the ground at high speed. Set to 0 for a vehicle that should lift off ramps.</p>
+<h3 id="speed">Speed</h3>
+<p>The current vehicle speed in km/h or mph (depending on <code>RCC_Settings.units</code>). Read-only — this is what gauges read from.</p>
+<h3 id="max-speed">Max Speed</h3>
+<p>The theoretical top speed calculated from engine RPM → gear ratio → final drive ratio. Read-only.</p>
+<h3 id="limit-max-speed--limit-max-speed-at">Limit Max Speed / Limit Max Speed At</h3>
+<p>If <code>limitMaxSpeed</code> is on, the vehicle is hard-capped at <code>limitMaxSpeedAt</code> km/h. Useful for speed-limited demo vehicles or to enforce a track speed limit.</p>
+<h2 id="engine">Engine</h2>
+<h3 id="engine-torque-curve">Engine Torque Curve</h3>
+<p>Engine torque (Nm) as a function of RPM. Auto-generated if <code>autoGenerateEngineRPMCurve</code> is on.</p>
+<h3 id="auto-generate-engine-rpm-curve">Auto Generate Engine RPM Curve</h3>
+<p>Regenerates the torque curve whenever you change <code>maxEngineTorque</code>, <code>maxEngineTorqueAtRPM</code>, <code>minEngineRPM</code>, or <code>maxEngineRPM</code>. Leave on for sensible defaults; turn off if you want to hand-tune the curve.</p>
+<h3 id="max-engine-torque">Max Engine Torque</h3>
+<p>Peak torque in Newton-meters. Sports cars: 300–500 Nm. Trucks: 1500–3000 Nm. Default 300 Nm.</p>
+<h3 id="max-engine-torque-at-rpm">Max Engine Torque At RPM</h3>
+<p>The RPM where peak torque is achieved. Default 5500 RPM. Diesel trucks peak lower (~2000 RPM); high-revving sports engines peak higher (~7000 RPM).</p>
+<h3 id="min-engine-rpm">Min Engine RPM</h3>
+<p>Idle RPM. Default 800.</p>
+<h3 id="max-engine-rpm">Max Engine RPM</h3>
+<p>Redline RPM. Default 7000. Above this, the rev limiter cuts throttle (if <code>useRevLimiter</code> is on).</p>
+<h3 id="engine-rpm">Engine RPM</h3>
+<p>Current smoothed RPM. Read-only — UI gauges read from this.</p>
+<h3 id="engine-rpm-raw">Engine RPM Raw</h3>
+<p>Unsmoothed RPM. Internal use.</p>
+<h3 id="engine-inertia">Engine Inertia</h3>
+<p>How quickly RPM responds to throttle changes. Range 0.02–0.4. Lower = faster reactions (race engines), higher = slower (truck engines). Default 0.15.</p>
+<h3 id="use-rev-limiter">Use Rev Limiter</h3>
+<p>When on, cuts throttle at <code>maxEngineRPM</code> to prevent over-revving.</p>
+<h3 id="use-exhaust-flame">Use Exhaust Flame</h3>
+<p>When on, the exhaust can spit a flame when you lift off the throttle at high RPM. Looks great on sports cars; turn off for trucks.</p>
+<h3 id="run-engine-at-awake">Run Engine At Awake</h3>
+<p>When on, the engine starts running automatically when the vehicle spawns. Turn off for ignition-key gameplay (player has to manually start).</p>
+<h3 id="engine-running">Engine Running</h3>
+<p>Current engine state. Toggle in code via <code>carController.StartEngine()</code> and <code>carController.KillEngine()</code>, or via <code>RCC.SetEngine(carController, true)</code>.</p>
+<h2 id="steering-assistance">Steering Assistance</h2>
+<p>These toggles control how much help the driver gets in keeping the car straight. The active behavior preset usually controls these; this section is a per-vehicle override when <code>overrideBehavior</code> is on.</p>
+<h3 id="use-steering-limiter">Use Steering Limiter</h3>
+<p>When on, reduces max steering angle when the car is sliding. Prevents the player from making the slide worse with full lock.</p>
+<h3 id="use-counter-steering">Use Counter Steering</h3>
+<p>When on, the car automatically counter-steers when sliding. Helps the player drift.</p>
+<h3 id="use-steering-sensitivity">Use Steering Sensitivity</h3>
+<p>When on, smooths large steering input changes over time. Without this, snapping the wheel from full left to full right instantly upsets the physics.</p>
+<h3 id="counter-steering-factor">Counter Steering Factor</h3>
+<p>How aggressive the auto counter-steer is. Range 0–1. Default 0.5.</p>
+<h3 id="steering-sensitivity-factor">Steering Sensitivity Factor</h3>
+<p>How responsive steering is. Range 0.05–1. Lower = smoother, higher = snappier. Default 1.</p>
+<h2 id="fuel-system">Fuel System</h2>
+<h3 id="use-fuel-consumption">Use Fuel Consumption</h3>
+<p>When on, the engine consumes fuel and can run out. Off by default.</p>
+<h3 id="fuel-tank-capacity--fuel-tank">Fuel Tank Capacity / Fuel Tank</h3>
+<p>Max capacity in liters / current amount.</p>
+<h3 id="fuel-consumption-rate">Fuel Consumption Rate</h3>
+<p>Liters per second under load. Default 0.1.</p>
+<p>When fuel runs out, the engine stops. Refuel by setting <code>fuelTank = fuelTankCapacity</code> (the <code>RCC_FuelStation</code> prefab does this automatically when the vehicle drives over it).</p>
+<h2 id="engine-heat">Engine Heat</h2>
+<h3 id="use-engine-heat">Use Engine Heat</h3>
+<p>When on, the engine gets hotter as you drive and can overheat. Off by default.</p>
+<h3 id="engine-heat_1">Engine Heat</h3>
+<p>Current temperature in °C.</p>
+<h3 id="engine-cooling-water-threshold">Engine Cooling Water Threshold</h3>
+<p>Temperature above which cooling kicks in. Default 90°C.</p>
+<h3 id="engine-heat-rate--engine-cool-rate">Engine Heat Rate / Engine Cool Rate</h3>
+<p>How fast it heats up / cools down.</p>
+<h2 id="gears">Gears</h2>
+<h3 id="gears_1">Gears[]</h3>
+<p>Per-gear ratios, max speeds, and shift-up target speeds. Auto-generated from <code>totalGears</code> and <code>finalRatio</code> on first init. Edit the array to fine-tune.</p>
+<h3 id="total-gears">Total Gears</h3>
+<p>Number of forward gears. Range 1–8. Default 6.</p>
+<h3 id="current-gear">Current Gear</h3>
+<p>The active gear index. Read-only at runtime. Force a gear via <code>carController.ShiftToGear(int)</code>.</p>
+<h3 id="n-gear">N Gear</h3>
+<p>Whether the vehicle is in neutral.</p>
+<h3 id="final-ratio">Final Ratio</h3>
+<p>The final drive ratio multiplied with each gear's ratio. Default 3.23. Lower = higher top speed but slower acceleration.</p>
+<h3 id="gear-shifting-delay">Gear Shifting Delay</h3>
+<p>Time the clutch is disengaged during a shift, in seconds. Default 0.35. Lower = snapper shifts.</p>
+<h3 id="gear-shifting-threshold">Gear Shifting Threshold</h3>
+<p>Fraction of the current gear's target speed at which the gearbox upshifts. Range 0.25–1. Default 0.75.</p>
+<h3 id="clutch-inertia">Clutch Inertia</h3>
+<p>How fast the clutch engages. Range 0.1–0.9. Default 0.25.</p>
+<h3 id="gear-shift-up-rpm--gear-shift-down-rpm">Gear Shift Up RPM / Gear Shift Down RPM</h3>
+<p>RPM thresholds for auto-shift in automatic transmissions. Defaults 6500 / 3500.</p>
+<h3 id="changing-gear">Changing Gear</h3>
+<p>Live status — true during the shift duration.</p>
+<h3 id="direction">Direction</h3>
+<p>1 = forward, -1 = reverse, 0 = neutral. Read-only.</p>
+<h3 id="auto-reverse">Auto Reverse</h3>
+<p>When on, pressing brake at near-zero speed engages reverse. Default on. Turn off if you want manual reverse via gear shift only.</p>
+<h3 id="automatic-gear">Automatic Gear</h3>
+<p>When on, the gearbox shifts up/down by itself. Off = manual shift only.</p>
+<h3 id="automatic-clutch">Automatic Clutch</h3>
+<p>When on, the clutch engages/disengages automatically.</p>
+<h2 id="audio">Audio</h2>
+<h3 id="audio-type">Audio Type</h3>
+<p>How many engine sound sources to layer:</p>
+<ul>
+<li><strong>Off</strong> — no engine audio.</li>
+<li><strong>OneSource</strong> — single layer (simplest, less realistic).</li>
+<li><strong>TwoSource</strong> — two layers (low + high RPM).</li>
+<li><strong>ThreeSource</strong> — three layers (low + mid + high RPM). Best fidelity.</li>
+</ul>
+<h3 id="engine-sound-clips-multiple-fields">Engine Sound Clips (multiple fields)</h3>
+<p>Audio clips for each engine sound layer at idle, mid, and high RPM. The controller crossfades them based on current RPM.</p>
+<h3 id="engine-audio-source--engine-off-audio--exhaust-audio">Engine Audio Source / Engine Off Audio / Exhaust Audio</h3>
+<p>References to the AudioSource children that play engine audio. Auto-assigned by the wizard.</p>
+<h3 id="max-engine-sound-volume--max-engine-sound-pitch--min-engine-sound-pitch">Max Engine Sound Volume / Max Engine Sound Pitch / Min Engine Sound Pitch</h3>
+<p>Volume and pitch envelope. Pitch varies with RPM between min and max.</p>
+<h2 id="damage">Damage</h2>
+<h3 id="damage-embedded-rcc_damage">Damage (embedded RCC_Damage)</h3>
+<p>The damage data is embedded as a single foldout. Inside it:</p>
+<ul>
+<li><strong>Use Damage</strong> — toggle the whole damage system.</li>
+<li><strong>Damage Multiplier</strong> — global damage scalar.</li>
+<li><strong>Max Damage</strong> — body deformation cap.</li>
+<li><strong>Repair Now</strong> — set to true in code to instantly repair.</li>
+<li><strong>Recalculate Original Meshes</strong> — re-snapshot rest pose (use after rigging changes).</li>
+<li><strong>Detachable Parts</strong>, <strong>Wheel Damage</strong>, <strong>Light Damage</strong> — sub-sections for each damage type.</li>
+</ul>
+<p>See <strong><a href="12_DamageSystem.html">12 — Damage System</a></strong> for full details.</p>
+<h2 id="stability-helpers-under-the-behavior-preset-applied-here">Stability Helpers (under the Behavior preset, applied here)</h2>
+<p>These three assist systems run only when the active behavior preset (or the per-vehicle override) has them enabled.</p>
+<h3 id="abs--anti-lock-braking">ABS — Anti-Lock Braking</h3>
+<p>Prevents wheel lockup during hard braking by modulating brake force. Default disabled in Simulator, enabled in Arcade.</p>
+<h3 id="esp--electronic-stability-program">ESP — Electronic Stability Program</h3>
+<p>Applies selective braking to prevent skids. The vehicle detects if it's sliding more than it should be steered and applies brake force to the appropriate wheel to correct the slide.</p>
+<h3 id="tcs--traction-control">TCS — Traction Control</h3>
+<p>Reduces engine power when a wheel is spinning faster than the others.</p>
+<h2 id="other-important-fields-you-may-need-to-tune">Other Important Fields You May Need to Tune</h2>
+<h3 id="boost--nos">Boost / NOS</h3>
+<p>If your vehicle has nitrous boost, there are fields for <code>useNOS</code>, <code>NOSCapacity</code>, <code>NOSConsumption</code>, etc. The boost increases torque temporarily when <code>boostInput</code> is held.</p>
+<h3 id="turbo">Turbo</h3>
+<p>Similar to NOS but with a separate turbo whistle audio and a different curve. <code>useTurbo</code>, <code>turboLoudness</code>, etc.</p>
+<h3 id="trailer-attach-point">Trailer Attach Point</h3>
+<p>If your vehicle can tow trailers, drop a child transform at the hitch position and assign it here.</p>
+<h2 id="tuning-workflow">Tuning Workflow</h2>
+<p>When tuning a new vehicle, work in this order:</p>
+<ol>
+<li><strong>Wheel positioning and radius first.</strong> If the wheels are wrong, nothing else feels right.</li>
+<li><strong>Mass and COM.</strong> Get the rigidbody weight and center of mass into a sensible place.</li>
+<li><strong>Engine and gears.</strong> Tune torque curve and gear ratios for the desired top speed and acceleration.</li>
+<li><strong>Behavior preset.</strong> Pick the closest preset (Arcade / Drift / Simulator) — it sets most tuning at once.</li>
+<li><strong>Friction curves.</strong> If the preset is close but not perfect, override per-wheel or per-vehicle.</li>
+<li><strong>Steering response.</strong> Tune the steering curve for the speed range you care about.</li>
+<li><strong>Anti-roll and downforce.</strong> Add stability for fast vehicles, reduce for off-road / monster trucks.</li>
+</ol>
+<p>If you get a value wildly wrong, revert that field to default and move on. Most fields don't need to be touched.</p>
+<h2 id="next-steps">Next Steps</h2>
+<ul>
+<li><strong><a href="09_HowWheelCollidersWork.html">09 — How WheelColliders Work</a></strong> — what's actually happening at the friction layer.</li>
+<li><strong><a href="10_BehaviorPresets.html">10 — Behavior Presets</a></strong> — switching driving feel.</li>
+<li><strong><a href="12_DamageSystem.html">12 — Damage System</a></strong> — configuring deformation and detachable parts.</li>
+</ul>
+</div>
+<div class="footer">
+Generated from: 08_VehicleInspectorReference.md<br>
+Date: 2026-05-22 00:32<br>
+© 2014 - 2026 BoneCracker Games — Realistic Car Controller V5.0.0
+</div>
+</body>
+</html>
