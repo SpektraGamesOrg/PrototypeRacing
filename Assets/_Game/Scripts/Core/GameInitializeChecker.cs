@@ -1,4 +1,4 @@
-/*using Core;
+using Core;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -24,4 +24,4 @@ namespace Scripts.Core
         }
 #endif
     }
-}*/
+}
