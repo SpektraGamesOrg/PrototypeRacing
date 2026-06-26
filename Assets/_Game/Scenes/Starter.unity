@@ -632,7 +632,8 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 407518541}
   m_Father: {fileID: 1517065092}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -1075,7 +1076,7 @@ GameObject:
   - component: {fileID: 407518541}
   - component: {fileID: 407518540}
   m_Layer: 0
-  m_Name: Popup_GoldClaimPopup
+  m_Name: Overlay_GoldClaimOverlay
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1092,7 +1093,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8ae0d393a892f4b3f9d2dfec8db5a2c2, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UI.GoldClaimPopup
+  m_EditorClassIdentifier: Assembly-CSharp::UI.GoldClaimOverlay
   content: {fileID: 631635551}
   canvasGroup: {fileID: 631635550}
   hasTransitionAnimations: 0
@@ -1103,6 +1104,8 @@ MonoBehaviour:
   playHideAnimation:
     m_PersistentCalls:
       m_Calls: []
+  alwaysShow: 0
+  hideFromActiveUis: 0
   claimButton: {fileID: 1681599803}
   claimLabel: {fileID: 1898911344}
   timerBarFill: {fileID: 434616064}
@@ -1120,7 +1123,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 631635551}
-  m_Father: {fileID: 824562172}
+  m_Father: {fileID: 299966907}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -2056,8 +2059,7 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 407518541}
+  m_Children: []
   m_Father: {fileID: 1517065092}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -3975,9 +3977,9 @@ MonoBehaviour:
   - {fileID: 1246275618}
   - {fileID: 273593776}
   - {fileID: 1952170609}
-  allPopups:
+  allPopups: []
+  allOverlays:
   - {fileID: 407518540}
-  allOverlays: []
   allTabs: []
 --- !u!1 &1572723387
 GameObject:

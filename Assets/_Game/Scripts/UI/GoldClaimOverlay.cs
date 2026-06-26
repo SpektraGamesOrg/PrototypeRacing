@@ -9,13 +9,13 @@ using UnityEngine.UI;
 namespace UI
 {
     /// <summary>
-    /// Side popup shown when a gold is collected, offering a "CLAIM Nx" rewarded-ad bonus.
+    /// Side overlay shown when a gold is collected, offering a "CLAIM Nx" rewarded-ad bonus.
     /// Listens for <see cref="Gold.Gold.ClaimRequested"/>, shows itself with a timer bar that drains
     /// over <see cref="displayDuration"/>, and auto-dismisses when it empties (the player keeps the
     /// base reward they already received). Tapping CLAIM shows a rewarded ad via
     /// <see cref="RewardedAds"/> and, on success, grants the bonus through the request callback.
     /// </summary>
-    public sealed class GoldClaimPopup : PopupBase
+    public sealed class GoldClaimOverlay : OverlayBase
     {
         [Title("Gold Claim")]
         [Tooltip("Button that triggers the rewarded ad. Use the project EnhancedButton.")]
