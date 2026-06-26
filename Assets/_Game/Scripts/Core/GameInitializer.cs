@@ -16,9 +16,6 @@ namespace Core
     [DefaultExecutionOrder(-1000)]
     public class GameInitializer : SingletonComponent<GameInitializer>
     {
-        // Bootstrap owns the first slice of the loading bar: [0, InitializationProgressEnd]. Inside
-        // InitializeAsync we report *logical* 0..1 progress; the RangedProgress wrapper scales it onto this
-        // slice, so changing this value rescales the whole bootstrap phase without touching any Report call.
         private const float InitializationProgressEnd = 0.3f;
 
         public static bool Initialized { get; private set; } = false;
