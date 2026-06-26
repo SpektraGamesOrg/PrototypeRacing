@@ -8,7 +8,7 @@ def shortenURL(longURL) {
 def scheduleDeleteURL(shortURL) {
     // Schedule a DELETE request 12 hours later
     sh """
-    ( echo "curl -s -X DELETE ${shortURL}" | at now + 12 hours ) </dev/null >/dev/null 2>&1
+    echo "curl -s -X DELETE ${shortURL}" | at now + 12 hours
     """
 }
 
@@ -406,8 +406,10 @@ pipeline {
                         def presignedApkURL = sh(script: "aws s3 presign 's3://${S3FOLDER}${ARCHIVE_NAME}.apk' --expires-in ${URL_EXPIRATION} --endpoint-url https://${BUCKET_NAME}.s3-accelerate.amazonaws.com", returnStdout: true).trim()
                         env.PRESIGNED_URL = shortenURL(presignedApkURL)
                         echo "APK uploaded! Access Shortened Presigned URL: $PRESIGNED_URL"
-                        sh "( echo \"aws s3 rm s3://${BUCKET_NAME}/${S3FOLDER} --recursive\" | at now + 12 hours ) </dev/null >/dev/null 2>&1"
+                        sh "echo \"aws s3 rm s3://${BUCKET_NAME}/${S3FOLDER} --recursive\" | at now + 12 hours"
+                        echo "scheduleDeleteURL Start"
                         scheduleDeleteURL(env.PRESIGNED_URL)
+                        echo "scheduleDeleteURL Finished"
                     } else {
                         // Handle non-APK uploads
                         if (INTERNAL_APP_SHARING == 'true') {
@@ -472,7 +474,9 @@ pipeline {
                     
                     // Additional steps if BUILD_PURPOSE is Testing
                     if (BUILD_PURPOSE == 'Testing') {
+                        echo "Testing Start"
                         def presignedFullSizeIconURL = sh(script: "aws s3 presign 's3://${S3_ICONS_FOLDER}${FULL_SIZE_ICON}' --expires-in ${URL_EXPIRATION} --endpoint-url https://${BUCKET_NAME}.s3-accelerate.amazonaws.com", returnStdout: true).trim()
+                        echo "Testing presignedFullSizeIconURL done"
                         def shortenedFullSizeIconURL = shortenURL(presignedFullSizeIconURL)
                         echo "Access Presigned Full Size Icon URL: ${shortenedFullSizeIconURL}"
                         env.SHORTENED_FULL_SIZE_ICON_URL = shortenedFullSizeIconURL
