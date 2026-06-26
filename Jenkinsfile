@@ -406,6 +406,7 @@ pipeline {
                         def presignedApkURL = sh(script: "aws s3 presign 's3://${S3FOLDER}${ARCHIVE_NAME}.apk' --expires-in ${URL_EXPIRATION} --endpoint-url https://${BUCKET_NAME}.s3-accelerate.amazonaws.com", returnStdout: true).trim()
                         env.PRESIGNED_URL = shortenURL(presignedApkURL)
                         echo "APK uploaded! Access Shortened Presigned URL: $PRESIGNED_URL"
+                        echo "Before at now + 12 hours"
                         sh "echo \"aws s3 rm s3://${BUCKET_NAME}/${S3FOLDER} --recursive\" | at now + 12 hours"
                         echo "scheduleDeleteURL Start"
                         scheduleDeleteURL(env.PRESIGNED_URL)
