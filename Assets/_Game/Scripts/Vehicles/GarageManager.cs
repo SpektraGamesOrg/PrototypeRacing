@@ -177,7 +177,12 @@ namespace Vehicles
                 // If the target is not ready, cover the gap with the loading overlay and wait for it.
                 if (!resource.IsLoaded)
                 {
-                    RuntimeUI.ShowLoading();
+                    // Only the browse overlay covers gaps once the garage is live. The very first display is
+                    // already covered by the scene LoadingScreen (CustomSceneManager), so showing the RuntimeUI
+                    // overlay on top of it just makes it flash for a few frames before the menu is revealed.
+                    if (IsReady)
+                        RuntimeUI.ShowLoading();
+
                     await LoadAsync(id, resource);
 
                     // A newer switch came in while we were loading; it owns the overlay and the spawn now.
