@@ -985,7 +985,7 @@ namespace Sirenix.OdinInspector.Modules.Addressables.Editor
                     searchFilter += $"t:{filterType.Name} ";
                 }
 
-                IEnumerator<HierarchyProperty> enumerator = AssetDatabase_Internals.EnumerateAllAssets(searchFilter, false, AssetDatabaseSearchArea.InAssetsOnly);
+                IEnumerator<AssetDatabaseAssetInfo> enumerator = AssetDatabase_Internals.EnumerateAllAssets(searchFilter, false, AssetDatabaseSearchArea.InAssetsOnly);
 
                 if (enumerator.MoveNext())
                 {
@@ -1007,7 +1007,7 @@ namespace Sirenix.OdinInspector.Modules.Addressables.Editor
 
                     do
                     {
-                        HierarchyProperty current = enumerator.Current;
+                        AssetDatabaseAssetInfo current = enumerator.Current;
 
                         if (addedGuids.Contains(current.guid) || !current.isMainRepresentation)
                         {
@@ -1024,7 +1024,7 @@ namespace Sirenix.OdinInspector.Modules.Addressables.Editor
                         }
                         else
                         {
-                            string path = AssetDatabase.GetAssetPath(current.instanceID);
+                            string path = current.assetPath;
 
                             if (!current.isFolder)
                             {

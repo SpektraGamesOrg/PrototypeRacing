@@ -924,10 +924,9 @@ namespace FluffyUnderware.Curvy.Generator.Modules
             //Parallel mesh baking if needed
             if (Collider == CGColliderEnum.Mesh && meshResources.Count > 1) //do not bake if no mesh collider asked
             {
-                SubArray<int> meshIds = ArrayPools.Int32.Allocate(
-                    meshResources.Count,
-                    false
-                );
+                // Physics.BakeMesh now takes an EntityId instead of an int instance id, and EntityId is not
+                // int-representable, so it cannot be stored in the Int32 array pool. Use a plain EntityId array.
+                EntityId[] meshIds = new EntityId[meshResources.Count];
                 for (int i = 0; i < meshResources.Count; i++)
                     if (meshResources[i] == null)
                     {
@@ -937,22 +936,20 @@ namespace FluffyUnderware.Curvy.Generator.Modules
                             this
                         );
 #endif
-                        meshIds.Array[i] =
-                            0; //meshIds is allocated without being cleared, so set to 0 to avoid using the meshId from a previous call
+                        meshIds[i] =
+                            default; //default EntityId (id 0) so we avoid baking a stale/invalid mesh
                     }
                     else
-                        meshIds.Array[i] = meshResources[i].Filter.sharedMesh.GetInstanceID();
+                        meshIds[i] = meshResources[i].Filter.sharedMesh.GetEntityId();
 
                 Parallel.For(
                     0,
                     meshResources.Count,
                     i => Physics.BakeMesh(
-                        meshIds.Array[i],
+                        meshIds[i],
                         Convex
                     )
                 );
-
-                ArrayPools.Int32.Free(meshIds);
             }
 
             for (int r = 0; r < meshResources.Count; r++)

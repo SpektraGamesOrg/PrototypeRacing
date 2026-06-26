@@ -1,5 +1,5 @@
 // =====================================================================
-// Copyright © 2013 ToolBuddy
+// Copyright ï¿½ 2013 ToolBuddy
 // All rights reserved
 // 
 // http://www.toolbuddy.net
@@ -19,7 +19,7 @@ namespace FluffyUnderware.Curvy
                 return 1;
 
             if (obj is CurvySpline other)
-                return GetInstanceID().CompareTo(other.GetInstanceID());
+                return GetEntityId().CompareTo(other.GetEntityId());
 
             throw new ArgumentException($"Object must be of type {nameof(CurvySpline)}");
 

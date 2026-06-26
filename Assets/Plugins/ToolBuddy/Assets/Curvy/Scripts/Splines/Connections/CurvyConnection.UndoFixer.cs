@@ -1,5 +1,5 @@
 // =====================================================================
-// Copyright © 2013 ToolBuddy
+// Copyright ï¿½ 2013 ToolBuddy
 // All rights reserved
 // 
 // http://www.toolbuddy.net
@@ -66,12 +66,12 @@ namespace FluffyUnderware.Curvy
                     if (controlPoint == null)
                     {
                         CurvySplineSegment validControlPoint =
-                            (CurvySplineSegment)EditorUtility.InstanceIDToObject(controlPoint.GetInstanceID());
+                            (CurvySplineSegment)EditorUtility.EntityIdToObject(controlPoint.GetEntityId());
                         if (validControlPoint == null)
                         {
 #if CURVY_SANITY_CHECKS
                             DTLog.LogWarning(
-                                $"[CURVY] Connection {curvyConnection.name} could not find Control Point of id {controlPoint.GetInstanceID()}"
+                                $"[CURVY] Connection {curvyConnection.name} could not find Control Point of id {controlPoint.GetEntityId()}"
                             );
 #endif
                         }
@@ -95,13 +95,13 @@ namespace FluffyUnderware.Curvy
                         == false)
                     {
                         CurvySplineSegment validFollowUp =
-                            (CurvySplineSegment)EditorUtility.InstanceIDToObject(controlPoint.FollowUp.GetInstanceID());
+                            (CurvySplineSegment)EditorUtility.EntityIdToObject(controlPoint.FollowUp.GetEntityId());
 
                         if (validFollowUp)
                         {
 #if CURVY_SANITY_CHECKS
                             DTLog.LogWarning(
-                                $"[CURVY] Connection {curvyConnection.name} could not find Control Point of id {controlPoint.GetInstanceID()}"
+                                $"[CURVY] Connection {curvyConnection.name} could not find Control Point of id {controlPoint.GetEntityId()}"
                             );
 #endif
                         }

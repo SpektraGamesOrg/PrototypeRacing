@@ -1,7 +1,7 @@
 {
   "name": "com.unity.uiextensions",
   "displayName": "Unity UI Extensions",
-  "version": "2.3.2-pre.5",
+  "version": "3.0.0",
   "description": "An extension project for the Unity3D UI system, all crafted and contributed by the awesome Unity community",
   "author": "Simon darkside Jackson <@SimonDarksideJ>",
   "contributors": [
@@ -10,10 +10,11 @@
       "twitter": "@SimonDarksideJ"
     }
   ],
-  "unity": "2020.3",
+  "unity": "6000.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Unity-UI-Extensions/com.unity.uiextensions.git"
+    "url": "https://github.com/Unity-UI-Extensions/com.unity.uiextensions",
+    "revision": "5975de7b1ccf76a9e448f1546d58cb1647e42e92"
   },
   "bugs": {
     "url": "https://github.com/Unity-UI-Extensions/com.unity.uiextensions/issues"
@@ -31,5 +32,12 @@
       "path": "Examples~"
     }
   ],
-  "license": "BSD3"
+  "license": "BSD-3-Clause",
+  "dependencies": {
+    "com.unity.ugui": "2.0.0"
+  },
+  "publishConfig": {
+    "registry": "https://package.openupm.com"
+  },
+  "_fingerprint": "0adfd7ded1a2950db7ed62015a02e92edc60e9b9"
 }

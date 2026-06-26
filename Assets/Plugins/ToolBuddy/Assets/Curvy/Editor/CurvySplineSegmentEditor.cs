@@ -1,5 +1,5 @@
 // =====================================================================
-// Copyright © 2013 ToolBuddy
+// Copyright ï¿½ 2013 ToolBuddy
 // All rights reserved
 // 
 // http://www.toolbuddy.net
@@ -132,8 +132,8 @@ namespace FluffyUnderware.CurvyEditor
             tOC = serializedObject.FindProperty("m_OverrideGlobalContinuity");
             tOB = serializedObject.FindProperty("m_OverrideGlobalBias");
 
-            EditorApplication.hierarchyWindowItemOnGUI -= OnHierarchyWindowItemOnGUI;
-            EditorApplication.hierarchyWindowItemOnGUI += OnHierarchyWindowItemOnGUI;
+            EditorApplication.hierarchyWindowItemByEntityIdOnGUI -= OnHierarchyWindowItemOnGUI;
+            EditorApplication.hierarchyWindowItemByEntityIdOnGUI += OnHierarchyWindowItemOnGUI;
 
             mBezierRot = Quaternion.identity;
         }
@@ -143,7 +143,7 @@ namespace FluffyUnderware.CurvyEditor
         {
             base.OnDisable();
             DestroyImmediate(mConnectionEditor);
-            EditorApplication.hierarchyWindowItemOnGUI -= OnHierarchyWindowItemOnGUI;
+            EditorApplication.hierarchyWindowItemByEntityIdOnGUI -= OnHierarchyWindowItemOnGUI;
             // just in case
             Tools.hidden = false;
         }
@@ -552,9 +552,9 @@ namespace FluffyUnderware.CurvyEditor
             DTHandles.PopHandlesColor();
         }
 
-        private void OnHierarchyWindowItemOnGUI(int instanceid, Rect selectionrect)
+        private void OnHierarchyWindowItemOnGUI(EntityId entityId, Rect selectionrect)
         {
-            GameObject obj = EditorUtility.InstanceIDToObject(instanceid) as GameObject;
+            GameObject obj = EditorUtility.EntityIdToObject(entityId) as GameObject;
 
             if (!obj)
                 return;

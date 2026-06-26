@@ -107,7 +107,7 @@ namespace FluffyUnderware.DevTools
             {
                 T instance = Instance;
 
-                if (instance != null && instance.GetInstanceID() != GetInstanceID())
+                if (instance != null && instance.GetEntityId() != GetEntityId())
                 {
                     {
                         instance.MergeDoubleLoaded(this);

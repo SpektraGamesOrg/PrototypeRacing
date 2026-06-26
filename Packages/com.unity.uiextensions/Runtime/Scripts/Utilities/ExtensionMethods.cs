@@ -24,8 +24,12 @@ namespace UnityEngine.UI.Extensions
             return
                 !gameObject.scene.IsValid() &&
                 !gameObject.scene.isLoaded &&
-                gameObject.GetInstanceID() >= 0 &&
+                // Local patch (Unity 6.5 InstanceID->EntityId migration): the original heuristic
+                // `GetInstanceID() >= 0` is gone. EntityId is opaque and its int conversion is obsolete (CS0619),
+                // so there is no faithful sign check. The scene checks above already identify a prefab asset
+                // (no valid/loaded scene) at runtime, which is what this method needs.
                 !gameObject.hideFlags.HasFlag(HideFlags.HideInHierarchy);
+                    // I don't care about GameObjects *inside* prefabs, just the overall prefab.
         }
 
         /// <summary>

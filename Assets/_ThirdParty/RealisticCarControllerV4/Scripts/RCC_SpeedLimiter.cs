@@ -19,9 +19,9 @@ using UnityEngine;
 public class RCC_SpeedLimiter : RCC_Core {
 
     /// <summary>
-    /// Stores each vehicle's original drag value before modification, keyed by instance ID.
+    /// Stores each vehicle's original drag value before modification, keyed by entity ID.
     /// </summary>
-    private Dictionary<int, float> defaultDrags = new Dictionary<int, float>();
+    private Dictionary<EntityId, float> defaultDrags = new Dictionary<EntityId, float>();
 
     private void OnTriggerStay(Collider other) {
 
@@ -30,7 +30,7 @@ public class RCC_SpeedLimiter : RCC_Core {
         if (!carController)
             return;
 
-        int id = carController.GetInstanceID();
+        EntityId id = carController.GetEntityId();
 
         if (!defaultDrags.ContainsKey(id))
             defaultDrags[id] = carController.Rigid.linearDamping;
@@ -46,7 +46,7 @@ public class RCC_SpeedLimiter : RCC_Core {
         if (!carController)
             return;
 
-        int id = carController.GetInstanceID();
+        EntityId id = carController.GetEntityId();
 
         if (defaultDrags.ContainsKey(id)) {
             carController.Rigid.linearDamping = defaultDrags[id];

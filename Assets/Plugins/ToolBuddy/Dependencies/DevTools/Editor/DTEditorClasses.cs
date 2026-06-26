@@ -377,7 +377,7 @@ namespace FluffyUnderware.DevToolsEditor
                 {
                     mState.target = value;
                     if (serializedObject != null)
-                        DTPersistentState.SetBool(serializedObject.targetObject.GetInstanceID().ToString() + Path, value);
+                        DTPersistentState.SetBool(serializedObject.targetObject.GetEntityId().ToString() + Path, value);
                     NeedRepaint = true;
                 }
             }
@@ -549,7 +549,7 @@ namespace FluffyUnderware.DevToolsEditor
             node = base.Add(node);
             DTGroupNode grp = node as DTGroupNode;
             if (grp != null && _serializedObject != null && _serializedObject.targetObject != null)
-                grp.mState.value = DTPersistentState.GetBool(_serializedObject.targetObject.GetInstanceID().ToString() + grp.Path, grp.mState.value);
+                grp.mState.value = DTPersistentState.GetBool(_serializedObject.targetObject.GetEntityId().ToString() + grp.Path, grp.mState.value);
 
             return node;
         }

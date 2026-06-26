@@ -235,7 +235,7 @@ namespace FluffyUnderware.CurvyEditor
         /// <summary>
         /// InstanceIDs of the GameObjects containing CurvyConnections
         /// </summary>
-        private readonly HashSet<int> connectionGameObjectIDs = new HashSet<int>();
+        private readonly HashSet<EntityId> connectionGameObjectIDs = new HashSet<EntityId>();
 
         private CurvySplineSegment curvySplineSegment;
 
@@ -250,7 +250,7 @@ namespace FluffyUnderware.CurvyEditor
             Undo.undoRedoPerformed += OnUndoRedo;
             EditorApplication.update += checkLaunch;
             EditorApplication.hierarchyChanged += ScanConnections;
-            EditorApplication.hierarchyWindowItemOnGUI += OnHierarchyWindowItemOnGUI;
+            EditorApplication.hierarchyWindowItemByEntityIdOnGUI += OnHierarchyWindowItemOnGUI;
             ScanConnections();
         }
 
@@ -262,7 +262,7 @@ namespace FluffyUnderware.CurvyEditor
                 Undo.undoRedoPerformed -= OnUndoRedo;
                 EditorApplication.update -= checkLaunch;
                 EditorApplication.hierarchyChanged -= ScanConnections;
-                EditorApplication.hierarchyWindowItemOnGUI -= OnHierarchyWindowItemOnGUI;
+                EditorApplication.hierarchyWindowItemByEntityIdOnGUI -= OnHierarchyWindowItemOnGUI;
             }
 
             base.Dispose(disposing);
@@ -283,7 +283,7 @@ namespace FluffyUnderware.CurvyEditor
         }
 
         private static void UpdateConnectionGameObjectIDs(
-            HashSet<int> instanceIDs)
+            HashSet<EntityId> instanceIDs)
         {
             instanceIDs.Clear();
 
@@ -306,7 +306,7 @@ namespace FluffyUnderware.CurvyEditor
                         continue;
 
                     // see comment in CurvyConnection.DoUpdate to know more about when cp.gameObject can be null
-                    instanceIDs.Add(cp.gameObject.GetInstanceID());
+                    instanceIDs.Add(cp.gameObject.GetEntityId());
                 }
             }
         }
@@ -314,28 +314,28 @@ namespace FluffyUnderware.CurvyEditor
         #region Hierarchy annotations
 
         private void OnHierarchyWindowItemOnGUI(
-            int instanceid,
+            EntityId entityId,
             Rect selectionrect)
         {
             if (AnnotateHierarchy == false)
                 return;
 
             TryDrawAnchorIcon(
-                instanceid,
+                entityId,
                 selectionrect
             );
 
             TryDrawConnectionIcon(
-                instanceid,
+                entityId,
                 selectionrect
             );
         }
 
         private void TryDrawAnchorIcon(
-            int instanceid,
+            EntityId entityId,
             Rect selectionrect)
         {
-            GameObject gameObject = EditorUtility.InstanceIDToObject(instanceid) as GameObject;
+            GameObject gameObject = EditorUtility.EntityIdToObject(entityId) as GameObject;
             if (gameObject == null)
                 return;
 
@@ -360,10 +360,10 @@ namespace FluffyUnderware.CurvyEditor
         }
 
         private void TryDrawConnectionIcon(
-            int instanceid,
+            EntityId entityId,
             Rect selectionrect)
         {
-            if (!connectionGameObjectIDs.Contains(instanceid))
+            if (!connectionGameObjectIDs.Contains(entityId))
                 return;
 
             GUI.DrawTexture(

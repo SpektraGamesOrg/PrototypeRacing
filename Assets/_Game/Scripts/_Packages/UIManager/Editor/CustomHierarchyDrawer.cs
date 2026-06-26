@@ -11,12 +11,12 @@ namespace UIManager.Editor
 
         static CustomHierarchyDrawer()
         {
-            EditorApplication.hierarchyWindowItemOnGUI += HierarchyItemCB;
+            EditorApplication.hierarchyWindowItemByEntityIdOnGUI += HierarchyItemCB;
         }
 
-        private static void HierarchyItemCB(int instanceID, Rect rect)
+        private static void HierarchyItemCB(EntityId entityID, Rect rect)
         {
-            GameObject gameObject = EditorUtility.InstanceIDToObject(instanceID) as GameObject;
+            GameObject gameObject = EditorUtility.EntityIdToObject(entityID) as GameObject;
 
             if (gameObject == null || !gameObject.activeSelf)
                 return;

@@ -503,7 +503,7 @@ namespace FluffyUnderware.DevTools.Extensions
         /// <returns>True if the target or any of its parent GameObjects are selected; otherwise, false.</returns>
         public static bool IsSelectedOrParentSelected(this GameObject taget)
         {
-            bool isTargetSelected = Selection.Contains(taget.GetInstanceID());
+            bool isTargetSelected = Selection.Contains(taget.GetEntityId());
             bool isTargetOrAncestorSelected;
             {
                 if (isTargetSelected)
@@ -518,7 +518,7 @@ namespace FluffyUnderware.DevTools.Extensions
                     while (isTargetOrAncestorSelected == false &&
                            ReferenceEquals(ancestorTransform, null) == false)
                     {
-                        isTargetOrAncestorSelected = Selection.Contains(ancestorTransform.gameObject.GetInstanceID());
+                        isTargetOrAncestorSelected = Selection.Contains(ancestorTransform.gameObject.GetEntityId());
                         ancestorTransform = ancestorTransform.parent;
                     }
                 }

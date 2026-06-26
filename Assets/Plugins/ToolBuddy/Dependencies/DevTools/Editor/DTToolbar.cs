@@ -27,8 +27,8 @@ namespace FluffyUnderware.DevToolsEditor
             DTSelection.OnSelectionChange += OnSelectionChange;
             SceneView.duringSceneGui -= RenderToolbar;
             SceneView.duringSceneGui += RenderToolbar;
-            EditorApplication.hierarchyWindowItemOnGUI -= onHierarchy;
-            EditorApplication.hierarchyWindowItemOnGUI += onHierarchy;
+            EditorApplication.hierarchyWindowItemByEntityIdOnGUI -= onHierarchy;
+            EditorApplication.hierarchyWindowItemByEntityIdOnGUI += onHierarchy;
             EditorApplication.update -= onUpdate;
             EditorApplication.update += onUpdate;
         }
@@ -57,10 +57,10 @@ namespace FluffyUnderware.DevToolsEditor
         }
 
         private static void onHierarchy(
-            int instanceID,
+            EntityId entityId,
             Rect selectionRect)
         {
-            if (Selection.instanceIDs.Contains(instanceID))
+            if (Selection.entityIds.Contains(entityId))
                 _handleEvent = new Event(Event.current);
         }
 

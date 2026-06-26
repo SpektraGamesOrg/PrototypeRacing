@@ -35,6 +35,7 @@ namespace UnityEngine.UI.Extensions.ColorPicker
 
 		protected virtual void Reset()
 		{
+			// Local patch (Unity 6.5 InstanceID->EntityId migration): GetInstanceID() is obsolete (CS0619).
 			playerPrefsKey = "colorpicker_" + GetEntityId().ToString();
 		}
 
