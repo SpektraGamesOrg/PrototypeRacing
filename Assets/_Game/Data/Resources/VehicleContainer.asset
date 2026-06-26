@@ -20,7 +20,7 @@ MonoBehaviour:
     price: 0
   - id: 2
     mainBehaviour:
-      guid: 1f7cbd68225b17e49a4938ae6c70658e
+      guid: 362090f9a9c32448dbb2f1f77f925d32
       resourcesPath: R35
     price: 1500
   - id: 3

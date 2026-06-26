@@ -1,5 +1,4 @@
 using System;
-using NWH.VehiclePhysics2;
 using SpektraGames.RuntimeUI.Runtime;
 using UnityEngine;
 
@@ -16,8 +15,8 @@ namespace Vehicles
         }
 
         [SerializeField]
-        private VehicleController vehicleController = null;
-        public VehicleController VehicleController => vehicleController;
+        private RCC_CarControllerV4 vehicleController = null;
+        public RCC_CarControllerV4 VehicleController => vehicleController;
 
         [SerializeField]
         private new Rigidbody rigidbody = null;
@@ -37,9 +36,9 @@ namespace Vehicles
             if (Application.isPlaying)
                 return;
 
-            if (vehicleController != GetComponent<VehicleController>())
+            if (vehicleController != GetComponent<RCC_CarControllerV4>())
             {
-                vehicleController = GetComponent<VehicleController>();
+                vehicleController = GetComponent<RCC_CarControllerV4>();
                 anyChange = true;
             }
 
