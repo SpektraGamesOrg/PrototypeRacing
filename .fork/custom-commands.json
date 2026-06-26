@@ -20,7 +20,7 @@
         {
           "action" : {
             "script" : "```bash\ncurl -X POST https://bridge.api.spektragames.com/api/v1/git/builds \\\n     -H \"Content-Type: application/json\" \\\n     -H \"X-Api-Key: 2d58d1a956341b43c6bd31ef3cf922ab1e4cfa73eeb56d6494e6f1ab6b96ef62\" \\\n     -d '{\n           \"DESCRIPTION\": \"'\"$1{text}\"'\",\n           \"COMMIT_HASH\": \"'\"$sha\"'\",\n           \"REPO_NAME\": \"'\"$(basename -s .git \"$(git remote get-url origin)\")\"'\",\n           \"BUILD_TARGET\": \"Android\",\n           \"BUILD_TYPE\": \"Development\",\n           \"BUILD_PURPOSE\": \"Testing\",\n           \"VEHICLE_REBUILD_OPTION\": \"None\"\n         }'\n```\n",
-            "showOutput" : false,
+            "showOutput" : true,
             "type" : "sh",
             "waitForExit" : true
           },
@@ -54,7 +54,7 @@
         {
           "action" : {
             "script" : "curl -X POST https://bridge.api.spektragames.com/api/v1/git/builds \\\n     -H \"Content-Type: application/json\" \\\n     -H \"X-Api-Key: 2d58d1a956341b43c6bd31ef3cf922ab1e4cfa73eeb56d6494e6f1ab6b96ef62\" \\\n     -d '{\n           \"DESCRIPTION\": \"'\"$1{text}\"'\",\n           \"COMMIT_HASH\": \"'\"$sha\"'\",\n           \"REPO_NAME\": \"'\"$(basename -s .git \"$(git remote get-url origin)\")\"'\",\n           \"BUILD_TARGET\": \"Android\",\n           \"BUILD_TYPE\": \"Production\",\n           \"BUILD_PURPOSE\": \"Release\",\n\"VEHICLE_REBUILD_OPTION\": \"None\"\n         }'\n",
-            "showOutput" : false,
+            "showOutput" : true,
             "type" : "sh",
             "waitForExit" : true
           },
@@ -88,7 +88,7 @@
         {
           "action" : {
             "script" : "curl -X POST https://bridge.api.spektragames.com/api/v1/git/builds \\\n     -H \"Content-Type: application/json\" \\\n     -H \"X-Api-Key: 2d58d1a956341b43c6bd31ef3cf922ab1e4cfa73eeb56d6494e6f1ab6b96ef62\" \\\n     -d '{\n           \"DESCRIPTION\": \"'\"$1{text}\"'\",\n           \"COMMIT_HASH\": \"'\"$sha\"'\",\n           \"REPO_NAME\": \"'\"$(basename -s .git \"$(git remote get-url origin)\")\"'\",\n           \"BUILD_TARGET\": \"Android\",\n           \"BUILD_TYPE\": \"Production\",\n           \"BUILD_PURPOSE\": \"Release\",\n           \"FORCE_ENABLE_SRDEBUGGER\": \"true\",\n\"VEHICLE_REBUILD_OPTION\": \"None\"\n         }'\n",
-            "showOutput" : false,
+            "showOutput" : true,
             "type" : "sh",
             "waitForExit" : true
           },
@@ -122,7 +122,7 @@
         {
           "action" : {
             "script" : "curl -X POST https://bridge.api.spektragames.com/api/v1/git/builds \\\n     -H \"Content-Type: application/json\" \\\n     -H \"X-Api-Key: 2d58d1a956341b43c6bd31ef3cf922ab1e4cfa73eeb56d6494e6f1ab6b96ef62\" \\\n     -d '{\n           \"DESCRIPTION\": \"'\"$1{text}\"'\",\n           \"COMMIT_HASH\": \"'\"$sha\"'\",\n           \"REPO_NAME\": \"'\"$(basename -s .git \"$(git remote get-url origin)\")\"'\",\n           \"BUILD_TARGET\": \"Android\",\n           \"BUILD_TYPE\": \"Production\",\n           \"BUILD_PURPOSE\": \"Testing\",\n\"VEHICLE_REBUILD_OPTION\": \"None\"\n         }'\n",
-            "showOutput" : false,
+            "showOutput" : true,
             "type" : "sh",
             "waitForExit" : true
           },
