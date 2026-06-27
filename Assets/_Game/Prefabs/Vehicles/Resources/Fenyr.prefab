@@ -3315,7 +3315,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9169496643767143000}
-  - component: {fileID: 7003036316291576115}
   m_Layer: 11
   m_Name: Fenyr
   m_TagString: Vehicle
@@ -3343,22 +3342,6 @@ Transform:
   - {fileID: 6575840092123261941}
   m_Father: {fileID: 3739594714802641649}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7003036316291576115
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3181847393076033253}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5ec737efa3ae24285aeff32809ae3826, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Vehicles.VehicleMainBehaviour
-  vehicleID: 15
-  vehicleController: {fileID: 0}
-  rigidbody: {fileID: 0}
-  kmTracker: {fileID: 0}
 --- !u!1 &3230745968437549903
 GameObject:
   m_ObjectHideFlags: 0
@@ -3883,6 +3866,7 @@ GameObject:
   - component: {fileID: 8658465359991164460}
   - component: {fileID: 5520015547198650708}
   - component: {fileID: 910689741781764411}
+  - component: {fileID: 9215793388159520930}
   m_Layer: 11
   m_Name: Fenyr
   m_TagString: Untagged
@@ -8752,3 +8736,18 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7407449276587869266, guid: 396310501878c83458084e85d4d76e2e, type: 3}
   m_PrefabInstance: {fileID: 8616113313186831492}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &9215793388159520930
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3631941028679265013}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8e304bdabbbce74ba49d09f0091bbde, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Vehicles.CarDeformationSystem.VehicleDamageReceiver
+  maxImpact: 25
+  minImpact: 3
+  mainVehicleBehaviour: {fileID: -5096460011673770898}

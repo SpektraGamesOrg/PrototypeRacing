@@ -3252,6 +3252,7 @@ GameObject:
   - component: {fileID: 6448389183193360085}
   - component: {fileID: 2845316561103630150}
   - component: {fileID: 8108563259994746695}
+  - component: {fileID: 839609831419405386}
   m_Layer: 11
   m_Name: Supra
   m_TagString: Untagged
@@ -3721,8 +3722,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 82971601896783609}
-  - component: {fileID: 318145453588150804}
-  - component: {fileID: 839609831419405386}
   m_Layer: 11
   m_Name: Supra
   m_TagString: Vehicle
@@ -3752,36 +3751,21 @@ Transform:
   - {fileID: 1098227731856577016}
   m_Father: {fileID: 6205837048854703307}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &318145453588150804
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3358121485252897274}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5ec737efa3ae24285aeff32809ae3826, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Vehicles.VehicleMainBehaviour
-  vehicleID: 1
-  vehicleController: {fileID: 0}
-  rigidbody: {fileID: 0}
-  kmTracker: {fileID: 0}
 --- !u!114 &839609831419405386
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3358121485252897274}
+  m_GameObject: {fileID: 3337518441148050883}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c8e304bdabbbce74ba49d09f0091bbde, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::VehicleDamageReceiver
+  m_EditorClassIdentifier: Assembly-CSharp::Vehicles.CarDeformationSystem.VehicleDamageReceiver
   maxImpact: 25
   minImpact: 3
+  mainVehicleBehaviour: {fileID: 3459056531034866381}
 --- !u!1 &3369975449470551115
 GameObject:
   m_ObjectHideFlags: 0

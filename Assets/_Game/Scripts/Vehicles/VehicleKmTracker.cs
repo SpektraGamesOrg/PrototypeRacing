@@ -1,3 +1,4 @@
+using Core;
 using Save;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -49,8 +50,17 @@ namespace Vehicles
         {
             if (!body)
             {
-                Debug.LogError($"[VehicleKmTracker] {name} has no Rigidbody assigned; odometer disabled. " +
+                Debug.Log($"[VehicleKmTracker] {name} has no Rigidbody assigned; odometer disabled. " +
                                "Re-run MainVehicleBehaviour.Validate to wire it.", this);
+                enabled = false;
+            }
+        }
+
+        private void Start()
+        {
+            if (!GameManager.Exists())
+            {
+                Debug.LogError($"[VehicleKmTracker] {name} Component disabled because of we are not in game scene", this);
                 enabled = false;
             }
         }

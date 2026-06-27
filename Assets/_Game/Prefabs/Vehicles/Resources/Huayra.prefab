@@ -6029,7 +6029,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 614921728567194080}
-  - component: {fileID: 3855869471310734569}
   m_Layer: 11
   m_Name: Huayra
   m_TagString: Vehicle
@@ -6058,22 +6057,6 @@ Transform:
   - {fileID: 4903555692543924434}
   m_Father: {fileID: 2249023249468489722}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3855869471310734569
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6108948344551116780}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5ec737efa3ae24285aeff32809ae3826, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Vehicles.VehicleMainBehaviour
-  vehicleID: 14
-  vehicleController: {fileID: 0}
-  rigidbody: {fileID: 0}
-  kmTracker: {fileID: 0}
 --- !u!1 &6340983994531704284
 GameObject:
   m_ObjectHideFlags: 0
@@ -7581,6 +7564,7 @@ GameObject:
   - component: {fileID: 6252644882475004074}
   - component: {fileID: 2926197571968179702}
   - component: {fileID: 7417468864580061872}
+  - component: {fileID: 9190116298026374397}
   m_Layer: 11
   m_Name: Huayra
   m_TagString: Untagged
@@ -8762,3 +8746,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6dcd2266c92fd740bdfac8b91d46014, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &9190116298026374397
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8515333111759815284}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8e304bdabbbce74ba49d09f0091bbde, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Vehicles.CarDeformationSystem.VehicleDamageReceiver
+  maxImpact: 25
+  minImpact: 3
+  mainVehicleBehaviour: {fileID: 5679342249201138524}

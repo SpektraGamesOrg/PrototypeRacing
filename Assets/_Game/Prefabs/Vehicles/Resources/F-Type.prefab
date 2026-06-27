@@ -1248,6 +1248,7 @@ GameObject:
   - component: {fileID: 5280233228135995458}
   - component: {fileID: 8157659448966478820}
   - component: {fileID: 2189354508629473904}
+  - component: {fileID: 9173697746264735446}
   m_Layer: 11
   m_Name: F-Type
   m_TagString: Untagged
@@ -7696,7 +7697,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7332737307679299124}
-  - component: {fileID: 1066526748573586928}
   m_Layer: 11
   m_Name: F-Type
   m_TagString: Vehicle
@@ -7725,22 +7725,6 @@ Transform:
   - {fileID: 334469741825564983}
   m_Father: {fileID: 8063441069597094492}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1066526748573586928
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7745709894123931941}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5ec737efa3ae24285aeff32809ae3826, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Vehicles.VehicleMainBehaviour
-  vehicleID: 10
-  vehicleController: {fileID: 0}
-  rigidbody: {fileID: 0}
-  kmTracker: {fileID: 0}
 --- !u!1 &7977528479476016556
 GameObject:
   m_ObjectHideFlags: 0
@@ -9209,3 +9193,18 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 887692037317302799, guid: 3163f72b5b60bf147aaabe2b6c6b198f, type: 3}
   m_PrefabInstance: {fileID: 5061876293921889881}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &9173697746264735446
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1090249744996250524}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8e304bdabbbce74ba49d09f0091bbde, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Vehicles.CarDeformationSystem.VehicleDamageReceiver
+  maxImpact: 25
+  minImpact: 3
+  mainVehicleBehaviour: {fileID: -6889043351551406046}
