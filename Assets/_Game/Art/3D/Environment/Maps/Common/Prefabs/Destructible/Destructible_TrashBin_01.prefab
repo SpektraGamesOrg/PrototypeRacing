@@ -18,7 +18,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 1
   m_IsActive: 1
 --- !u!4 &634670974273801846
 Transform:
@@ -157,7 +157,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 1
   m_IsActive: 1
 --- !u!4 &4382295444752031244
 Transform:
@@ -245,8 +245,8 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_StaticEditorFlags: 1
+  m_IsActive: 1
 --- !u!4 &4480920212099417492
 Transform:
   m_ObjectHideFlags: 0
@@ -276,14 +276,13 @@ GameObject:
   m_Component:
   - component: {fileID: 4757569896629232257}
   - component: {fileID: -8135610592796668088}
-  - component: {fileID: -1145704191961681525}
   - component: {fileID: 1231301816479173774}
   m_Layer: 19
   m_Name: Destructible_TrashBin_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 1
   m_IsActive: 1
 --- !u!4 &4757569896629232257
 Transform:
@@ -323,25 +322,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.6597184, y: 1.1267252, z: 0.6127832}
   m_Center: {x: 0.008213714, y: 0.5819988, z: 0.03872174}
---- !u!205 &-1145704191961681525
-LODGroup:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4196023081426711391}
-  serializedVersion: 2
-  m_LocalReferencePoint: {x: 0.004724741, y: 0.61779976, z: -0.005712867}
-  m_Size: 1.2355995
-  m_FadeMode: 0
-  m_AnimateCrossFading: 0
-  m_LastLODIsBillboard: 0
-  m_LODs:
-  - screenRelativeHeight: 0.03
-    fadeTransitionWidth: 0
-    renderers:
-    - renderer: {fileID: 5881740561715181158}
-  m_Enabled: 1
 --- !u!114 &1231301816479173774
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -383,7 +363,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 1
   m_IsActive: 1
 --- !u!4 &7891168524896879047
 Transform:
@@ -524,7 +504,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 1
   m_IsActive: 1
 --- !u!4 &5286776182857284407
 Transform:
@@ -665,7 +645,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 1
   m_IsActive: 1
 --- !u!4 &4967062643520762746
 Transform:

@@ -50,7 +50,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 1
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &8133564172204439320
 Transform:
@@ -563,7 +563,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 1
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &8618787506861186433
 Transform:
@@ -652,7 +652,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 1
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &5322305295441937696
 Transform:
   m_ObjectHideFlags: 0
@@ -857,9 +857,9 @@ LODGroup:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6524796776340920186}
-  serializedVersion: 2
-  m_LocalReferencePoint: {x: -4.4009433, y: 3.817213, z: 0.17832625}
-  m_Size: 9.28534
+  serializedVersion: 3
+  m_LocalReferencePoint: {x: -4.4010043, y: 3.817213, z: 0.17832619}
+  m_Size: 9.28585
   m_FadeMode: 0
   m_AnimateCrossFading: 0
   m_LastLODIsBillboard: 0
@@ -868,11 +868,6 @@ LODGroup:
     fadeTransitionWidth: 0
     renderers:
     - renderer: {fileID: 9199480504061784486}
-    - renderer: {fileID: 4431623080484130381}
-    - renderer: {fileID: 7498255433701777400}
-    - renderer: {fileID: 6156374513936055167}
-    - renderer: {fileID: 2363132713364109307}
-    - renderer: {fileID: 4328583722916278921}
   - screenRelativeHeight: 0.20276546
     fadeTransitionWidth: 0
     renderers:
@@ -882,6 +877,7 @@ LODGroup:
     renderers:
     - renderer: {fileID: 4414566421522038338}
   m_Enabled: 1
+  m_GlobalIlluminationLOD: 0
 --- !u!65 &-8280827745535163127
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1084,7 +1080,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 1
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &6787954451544032317
 Transform:
