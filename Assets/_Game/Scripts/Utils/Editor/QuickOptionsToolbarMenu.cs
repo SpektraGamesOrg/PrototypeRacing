@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using Save;
 using Sirenix.OdinValidator.Editor;
 using SpektraGames.SpektraUtilities.Runtime;
 using UnityEditor;
@@ -21,6 +22,32 @@ namespace Utils.Editor.QuickOptionsToolbarMenu
             var content = new MainToolbarContent("Quick Options", icon, "Quick Options Menu");
 
             return new MainToolbarButton(content, ShowQuickOptionsMenu);
+        }
+
+        // Dock in the Middle zone before Unity's Play Mode Controls so the button sits immediately to the
+        // left of the Play/Pause/Step buttons.
+        [MainToolbarElement("SpektraGames/SelectSaveHelper",
+            defaultDockPosition = MainToolbarDockPosition.Middle, defaultDockIndex = 0)]
+        public static MainToolbarElement CreateSelectSaveHelperButton()
+        {
+            var icon = EditorGUIUtility.IconContent("d_Search Icon").image as Texture2D;
+            var content = new MainToolbarContent(icon, "Select SaveHelper in scene");
+
+            return new MainToolbarButton(content, SelectSaveHelper);
+        }
+
+        private static void SelectSaveHelper()
+        {
+            // Editor-only toolbar code, so scene scanning is fine here. Works in both edit and play mode.
+            var saveHelper = UnityEngine.Object.FindFirstObjectByType<SaveHelper>(FindObjectsInactive.Include);
+            if (!saveHelper)
+            {
+                Debug.LogError("SaveHelper was not found in the active scene.");
+                return;
+            }
+
+            Selection.activeGameObject = saveHelper.gameObject;
+            EditorGUIUtility.PingObject(saveHelper.gameObject);
         }
 
         private static void ShowQuickOptionsMenu()

@@ -56,6 +56,9 @@ public class RCC_Customizer_Decal : RCC_Core {
         dp.scaleMode = DecalScaleMode.InheritFromHierarchy;
         dp.pivot = Vector3.zero;
         dp.drawDistance = 500f;
+        
+        if(!RCC_Settings.Instance)
+            return;
 
         if (dp.material == null)
             dp.material = RCC_Settings.Instance.defaultDecalMaterial;
