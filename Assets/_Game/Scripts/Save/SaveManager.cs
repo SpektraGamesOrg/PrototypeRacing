@@ -331,19 +331,28 @@ namespace Save
                 return;
             }
 
+            //Debug.LogError("EnsureStarterVehicle");
+
             bool anyChange = false;
 
             for (var i = 0; i < container.Vehicles.Count; i++)
             {
                 var vehicle = container.Vehicles[i];
 
+                //Debug.LogError($"vehicle.ID: {vehicle.ID}, VehicleObtainType: {vehicle.VehicleObtainType}, IsOwned: {IsOwned(vehicle.ID)}");
+
                 if (vehicle.VehicleObtainType == VehicleObtainType.Free &&
                     !IsOwned(vehicle.ID))
                 {
                     AddOwned(vehicle.ID);
 
+                    //Debug.LogError("Added owned: " + vehicle.ID);
+                    //Debug.LogError("SelectedVehicle: " + SelectedVehicle);
+
                     if (SelectedVehicle == VehicleID.None)
                         SelectVehicle(vehicle.ID);
+
+                    //Debug.LogError("SelectedVehicle: " + SelectedVehicle);
 
                     anyChange = true;
                 }
@@ -372,6 +381,7 @@ namespace Save
         /// </summary>
         public static void ResetAll()
         {
+            //Debug.LogError("[SaveManager] ResetAll called.");
             PlayerPrefs.DeleteAll();
             PlayerPrefs.Save();
             OnSaveReset?.Invoke();

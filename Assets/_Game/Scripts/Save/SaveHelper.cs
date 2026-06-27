@@ -116,6 +116,12 @@ namespace Save
         }
 
         [Button]
+        private void ReInitialize()
+        {
+            SaveManager.Initialize();
+        }
+        
+        [Button]
         private void ClearPlayerPrefs()
         {
             SaveManager.ResetAll();
