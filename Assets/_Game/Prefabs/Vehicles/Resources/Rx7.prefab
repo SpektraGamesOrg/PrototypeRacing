@@ -7134,7 +7134,7 @@ GameObject:
   - component: {fileID: -783038467025350192}
   m_Layer: 11
   m_Name: Rx7
-  m_TagString: Untagged
+  m_TagString: Vehicle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7501,6 +7501,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 633577043808a4cec8a90ca28b085916, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Vehicles.VehicleKmTracker
+  mainVehicleBehaviour: {fileID: 3476444351938451524}
   body: {fileID: 6547014499700783746}
   controller: {fileID: 3571639989426556995}
 --- !u!114 &9202793905010015695
@@ -7515,10 +7516,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8e304bdabbbce74ba49d09f0091bbde, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Vehicles.CarDeformationSystem.VehicleDamageReceiver
+  mainVehicleBehaviour: {fileID: 3476444351938451524}
   maxImpact: 25
   minImpact: 3
   painters: []
-  mainVehicleBehaviour: {fileID: 3476444351938451524}
 --- !u!114 &-783038467025350192
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7531,6 +7532,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 733e85ed07fd84a7ca81ad1f23218ae7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Vehicles.VehicleKinematicMoverBehaviour
+  mainVehicleBehaviour: {fileID: 3476444351938451524}
+  radiusTolerance: 0.3
+  angleThreshold: 300
 --- !u!1 &7530180223929501733
 GameObject:
   m_ObjectHideFlags: 0

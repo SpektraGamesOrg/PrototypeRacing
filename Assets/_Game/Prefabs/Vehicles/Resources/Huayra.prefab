@@ -7568,7 +7568,7 @@ GameObject:
   - component: {fileID: -4073820013111585172}
   m_Layer: 11
   m_Name: Huayra
-  m_TagString: Untagged
+  m_TagString: Vehicle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7935,6 +7935,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 633577043808a4cec8a90ca28b085916, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Vehicles.VehicleKmTracker
+  mainVehicleBehaviour: {fileID: 5679342249201138524}
   body: {fileID: 6252644882475004074}
   controller: {fileID: 2926197571968179702}
 --- !u!114 &9190116298026374397
@@ -7949,10 +7950,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8e304bdabbbce74ba49d09f0091bbde, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Vehicles.CarDeformationSystem.VehicleDamageReceiver
+  mainVehicleBehaviour: {fileID: 5679342249201138524}
   maxImpact: 25
   minImpact: 3
   painters: []
-  mainVehicleBehaviour: {fileID: 5679342249201138524}
 --- !u!114 &-4073820013111585172
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7965,6 +7966,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 733e85ed07fd84a7ca81ad1f23218ae7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Vehicles.VehicleKinematicMoverBehaviour
+  mainVehicleBehaviour: {fileID: 5679342249201138524}
+  radiusTolerance: 0.3
+  angleThreshold: 300
 --- !u!1 &8726493070014105322
 GameObject:
   m_ObjectHideFlags: 0

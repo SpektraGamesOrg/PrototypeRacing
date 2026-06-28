@@ -3870,7 +3870,7 @@ GameObject:
   - component: {fileID: 3983970841487428819}
   m_Layer: 11
   m_Name: Fenyr
-  m_TagString: Untagged
+  m_TagString: Vehicle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4237,6 +4237,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 633577043808a4cec8a90ca28b085916, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Vehicles.VehicleKmTracker
+  mainVehicleBehaviour: {fileID: -5096460011673770898}
   body: {fileID: 8658465359991164460}
   controller: {fileID: 5520015547198650708}
 --- !u!114 &9215793388159520930
@@ -4251,10 +4252,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8e304bdabbbce74ba49d09f0091bbde, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Vehicles.CarDeformationSystem.VehicleDamageReceiver
+  mainVehicleBehaviour: {fileID: -5096460011673770898}
   maxImpact: 25
   minImpact: 3
   painters: []
-  mainVehicleBehaviour: {fileID: -5096460011673770898}
 --- !u!114 &3983970841487428819
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4267,6 +4268,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 733e85ed07fd84a7ca81ad1f23218ae7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Vehicles.VehicleKinematicMoverBehaviour
+  mainVehicleBehaviour: {fileID: -5096460011673770898}
+  radiusTolerance: 0.3
+  angleThreshold: 300
 --- !u!1 &3830786631287650898
 GameObject:
   m_ObjectHideFlags: 0
