@@ -151,6 +151,11 @@ namespace Core
                         await UniTask.DelayFrame(bufferFrameDelay, cancellationToken: token);
                 }
 
+                // Free the gameplay-only minimap texture before the shared memory cleanup when returning to
+                // the main menu, so it is fully reclaimed by UnloadUnusedAssets / GC below.
+                if (sceneType == SceneType.MainMenu)
+                    Minimap.MinimapManager.UnloadMapTexture();
+
                 // Clean memory
                 await UniTask.NextFrame();
                 ResourceObjectCleaner.UnloadAll();

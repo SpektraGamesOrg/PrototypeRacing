@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 2280002783495939998}
   - component: {fileID: 1961245556822705590}
   - component: {fileID: 7292052478287481271}
+  - component: {fileID: -6347173433955746205}
   m_Layer: 0
   m_Name: GoldParentPrefab
   m_TagString: Untagged
@@ -98,6 +99,24 @@ MonoBehaviour:
   particles: {fileID: 0}
   shrinkDuration: 0.2
   shrinkTarget: {fileID: 8050293441192925522}
+--- !u!114 &-6347173433955746205
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6773004512704949716}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c51ac3569b2f435681d9c0455a04bb1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Minimap.MinimapMarker
+  icon: {fileID: 21300000, guid: 5b6a4dd5a0ed946068222a334bea0e40, type: 3}
+  size: {x: 28, y: 28}
+  color: {r: 1, g: 1, b: 1, a: 1}
+  clampToEdge: 0
+  keepUpright: 1
+  gizmoColor: {r: 0.96862745, g: 0.8039216, b: 0.32156864, a: 1}
 --- !u!1 &9115651842972282807
 GameObject:
   m_ObjectHideFlags: 0
@@ -156,6 +175,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
+  m_UseReflectionProbes: 0
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
