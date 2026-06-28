@@ -58,7 +58,7 @@ MonoBehaviour:
   ViewLabels: 0
   PathFindingEnabled: 0
   WaypointDistance: 4
-  LaneWidth: 6
+  LaneWidth: 3.8
   MoveTool: 1
   speedRoutes:
     Id: ffffffff
