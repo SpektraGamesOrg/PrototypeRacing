@@ -93,6 +93,8 @@ Material:
     - _AlphaClip: 0
     - _AlphaClipThreshold: 0.5
     - _AlphaToMask: 0
+    - _Animation: 0
+    - _BillBoard: 1
     - _Billboard: 1
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
