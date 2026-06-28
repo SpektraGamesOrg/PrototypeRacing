@@ -54,6 +54,9 @@ namespace SRDebugger.UI.Other
             SetLoadingSpinnerVisible(false);
             ClearErrorMessage();
             ClearForm();
+            
+            if(EmailField)
+                EmailField.SetTextWithoutNotify("yusuf@spektra.games");
         }
 
         public void Submit()
