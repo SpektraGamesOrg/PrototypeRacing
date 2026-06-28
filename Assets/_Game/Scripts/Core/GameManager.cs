@@ -108,8 +108,7 @@ namespace Core
 
             // Traffic
             gleyTrafficComponent.player = _spawnedVehicle.transform;
-            API.SetCamera(rccCamera.actualCamera.transform);
-            gleyTrafficComponent.enabled = true;
+            API.Initialize(_spawnedVehicle.transform, gleyTrafficComponent.nrOfVehicles, gleyTrafficComponent.vehiclePool, gleyTrafficComponent.Options);
 
             progress?.Report(1f);
             return _spawnedVehicle;

@@ -17,9 +17,9 @@ namespace Gley.TrafficSystem
         public VehiclePool vehiclePool;
 
         [Header("Optional Settings")]
-
         [Header("Spawning")]
-        [Tooltip("Square located at this distance from the player are actively update. Ex: if set is to 2 -> intersections will update on a 2 square distance from the player")]
+        [Tooltip(
+            "Square located at this distance from the player are actively update. Ex: if set is to 2 -> intersections will update on a 2 square distance from the player")]
         public int activeSquareLevels = 1;
         [Tooltip("Minimum distance from the player where a vehicle can be instantiated. (If -1 the system will automatically determine this value)")]
         public float minDistanceToAdd = -1;
@@ -33,7 +33,8 @@ namespace Gley.TrafficSystem
         public float greenLightTime = -1;
 
         [Header("Density")]
-        [Tooltip("Nr of vehicles instantiated around the player from the start. Set it to something < nrOfVehicles for low density right at the start. (If -1 all vehicles will be instantiated from the beginning)")]
+        [Tooltip(
+            "Nr of vehicles instantiated around the player from the start. Set it to something < nrOfVehicles for low density right at the start. (If -1 all vehicles will be instantiated from the beginning)")]
         public int initialActiveVehicles = -1;
         [Tooltip("Set high priority on roads for higher traffic density(ex highways). See priority setup")]
         public bool useWaypointPriority = false;
@@ -50,9 +51,15 @@ namespace Gley.TrafficSystem
         [Tooltip("Area to disable from the start if cars are not allowed to spawn there")]
         public Area disableWaypointsArea = default;
 
-        void Start()
+        private void Start()
         {
-            TrafficOptions options = new TrafficOptions()
+            TrafficOptions options = Options;
+
+            //API.Initialize(player, nrOfVehicles, vehiclePool, options);
+        }
+
+        public TrafficOptions Options =>
+            new()
             {
                 ActiveSquaresLevel = activeSquareLevels,
                 DisableWaypointsArea = disableWaypointsArea,
@@ -65,9 +72,5 @@ namespace Gley.TrafficSystem
                 YellowLightTime = yellowLightTime,
                 DefaultPathLength = _defaultPathLength,
             };
-
-           
-            API.Initialize(player, nrOfVehicles, vehiclePool, options);
-        }
     }
 }
