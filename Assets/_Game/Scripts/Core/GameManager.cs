@@ -107,8 +107,15 @@ namespace Core
             BindCamera(_spawnedVehicle.VehicleController);
 
             // Traffic
-            gleyTrafficComponent.player = _spawnedVehicle.transform;
-            API.Initialize(_spawnedVehicle.transform, gleyTrafficComponent.nrOfVehicles, gleyTrafficComponent.vehiclePool, gleyTrafficComponent.Options);
+            // Gley uses this transform's position as the line-of-sight "eye" that decides where traffic may spawn.
+            // Pass the elevated chase camera (what the player actually sees), not the ground-level car origin: the
+            // car origin sits inside the vehicle's own colliders, which would make every nearby spawn point read as
+            // "occluded" and defeat the minDistanceToAdd spawn guard.
+            gleyTrafficComponent.player = _spawnedVehicle.transform; // cosmetic only; the real reference is the Initialize argument below
+            Transform trafficLosEye = rccCamera && rccCamera.actualCamera
+                ? rccCamera.actualCamera.transform
+                : _spawnedVehicle.transform; // fallback if the camera has not resolved its Camera yet
+            API.Initialize(trafficLosEye, gleyTrafficComponent.nrOfVehicles, gleyTrafficComponent.vehiclePool, gleyTrafficComponent.Options);
 
             progress?.Report(1f);
             return _spawnedVehicle;

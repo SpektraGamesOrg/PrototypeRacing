@@ -21,10 +21,10 @@ MonoBehaviour:
     m_Bits: 65536
   buildingsLayers:
     serializedVersion: 2
-    m_Bits: 31743
+    m_Bits: 1015
   obstaclesLayers:
     serializedVersion: 2
     m_Bits: 0
   playerLayers:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 2056
