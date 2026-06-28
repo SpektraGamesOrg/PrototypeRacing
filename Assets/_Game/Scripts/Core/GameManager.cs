@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using Gley.TrafficSystem;
 using Save;
 using Sirenix.OdinInspector;
 using SpektraGames.ResourceObject.Runtime;
@@ -24,6 +25,7 @@ namespace Core
         [SerializeField] private Transform vehicleSpawnPoint;
 
         [SerializeField] private RCC_Camera rccCamera;
+        [SerializeField] private TrafficComponent gleyTrafficComponent;
 
         [Tooltip("The active gameplay vehicle instance. Assigned after the async spawn completes.")]
         [ShowInInspector, ReadOnly] private MainVehicleBehaviour _spawnedVehicle = null;
@@ -103,6 +105,12 @@ namespace Core
             _spawnedVehicle.VehicleController.StartEngine(true);
 
             BindCamera(_spawnedVehicle.VehicleController);
+
+            // Traffic
+            gleyTrafficComponent.player = _spawnedVehicle.transform;
+            API.SetCamera(rccCamera.actualCamera.transform);
+            gleyTrafficComponent.enabled = true;
+
             progress?.Report(1f);
             return _spawnedVehicle;
         }

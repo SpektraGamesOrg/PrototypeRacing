@@ -16,10 +16,12 @@ namespace Scripts.Core
 
             var currentScene = SceneManager.GetActiveScene();
 
-            if (currentScene.name != nameof(SceneType.Starter))
+            if (currentScene.name != nameof(SceneType.Starter) &&
+                (currentScene.name == nameof(SceneType.Game) || currentScene.name == nameof(SceneType.MainMenu))
+               )
             {
                 Debug.LogError("The game was not started from Starter scene.");
-                //SceneManager.LoadScene(nameof(SceneType.Starter));
+                SceneManager.LoadScene(nameof(SceneType.Starter));
             }
         }
 #endif
