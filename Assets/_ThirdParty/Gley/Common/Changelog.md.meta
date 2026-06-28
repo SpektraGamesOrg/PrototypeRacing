@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 88a41f3ef5e448f44bc172be7e7409b2
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 305800
+  packageName: Mobile Traffic System v3
+  packageVersion: 3.6.2
+  assetPath: Assets/Gley/Common/Changelog.md
+  uploadId: 938926

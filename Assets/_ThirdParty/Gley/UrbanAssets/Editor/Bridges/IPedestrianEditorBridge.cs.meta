@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 64a16faefc0dd4c4988bdc9eb11e851b
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 305800
+  packageName: Mobile Traffic System v3
+  packageVersion: 3.6.2
+  assetPath: Assets/Gley/UrbanAssets/Editor/Bridges/IPedestrianEditorBridge.cs
+  uploadId: 938926

@@ -5,8 +5,45 @@ apply from: '../shared/common.gradle'
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+// Android Resolver Dependencies Start
+    implementation 'androidx.recyclerview:recyclerview:1.2.1' // Packages/com.applovin.mediation.adapters.mintegral.android/Editor/Dependencies.xml:9
+    implementation 'com.android.installreferrer:installreferrer:2.1' // Packages/appsflyer-unity-plugin/Editor/AppsFlyerDependencies.xml:7
+    implementation 'com.applovin.mediation:bytedance-adapter:8.1.0.4.0' // Packages/com.applovin.mediation.adapters.bytedance.android/Editor/Dependencies.xml:8
+    implementation 'com.applovin.mediation:facebook-adapter:[6.21.0.0]' // Packages/com.applovin.mediation.adapters.facebook.android/Editor/Dependencies.xml:7
+    implementation 'com.applovin.mediation:google-adapter:[25.4.0.0]' // Packages/com.applovin.mediation.adapters.google.android/Editor/Dependencies.xml:4
+    implementation 'com.applovin.mediation:ironsource-adapter:9.4.4.0.0' // Packages/com.applovin.mediation.adapters.ironsource.android/Editor/Dependencies.xml:4
+    implementation 'com.applovin.mediation:mintegral-adapter:17.1.61.0' // Packages/com.applovin.mediation.adapters.mintegral.android/Editor/Dependencies.xml:8
+    implementation 'com.applovin.mediation:unityads-adapter:4.19.0.0' // Packages/com.applovin.mediation.adapters.unityads.android/Editor/Dependencies.xml:4
+    implementation 'com.applovin.mediation:vungle-adapter:7.7.4.0' // Packages/com.applovin.mediation.adapters.vungle.android/Editor/Dependencies.xml:4
+    implementation 'com.applovin:applovin-sdk:13.6.3' // Packages/com.applovin.mediation.ads/AppLovin/Editor/Dependencies.xml:4
+    implementation 'com.appsflyer:af-android-sdk:6.18.1' // Packages/appsflyer-unity-plugin/Editor/AppsFlyerDependencies.xml:5
+    implementation 'com.appsflyer:purchase-connector:2.2.0' // Packages/appsflyer-unity-plugin/Editor/AppsFlyerDependencies.xml:8
+    implementation 'com.appsflyer:unity-wrapper:6.18.1' // Packages/appsflyer-unity-plugin/Editor/AppsFlyerDependencies.xml:6
+    implementation 'com.google.android.ump:user-messaging-platform:4.0.0' // Assets/MaxSdk/AppLovin/Editor/Dependencies.xml:4
+// Android Resolver Dependencies End
 **DEPS**}
 
+// Drop AppsFlyer purchase-connector: it shares the 'com.appsflyer' namespace with
+// af-android-sdk, which AGP 9 rejects (duplicate library namespace in the manifest
+// merger). This game is ads-only with no IAP, so the purchase connector is unused.
+// Placed outside the Android Resolver markers so it survives EDM4U re-resolution.
+// Remove this block if in-app purchases (and their revenue attribution) are ever added.
+configurations.all {
+    exclude group: 'com.appsflyer', module: 'purchase-connector'
+}
+
+// Android Resolver Exclusions Start
+android {
+  packaging {
+      exclude ('/lib/armeabi/*' + '*')
+      exclude ('/lib/armeabi-v7a/*' + '*')
+      exclude ('/lib/mips/*' + '*')
+      exclude ('/lib/mips64/*' + '*')
+      exclude ('/lib/x86/*' + '*')
+      exclude ('/lib/x86_64/*' + '*')
+  }
+}
+// Android Resolver Exclusions End
 android {
     namespace "com.unity3d.player"
     ndkPath "**NDKPATH**"

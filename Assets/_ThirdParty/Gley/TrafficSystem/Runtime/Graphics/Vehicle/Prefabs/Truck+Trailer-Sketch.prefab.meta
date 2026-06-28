@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 838985f551a549c4da1a4d7acbdc158e
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 305800
+  packageName: Mobile Traffic System v3
+  packageVersion: 3.6.2
+  assetPath: Assets/Gley/TrafficSystem/Runtime/Graphics/Vehicle/Prefabs/Truck+Trailer-Sketch.prefab
+  uploadId: 938926

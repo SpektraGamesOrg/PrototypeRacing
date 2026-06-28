@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: d51976a5c295eb7468e6825b609ba261
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 305800
+  packageName: Mobile Traffic System v3
+  packageVersion: 3.6.2
+  assetPath: Assets/Gley/TrafficSystem/Editor/RenderPipeline/TrafficSystem-URP.unitypackage
+  uploadId: 938926
