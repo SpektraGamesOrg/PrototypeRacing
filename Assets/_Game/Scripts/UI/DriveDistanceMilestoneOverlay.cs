@@ -1,10 +1,10 @@
 using System;
-using System.Globalization;
 using Milestones;
 using TMPro;
 using UIManager;
 using UnityEngine;
 using UnityEngine.UI;
+using Utils;
 
 namespace UI
 {
@@ -37,7 +37,9 @@ namespace UI
         [SerializeField, Min(0f)] private float fillSmoothTime = 0.25f;
 
         // Cached last-shown values so the (allocating) label strings are only rebuilt on a real change.
-        private int _lastShownKm = -1;
+        // The progress value is tracked in hundredths of a km (the 2-decimal display unit) so the string
+        // rebuilds only when a visible digit changes, not every frame.
+        private int _lastShownHundredths = -1;
         private int _lastShownTargetKm = -1;
         private int _lastShownReward = -1;
 
@@ -105,20 +107,22 @@ namespace UI
 
                 _snapNext = false;
 
-                // Floor so the number only ticks up when a whole km is actually completed; clamp so it can
-                // never read past the target. Only rebuild the string when it changes.
-                int shownKm = Mathf.Min(Mathf.FloorToInt(liveKm), target);
-                if (progressText && (shownKm != _lastShownKm || target != _lastShownTargetKm))
+                // Show the live fractional distance with 2 decimals (e.g. "0.76 / 1 KM"); clamp so it can
+                // never read past the target. Cache on the rounded hundredths-of-a-km so the (allocating)
+                // string is only rebuilt when a visible digit actually changes, not every frame.
+                float shownKm = Mathf.Min(liveKm, target);
+                int shownHundredths = Mathf.RoundToInt(shownKm * 100f);
+                if (progressText && (shownHundredths != _lastShownHundredths || target != _lastShownTargetKm))
                 {
-                    _lastShownKm = shownKm;
+                    _lastShownHundredths = shownHundredths;
                     _lastShownTargetKm = target;
-                    progressText.text = $"{shownKm:N0} / {target:N0} KM";
+                    progressText.text = $"{DistanceFormat.Km(shownHundredths / 100f)} / {DistanceFormat.KmTarget(target)} KM";
                 }
 
                 if (rewardAmountText && milestone.RewardGold != _lastShownReward)
                 {
                     _lastShownReward = milestone.RewardGold;
-                    rewardAmountText.text = Abbreviate(milestone.RewardGold);
+                    rewardAmountText.text = GoldFormat.Abbreviate(milestone.RewardGold);
                 }
             }
             catch (Exception e)
@@ -145,18 +149,5 @@ namespace UI
                 _snapNext = true;
         }
 
-        // Compact, human-readable amount: "950", "1K", "10K", "150K", "1.5M", "15M", "1.2B".
-        // One optional decimal (dropped when whole). Invariant culture so the decimal is always a dot,
-        // regardless of the active locale.
-        private static string Abbreviate(int value)
-        {
-            if (value < 1_000)
-                return value.ToString(CultureInfo.InvariantCulture);
-            if (value < 1_000_000)
-                return (value / 1_000d).ToString("0.#", CultureInfo.InvariantCulture) + "K";
-            if (value < 1_000_000_000)
-                return (value / 1_000_000d).ToString("0.#", CultureInfo.InvariantCulture) + "M";
-            return (value / 1_000_000_000d).ToString("0.#", CultureInfo.InvariantCulture) + "B";
-        }
     }
 }

@@ -27,11 +27,21 @@ namespace UI
         [Tooltip("Optional label that shows the rounded percentage, e.g. \"57%\".")]
         [SerializeField] private TMP_Text percentText;
 
+        [Header("Direction")]
+        [Tooltip("When enabled the bar fills from right to left instead of the default left to right.")]
+        [SerializeField] private bool reverse;
+
         [Header("Smoothing")]
         [Tooltip("When enabled the fill eases toward the reported value instead of snapping.")]
         [SerializeField] private bool smooth = true;
         [Tooltip("Higher is snappier. Frame-rate independent.")]
         [SerializeField, Min(0.01f)] private float smoothSpeed = 8f;
+
+#if UNITY_EDITOR
+        [Header("Editor Preview")]
+        [Tooltip("Editor-only. Drag to preview the fill at this percentage without entering play mode. Ignored at runtime.")]
+        [SerializeField, Range(0f, 100f)] private float editorPreviewPercent;
+#endif
 
         /// <summary>Raised whenever the displayed value changes. Argument is in the 0..1 range.</summary>
         public event Action<float> ProgressChanged;
@@ -50,8 +60,24 @@ namespace UI
         /// <summary>True once the bar has visually reached the end.</summary>
         public bool IsComplete => _displayed >= 1f - 0.0001f;
 
+        /// <summary>When true the bar fills from right to left. Setting it re-orients the fill immediately.</summary>
+        public bool Reverse
+        {
+            get => reverse;
+            set
+            {
+                if (reverse == value)
+                    return;
+
+                reverse = value;
+                ApplyOrientation();
+                ApplyDisplayed();
+            }
+        }
+
         private void Awake()
         {
+            ApplyOrientation();
             SetProgress(0f, true);
         }
 
@@ -114,6 +140,34 @@ namespace UI
             SetProgress(0f, true);
         }
 
+        /// <summary>
+        /// Pins the fill to the left edge (normal) or the right edge (reverse) of its parent so that
+        /// growing its width fills in the requested direction. Only the horizontal anchor/pivot is
+        /// touched; whatever vertical anchoring the prefab uses is preserved.
+        /// </summary>
+        private void ApplyOrientation()
+        {
+            if (!fillRectTransform)
+                return;
+
+            float edge = reverse ? 1f : 0f;
+
+            Vector2 anchorMin = fillRectTransform.anchorMin;
+            Vector2 anchorMax = fillRectTransform.anchorMax;
+            Vector2 pivot = fillRectTransform.pivot;
+            anchorMin.x = edge;
+            anchorMax.x = edge;
+            pivot.x = edge;
+            fillRectTransform.anchorMin = anchorMin;
+            fillRectTransform.anchorMax = anchorMax;
+            fillRectTransform.pivot = pivot;
+
+            // Sit flush against the anchored edge; the width alone drives the visible fill.
+            Vector2 pos = fillRectTransform.anchoredPosition;
+            pos.x = 0f;
+            fillRectTransform.anchoredPosition = pos;
+        }
+
         private void ApplyDisplayed()
         {
             float shown = Mathf.Clamp01(_displayed);
@@ -154,6 +208,16 @@ namespace UI
 #if UNITY_EDITOR
         private void OnValidate()
         {
+            // Keep the fill oriented for the current direction and reflect the preview percentage
+            // live in the inspector. None of this runs at runtime.
+            ApplyOrientation();
+
+            if (!Application.isPlaying && fillRectTransform && fillParentRectTransform)
+            {
+                _target = Mathf.Clamp01(editorPreviewPercent / 100f);
+                _displayed = _target;
+                ApplyDisplayed();
+            }
         }
 #endif
     }

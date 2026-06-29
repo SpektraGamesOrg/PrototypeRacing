@@ -7,6 +7,7 @@ using TMPro;
 using UIManager;
 using UnityEngine;
 using UnityEngine.UI;
+using Utils;
 using Vehicles;
 
 namespace UI
@@ -346,7 +347,7 @@ namespace UI
                 if (unlockStatusText)
                     unlockStatusText.text = $"UNLOCK STATUS: <color=#FFC31A>{percent}%</color>";
                 if (unlockStatusDistanceText)
-                    unlockStatusDistanceText.text = $"{Mathf.Min(driven, target)} / {target} KM";
+                    unlockStatusDistanceText.text = $"{DistanceFormat.Km(Mathf.Min(driven, target))} / {DistanceFormat.KmTarget(target)} KM";
                 if (unlockStatusLoadingBar)
                     unlockStatusLoadingBar.SetProgress(progress01);
             }

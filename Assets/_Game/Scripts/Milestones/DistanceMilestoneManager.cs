@@ -194,6 +194,25 @@ namespace Milestones
         }
 
         /// <summary>
+        /// True when the LIVE distance has crossed a milestone threshold the committed odometer
+        /// (<see cref="DistanceDrivenKm"/>) has not yet reached - i.e. the player just drove past a milestone
+        /// line but the whole-km commit that makes it claimable hasn't happened. The km tracker polls this each
+        /// physics step and commits on the way past, so the MILESTONE COMPLETED pop-up can appear at the moment
+        /// of crossing instead of waiting for the next despawn/pause commit. Cheap: a couple of comparisons
+        /// against the ascending table. False (no forced commit) when the table is unavailable.
+        /// </summary>
+        public static bool HasUncommittedReachedMilestone()
+        {
+            DistanceMilestoneContainer container = DistanceMilestoneContainer.Instance;
+            if (!container)
+                return false;
+
+            int committedReached = ComputeReachedCount(container, SaveManager.DistanceDrivenKm);
+            int liveReached = ComputeReachedCount(container, Mathf.FloorToInt(LiveDistanceKm));
+            return liveReached > committedReached;
+        }
+
+        /// <summary>
         /// Subscribes to distance changes. Pending milestones from a previous session stay pending (their
         /// rewards are not auto-granted), ready for the pop-up to claim. Idempotent - safe to call once at
         /// startup; repeated calls are a no-op.
