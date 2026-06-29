@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Vehicles;
@@ -41,6 +42,23 @@ namespace Save
         /// for a full reset, so listeners should re-read everything they display when this fires.
         /// </summary>
         public static event System.Action OnSaveReset;
+
+        public static string UserId
+        {
+            get
+            {
+                string userId = PlayerPrefs.GetString(SaveKeys.UserId, string.Empty);
+
+                if (string.IsNullOrEmpty(userId))
+                {
+                    userId = Guid.NewGuid().ToString();
+                    PlayerPrefs.SetString(SaveKeys.UserId, userId);
+                    PlayerPrefs.Save();
+                }
+
+                return userId;
+            }
+        }
 
         public static int Gold
         {
@@ -318,6 +336,7 @@ namespace Save
         /// </summary>
         public static void Initialize()
         {
+            string userId = UserId; // To generate user id
             EnsureStarterVehicle();
         }
 

@@ -16,7 +16,10 @@ namespace Save
     {
 #if UNITY_EDITOR
         [ShowInInspector, ReadOnly, BoxGroup("Save State")]
-        private int CurrentCoins => Application.isPlaying ? SaveManager.Gold : 0;
+        private string UserId => Application.isPlaying ? SaveManager.UserId : "";
+
+        [ShowInInspector, ReadOnly, BoxGroup("Save State")]
+        private int CurrentGold => Application.isPlaying ? SaveManager.Gold : 0;
 
         [ShowInInspector, ReadOnly, BoxGroup("Save State")]
         private List<VehicleID> OwnedVehicles => Application.isPlaying
@@ -120,7 +123,7 @@ namespace Save
         {
             SaveManager.Initialize();
         }
-        
+
         [Button]
         private void ClearPlayerPrefs()
         {

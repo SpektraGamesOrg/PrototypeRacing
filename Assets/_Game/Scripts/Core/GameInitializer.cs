@@ -2,6 +2,8 @@ using System;
 using System.Globalization;
 using System.Threading;
 using _Game.Scripts.Utils.VContainer;
+using Analytics;
+using Analytics.AppsFlyer;
 using Cysharp.Threading.Tasks;
 using Milestones;
 using Save;
@@ -111,6 +113,43 @@ namespace Core
             RuntimeUI.Init();
             progress?.Report(0.6f); // Logical 0..1 within the bootstrap slice (scaled by RangedProgress).
 
+            MainLifetimeScope mainScope = ServiceLocator.GetScope<MainLifetimeScope>();
+
+            // Firebase
+            FirebaseAnalyticsService firebaseService = null;
+            if (mainScope.TryGetServiceFromScope(out firebaseService))
+            {
+                var loadFirebaseAsync = firebaseService.InitializeAsync();
+                float timeOut = 5f;
+                float counter = timeOut;
+                while (loadFirebaseAsync.Status != UniTaskStatus.Succeeded)
+                {
+                    await UniTask.NextFrame();
+                    counter -= Time.unscaledDeltaTime;
+
+                    if (counter <= 0)
+                    {
+                        Debug.LogError($"Firebase check dependencies could not complete in {timeOut} seconds");
+                        break;
+                    }
+                }
+
+                if (firebaseService.isFirebaseInitialized)
+                {
+                    firebaseService.SetUserId(PlayerPrefs.GetString("UserIDSaved", ""));
+                }
+                else
+                {
+                    Debug.LogError($"Firebase not initialized within {timeOut}s");
+                }
+            }
+            else
+            {
+                Debug.LogError("firebaseService not found in main scope");
+            }
+
+            ServiceLocator.TryGetService(out IMMPService mmpService);
+
             // Unity services
             try
             {
@@ -130,7 +169,7 @@ namespace Core
                 Debug.LogError(e.ToString());
             }
 
-            MainLifetimeScope mainScope = ServiceLocator.GetScope<MainLifetimeScope>();
+            SetUserIdForServices();
 
             // Completed
             Initializing = false;
@@ -141,6 +180,41 @@ namespace Core
             // here (InitializationProgressEnd), streams the scene, then the MainMenu scene loader loads the
             // garage car and switches to the menu screen.
             await LoadMainMenuSceneAsync();
+        }
+
+        private void SetUserIdForServices()
+        {
+            string userId = SaveManager.UserId;
+
+            try
+            {
+                UnityServices.ExternalUserId = userId;
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e.ToString());
+            }
+
+            try
+            {
+                ServiceLocator.TryGetService(out FirebaseAnalyticsService firebaseService);
+                firebaseService.SetUserId(userId);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e.ToString());
+            }
+
+            // try
+            // {
+            //     var adService = ServiceLocator.GetService<IAdService>();
+            //     adService.Initialize(hasTrackingConsent);
+            //     adService.SetUserId(userId);
+            // }
+            // catch (Exception e)
+            // {
+            //     Debug.LogError(e.ToString());
+            // }
         }
 
         // Loads the main menu scene through the SceneManager singleton once bootstrap completes.
