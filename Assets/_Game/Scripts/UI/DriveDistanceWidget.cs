@@ -1,4 +1,5 @@
 using Save;
+using Utils;
 
 namespace UI
 {
@@ -20,6 +21,6 @@ namespace UI
             SaveManager.OnDistanceDrivenChanged -= HandleValueChanged;
         }
 
-        protected override string GetDisplayText() => $"{SaveManager.DistanceDrivenKm:N0} KM";
+        protected override string GetDisplayText() => $"{DistanceFormat.Km(SaveManager.DistanceDrivenKm)} KM";
     }
 }

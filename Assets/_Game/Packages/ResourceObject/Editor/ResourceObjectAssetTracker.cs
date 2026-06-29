@@ -1,19 +1,20 @@
 using System.Collections.Generic;
-using System.IO;
-using SpektraGames.ResourceObject.Runtime;
 using UnityEditor;
-using UnityEditor.SceneManagement;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace SpektraGames.ResourceObject.Editor
 {
     /// <summary>
-    /// Listens to project asset changes:
-    ///  - When a Resources asset is <b>moved/renamed</b>, every <c>ResourceObject</c> referencing it (in prefabs,
-    ///    ScriptableObjects and currently-open scenes) has its serialized <c>resourcesPath</c> auto-updated from the
-    ///    (stable) guid, so the runtime load key never goes stale.
-    ///  - When a Resources asset is <b>deleted</b>, it logs an error so missing references are noticed.
+    /// Listens to project asset changes and keeps the <see cref="ResourceObjectRegistry"/> index current, then uses that
+    /// index to heal references cheaply:
+    ///  - When a Resources asset is <b>moved/renamed</b>, only the owners the index says reference it (prefabs,
+    ///    ScriptableObjects, loaded scenes, and indexed closed scenes) get their serialized <c>resourcesPath</c> recomputed
+    ///    from the (stable) guid - no project-wide file scan.
+    ///  - When an owner asset is <b>imported</b>, its index entry is refreshed by scanning just that asset.
+    ///  - When an asset is <b>deleted</b>, dead owners are pruned from the index.
+    ///
+    /// The old behavior (disk-scanning every prefab + .asset on every move via <c>File.ReadAllText</c>) is replaced by an
+    /// index lookup; a full rebuild is available on demand from the registry's "Sync" button.
     /// </summary>
     public class ResourceObjectAssetTracker : AssetPostprocessor
     {
@@ -23,184 +24,255 @@ namespace SpektraGames.ResourceObject.Editor
             string[] movedAssets,
             string[] movedFromAssetPaths)
         {
-            // --- Deletions: surface missing references ---
-            if (deletedAssets != null)
-            {
-                foreach (var path in deletedAssets)
-                {
-                    if (IsUnderResources(path))
-                    {
-                        if (path.Contains("PerformanceTestRunSettings"))
-                            break;
+            // Ignore the imports our own SaveAssets/SaveScene calls produce; the index already reflects them.
+            if (ResourceObjectRegistry.SuppressTracking)
+                return;
 
-                        // Debug.LogError(
-                        //     $"[ResourceObject] A Resources asset was deleted: '{path}'. " +
-                        //     "Any ResourceObject referencing it will now show as missing - reassign or clear it.");
-                    }
-                }
-            }
-
-            // --- Moves/renames: collect the guids of Resources assets whose path changed ---
-            var movedGuids = new HashSet<string>();
+            // --- Moves/renames: guids of Resources assets whose load path changed (moved within/into/out of Resources). ---
+            var movedResourceGuids = new HashSet<string>();
             if (movedAssets != null)
             {
                 for (int i = 0; i < movedAssets.Length; i++)
                 {
-                    // Either the new or old location being under Resources means the load path is affected
-                    // (moved within Resources, into Resources, or out of Resources).
-                    if (IsUnderResources(movedAssets[i]) || IsUnderResources(movedFromAssetPaths[i]))
+                    if (!ResourceObjectScanner.IsUnderResources(movedAssets[i]) &&
+                        !ResourceObjectScanner.IsUnderResources(movedFromAssetPaths[i]))
                     {
-                        var guid = AssetDatabase.AssetPathToGUID(movedAssets[i]);
-                        if (!string.IsNullOrEmpty(guid))
-                            movedGuids.Add(guid);
+                        continue;
                     }
+
+                    var guid = AssetDatabase.AssetPathToGUID(movedAssets[i]);
+                    if (!string.IsNullOrEmpty(guid))
+                        movedResourceGuids.Add(guid);
                 }
             }
 
-            if (movedGuids.Count == 0)
+            // --- Imported owners that we may need to (re)index. ---
+            List<string> importedAssetOwners = null;
+            List<string> importedScenes = null;
+            if (importedAssets != null)
+            {
+                for (int i = 0; i < importedAssets.Length; i++)
+                {
+                    var path = importedAssets[i];
+                    if (!path.StartsWith("Assets/"))
+                        continue;
+
+                    if (ResourceObjectScanner.IsAssetOwnerPath(path))
+                        (importedAssetOwners ??= new List<string>()).Add(path);
+                    else if (ResourceObjectScanner.IsScenePath(path))
+                        (importedScenes ??= new List<string>()).Add(path);
+                }
+            }
+
+            bool deletedAny = deletedAssets != null && deletedAssets.Length > 0;
+
+            if (movedResourceGuids.Count == 0 && importedAssetOwners == null && importedScenes == null && !deletedAny)
                 return;
 
-            // Defer the actual patching: writing/saving assets from inside an import callback can re-enter the importer.
-            EditorApplication.delayCall += () => RefreshReferencingAssets(movedGuids);
+            // Defer: writing/saving assets or scenes from inside an import callback can re-enter the importer.
+            EditorApplication.delayCall += () =>
+                ProcessDeferred(movedResourceGuids, importedAssetOwners, importedScenes, deletedAny);
         }
 
-        /// <summary>Find and refresh every ResourceObject whose path may have become stale because of a move.</summary>
-        private static void RefreshReferencingAssets(HashSet<string> movedGuids)
+        private static void ProcessDeferred(
+            HashSet<string> movedResourceGuids,
+            List<string> importedAssetOwners,
+            List<string> importedScenes,
+            bool deletedAny)
         {
-            // Patch persisted assets (prefabs + .asset/ScriptableObjects). A cheap text prefilter avoids loading
-            // assets that don't even mention one of the moved guids.
-            bool savedAnything = false;
-            foreach (var path in AssetDatabase.GetAllAssetPaths())
-            {
-                if (!path.StartsWith("Assets/"))
-                    continue;
-                if (!path.EndsWith(".prefab") && !path.EndsWith(".asset"))
-                    continue;
-
-                if (!FileMentionsAnyGuid(path, movedGuids))
-                    continue;
-
-                bool changed = false;
-                foreach (var obj in AssetDatabase.LoadAllAssetsAtPath(path))
-                {
-                    if (obj != null && RefreshSerializedObject(new SerializedObject(obj)))
-                        changed = true;
-                }
-
-                if (changed)
-                {
-                    var main = AssetDatabase.LoadMainAssetAtPath(path);
-                    if (main != null)
-                        EditorUtility.SetDirty(main);
-                    savedAnything = true;
-                }
-            }
-
-            if (savedAnything)
-                AssetDatabase.SaveAssets();
-
-            // Patch any currently-open scenes in memory (saving the scene is left to the user).
-            for (int i = 0; i < EditorSceneManager.sceneCount; i++)
-            {
-                var scene = EditorSceneManager.GetSceneAt(i);
-                if (!scene.isLoaded)
-                    continue;
-
-                bool sceneChanged = false;
-                foreach (var root in scene.GetRootGameObjects())
-                {
-                    foreach (var component in root.GetComponentsInChildren<Component>(true))
-                    {
-                        if (component != null && RefreshSerializedObject(new SerializedObject(component)))
-                            sceneChanged = true;
-                    }
-                }
-
-                if (sceneChanged)
-                    EditorSceneManager.MarkSceneDirty(scene);
-            }
-        }
-
-        /// <summary>
-        /// Walk every serialized property and, for each one that looks like a ResourceObject (a generic struct with
-        /// string children named "guid" and "resourcesPath"), recompute resourcesPath from the guid. Returns true if
-        /// anything changed.
-        /// </summary>
-        private static bool RefreshSerializedObject(SerializedObject serializedObject)
-        {
-            bool changed = false;
-            var iterator = serializedObject.GetIterator();
-            bool enterChildren = true;
-
-            while (iterator.Next(enterChildren))
-            {
-                enterChildren = true;
-                if (iterator.propertyType != SerializedPropertyType.Generic)
-                    continue;
-
-                var element = iterator.Copy();
-                var guidProp = element.FindPropertyRelative("guid");
-                var pathProp = element.FindPropertyRelative("resourcesPath");
-                if (guidProp == null || pathProp == null ||
-                    guidProp.propertyType != SerializedPropertyType.String ||
-                    pathProp.propertyType != SerializedPropertyType.String)
-                {
-                    continue;
-                }
-
-                // This node is a ResourceObject - don't descend into its string children.
-                enterChildren = false;
-
-                var guid = guidProp.stringValue;
-                if (string.IsNullOrEmpty(guid))
-                    continue;
-
-                var assetPath = AssetDatabase.GUIDToAssetPath(guid);
-                if (string.IsNullOrEmpty(assetPath))
-                    continue; // deleted asset -> leave as-is, the drawer flags it as missing
-
-                // Null means it is no longer under a Resources folder -> invalidate the load path.
-                var desired = ResourceObject<Object>.ToResourcesPath(assetPath) ?? string.Empty;
-                if (desired != pathProp.stringValue)
-                {
-                    pathProp.stringValue = desired;
-                    changed = true;
-                }
-            }
-
-            if (changed)
-                serializedObject.ApplyModifiedPropertiesWithoutUndo();
-
-            return changed;
-        }
-
-        private static bool FileMentionsAnyGuid(string assetPath, HashSet<string> guids)
-        {
-            string text;
+            bool previousSuppress = ResourceObjectRegistry.SuppressTracking;
+            ResourceObjectRegistry.SuppressTracking = true;
             try
             {
-                text = File.ReadAllText(assetPath);
-            }
-            catch
-            {
-                return false;
-            }
+                var registry = ResourceObjectRegistry.TryGet();
 
-            foreach (var guid in guids)
+                // No registry yet: only bootstrap (create + full sync) when there is real ResourceObject work to do. Don't
+                // materialize the asset just because some unrelated asset was deleted.
+                if (!registry)
+                {
+                    if (!ShouldBootstrap(movedResourceGuids, importedAssetOwners))
+                        return;
+                    registry = ResourceObjectRegistry.GetOrCreate(); // creates + full sync (indexes everything, incl. new imports)
+                }
+
+                if (deletedAny)
+                    registry.PruneDeadOwners();
+
+                RescanImportedAssetOwners(registry, importedAssetOwners);
+                RescanImportedScenes(registry, importedScenes);
+
+                if (movedResourceGuids.Count > 0)
+                    HealMovedReferences(registry, movedResourceGuids);
+
+                registry.SaveIfDirty();
+            }
+            finally
             {
-                if (text.Contains(guid))
+                ResourceObjectRegistry.SuppressTracking = previousSuppress;
+            }
+        }
+
+        /// <summary>True if a freshly bootstrapped registry would have anything meaningful to do.</summary>
+        private static bool ShouldBootstrap(HashSet<string> movedResourceGuids, List<string> importedAssetOwners)
+        {
+            if (movedResourceGuids.Count > 0)
+                return true;
+            if (importedAssetOwners == null)
+                return false;
+
+            for (int i = 0; i < importedAssetOwners.Count; i++)
+            {
+                if (ResourceObjectScanner.ShouldInspectFile(importedAssetOwners[i]))
                     return true;
             }
 
             return false;
         }
 
-        private static bool IsUnderResources(string assetPath)
+        private static void RescanImportedAssetOwners(ResourceObjectRegistry registry, List<string> importedAssetOwners)
         {
-            if (string.IsNullOrEmpty(assetPath))
-                return false;
-            assetPath = assetPath.Replace('\\', '/');
-            return assetPath.Contains("/Resources/") || assetPath.StartsWith("Resources/");
+            if (importedAssetOwners == null)
+                return;
+
+            var referenced = new HashSet<string>();
+            for (int i = 0; i < importedAssetOwners.Count; i++)
+            {
+                var path = importedAssetOwners[i];
+                var guid = AssetDatabase.AssetPathToGUID(path);
+                if (string.IsNullOrEmpty(guid))
+                    continue;
+
+                referenced.Clear();
+                // Only parse the file if it could possibly contain a ResourceObject; otherwise an empty set removes any
+                // stale entry for this owner.
+                if (ResourceObjectScanner.ShouldInspectFile(path))
+                    ResourceObjectScanner.CollectFromAssetOwner(path, referenced);
+
+                registry.UpsertOwner(guid, referenced);
+            }
+        }
+
+        private static void RescanImportedScenes(ResourceObjectRegistry registry, List<string> importedScenes)
+        {
+            if (importedScenes == null)
+                return;
+
+            var referenced = new HashSet<string>();
+            for (int i = 0; i < importedScenes.Count; i++)
+            {
+                var path = importedScenes[i];
+                var guid = AssetDatabase.AssetPathToGUID(path);
+                if (string.IsNullOrEmpty(guid))
+                    continue;
+
+                // Scan loaded scenes in place; defer closed ones (opening a scene during a routine import is too disruptive).
+                if (ResourceObjectScanner.TryGetLoadedScene(path, out var scene))
+                {
+                    referenced.Clear();
+                    ResourceObjectScanner.CollectFromScene(scene, referenced);
+                    registry.UpsertOwner(guid, referenced);
+                    registry.ClearPendingScene(guid);
+                }
+                else
+                {
+                    registry.MarkPendingScene(guid);
+                }
+            }
+        }
+
+        private static void HealMovedReferences(ResourceObjectRegistry registry, HashSet<string> movedResourceGuids)
+        {
+            var ownerGuids = new List<string>();
+            registry.CollectOwnersReferencing(movedResourceGuids, ownerGuids);
+
+            bool savedAssets = false;
+            List<string> closedScenesToHeal = null;
+
+            for (int i = 0; i < ownerGuids.Count; i++)
+            {
+                var path = AssetDatabase.GUIDToAssetPath(ownerGuids[i]);
+                if (string.IsNullOrEmpty(path))
+                    continue;
+
+                if (ResourceObjectScanner.IsAssetOwnerPath(path))
+                {
+                    if (ResourceObjectScanner.HealAssetOwner(path, movedResourceGuids))
+                        savedAssets = true;
+                }
+                else if (ResourceObjectScanner.IsScenePath(path) &&
+                         !ResourceObjectScanner.TryGetLoadedScene(path, out _))
+                {
+                    // Loaded scenes are handled below (index-independent); only closed scenes need the open/save/close path.
+                    (closedScenesToHeal ??= new List<string>()).Add(path);
+                }
+            }
+
+            if (savedAssets)
+                AssetDatabase.SaveAssets();
+
+            // Heal every currently-loaded scene in memory regardless of the index, so open scenes always stay correct even
+            // if their entry hasn't been built yet. Saving the scene is left to the user (matches the original behavior).
+            HealAllLoadedScenes(movedResourceGuids);
+
+            if (closedScenesToHeal != null)
+            {
+                for (int i = 0; i < closedScenesToHeal.Count; i++)
+                    ResourceObjectScanner.HealSceneAtPath(closedScenesToHeal[i], movedResourceGuids);
+            }
+
+            // Closed scenes that were imported but never indexed live only in pendingSceneGuids, so the index lookup above
+            // can't find them. Consult their file text directly and heal+index any that actually reference a moved guid.
+            HealPendingScenesReferencing(registry, movedResourceGuids);
+        }
+
+        private static void HealPendingScenesReferencing(ResourceObjectRegistry registry, HashSet<string> movedResourceGuids)
+        {
+            // Closed scenes can't be opened in play mode; leave them pending until the editor is back in edit mode.
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
+                return;
+
+            var pending = registry.PendingSceneGuids;
+            if (pending.Count == 0)
+                return;
+
+            // Snapshot: healing+indexing a pending scene mutates the registry's pending list as we go.
+            var pendingGuids = new List<string>(pending);
+            var referenced = new HashSet<string>();
+            for (int i = 0; i < pendingGuids.Count; i++)
+            {
+                var guid = pendingGuids[i];
+                var path = AssetDatabase.GUIDToAssetPath(guid);
+                if (string.IsNullOrEmpty(path) || !ResourceObjectScanner.IsScenePath(path))
+                {
+                    registry.ClearPendingScene(guid);
+                    continue;
+                }
+
+                // A loaded pending scene was already healed in memory above; skip the disk path for it.
+                if (ResourceObjectScanner.TryGetLoadedScene(path, out _))
+                    continue;
+
+                // Cheap text prefilter: only open scenes whose file actually mentions one of the moved guids.
+                if (!ResourceObjectScanner.FileMentionsAnyGuid(path, movedResourceGuids))
+                    continue;
+
+                // Open once to both heal the stale paths and learn what the scene references, then index it so future
+                // moves resolve it through the index and it leaves the pending list.
+                referenced.Clear();
+                ResourceObjectScanner.HealAndCollectSceneAtPath(path, movedResourceGuids, referenced);
+                registry.UpsertOwner(guid, referenced);
+                registry.ClearPendingScene(guid);
+            }
+        }
+
+        private static void HealAllLoadedScenes(HashSet<string> movedResourceGuids)
+        {
+            for (int i = 0; i < UnityEditor.SceneManagement.EditorSceneManager.sceneCount; i++)
+            {
+                var scene = UnityEditor.SceneManagement.EditorSceneManager.GetSceneAt(i);
+                if (scene.isLoaded)
+                    ResourceObjectScanner.HealLoadedScene(scene, movedResourceGuids);
+            }
         }
     }
 }

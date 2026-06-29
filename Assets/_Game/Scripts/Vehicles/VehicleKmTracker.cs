@@ -86,6 +86,16 @@ namespace Vehicles
             // while driving. This is a plain float assignment - no allocations, no PlayerPrefs - and is
             // display-only; milestone rewards still key off the committed whole-km value at commit time.
             DistanceMilestoneManager.ReportSessionDistanceKm(_pendingKm);
+
+            // Surface a milestone the instant its line is crossed: when the live distance has reached a
+            // milestone the committed odometer hasn't, flush the whole km now so the milestone becomes
+            // claimable (and the MILESTONE COMPLETED pop-up fires) immediately, instead of waiting for the
+            // next despawn/pause commit. CommitDistance only writes an int (no disk flush) and keeps the
+            // sub-km remainder, so this stays cheap. The >= 1 km guard is the cheap precondition for a
+            // crossing (a whole-km threshold can't be passed with < 1 uncommitted km) and skips the check
+            // on the frames right after a commit.
+            if (_pendingKm >= 1f && DistanceMilestoneManager.HasUncommittedReachedMilestone())
+                CommitDistance();
         }
 
         // Stage progress whenever the car is torn down (run end / scene change / pooled away).

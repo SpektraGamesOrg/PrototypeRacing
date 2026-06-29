@@ -19,7 +19,14 @@ dependencies {
     implementation 'com.appsflyer:af-android-sdk:6.18.1' // Packages/appsflyer-unity-plugin/Editor/AppsFlyerDependencies.xml:5
     implementation 'com.appsflyer:purchase-connector:2.2.0' // Packages/appsflyer-unity-plugin/Editor/AppsFlyerDependencies.xml:8
     implementation 'com.appsflyer:unity-wrapper:6.18.1' // Packages/appsflyer-unity-plugin/Editor/AppsFlyerDependencies.xml:6
+    implementation 'com.google.android.gms:play-services-base:18.10.0' // Assets/Firebase/Editor/AppDependencies.xml:20
     implementation 'com.google.android.ump:user-messaging-platform:4.0.0' // Assets/MaxSdk/AppLovin/Editor/Dependencies.xml:4
+    implementation 'com.google.firebase:firebase-analytics:23.2.0' // Assets/Firebase/Editor/CrashlyticsDependencies.xml:18
+    implementation 'com.google.firebase:firebase-analytics-unity:13.13.0' // Assets/Firebase/Editor/AnalyticsDependencies.xml:21
+    implementation 'com.google.firebase:firebase-app-unity:13.13.0' // Assets/Firebase/Editor/AppDependencies.xml:25
+    implementation 'com.google.firebase:firebase-common:22.1.0' // Assets/Firebase/Editor/AppDependencies.xml:16
+    implementation 'com.google.firebase:firebase-crashlytics-ndk:20.0.6' // Assets/Firebase/Editor/CrashlyticsDependencies.xml:16
+    implementation 'com.google.firebase:firebase-crashlytics-unity:13.13.0' // Assets/Firebase/Editor/CrashlyticsDependencies.xml:23
 // Android Resolver Dependencies End
 **DEPS**}
 

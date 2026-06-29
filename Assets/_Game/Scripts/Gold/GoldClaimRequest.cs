@@ -18,14 +18,21 @@ namespace Gold
         /// <summary>Extra coins granted on top of the base if the ad is watched.</summary>
         public readonly int Bonus;
 
+        /// <summary>
+        /// Seconds the "CLAIM Nx" pop-up stays up before auto-dismissing (the player keeps the base reward).
+        /// Supplied by the gold so the shared overlay's close time / loading bar is data-driven, not hard-coded.
+        /// </summary>
+        public readonly float PopupSeconds;
+
         /// <summary>Invoked (with <see cref="Bonus"/>) only when the player successfully claims via ad.</summary>
         public readonly Action<int> OnClaimed;
 
-        public GoldClaimRequest(int baseReward, int multiplier, int bonus, Action<int> onClaimed)
+        public GoldClaimRequest(int baseReward, int multiplier, int bonus, float popupSeconds, Action<int> onClaimed)
         {
             BaseReward = baseReward;
             Multiplier = multiplier;
             Bonus = bonus;
+            PopupSeconds = popupSeconds;
             OnClaimed = onClaimed;
         }
     }

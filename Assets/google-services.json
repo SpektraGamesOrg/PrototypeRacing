@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "387758774249",
+    "project_id": "real-car-driving-42a1b",
+    "storage_bucket": "real-car-driving-42a1b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:387758774249:android:0f515c0b17cb5c37c49d78",
+        "android_client_info": {
+          "package_name": "com.real.car.driving.racing.master.game.spektragames"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCzoArRdupEFAEsd7vu8hVgtxPuGGHWn1Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -123,10 +123,16 @@ namespace Core
 
         protected override void OnDestroy()
         {
-            // The milestone HUD overlay is a DontDestroyOnLoad view shown for gameplay (see GameSceneLoader).
-            // Hide it as the Game scene tears down so it never lingers over the loading screen or main menu.
+            // The milestone HUD overlay and its completion pop-ups are DontDestroyOnLoad views shown for
+            // gameplay (see GameSceneLoader). Close them as the Game scene tears down so none of them lingers
+            // over the loading screen or main menu. Close the pop-ups first (they would otherwise try to
+            // restore the HUD), then hide the HUD bar itself.
             if (GameUIManager.Instance)
+            {
+                GameUIManager.Instance.GetOverlayUI<MilestoneCompletedOverlay>()?.ForceClose();
+                GameUIManager.Instance.GetOverlayUI<ClaimGoldMultiplierWithAdsOverlay>()?.Hide(immediate: true);
                 GameUIManager.Instance.GetOverlayUI<DriveDistanceMilestoneOverlay>()?.Hide(immediate: true);
+            }
 
             base.OnDestroy();
         }

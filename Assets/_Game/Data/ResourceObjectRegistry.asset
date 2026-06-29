@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9626452eea444f6ea9c25ac1d4dae10, type: 3}
+  m_Name: ResourceObjectRegistry
+  m_EditorClassIdentifier: SpektraGames.ResourceObject.Editor::SpektraGames.ResourceObject.Editor.ResourceObjectRegistry
+  owners:
+  - ownerGuid: f567c19e4edca6048a28e49c0d757d2d
+    referencedGuids:
+    - 5278952d133644c4289804999ac08302
+    - d808e783f3edb47e9a32c1d45d55ff06
+    - 2150d2e91a5a841319918b13b8b8cd2d
+    - b5bdaff2c21e847d1918e4a9adc8c8d6
+    - 7d72f9cd1aee04f82a4930001b795b55
+    - 45041822b3d86453784c017de344a67a
+    - 8160bafef8a294fe4a5bcf3682343955
+    - d928e401b3a7d49aeb5f6433326cb227
+    - 9ac5a244b614d4e3dacfae9a03baf0c0
+    - 375d554edbeb0488c8dc46b31abc2fa3
+    - b7af76e6e7513434c8cd3c3fd67e6bc3
+    - c92cec79a61b44bbc928b3deedbbcf53
+    - b2562729d3b2142a3aaebfe4933dcb1e
+    - ae319c4236ccf4d3ebf2a0e891b5db58
+  pendingSceneGuids: []

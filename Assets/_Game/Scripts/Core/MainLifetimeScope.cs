@@ -1,5 +1,8 @@
 using System;
 using _Game.Scripts.Utils.VContainer;
+using Analytics;
+using Analytics.AppsFlyer;
+using Firebase.Analytics;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using VContainer;
@@ -23,7 +26,9 @@ namespace Core
 
         protected override void Configure(IContainerBuilder builder)
         {
-            // builder.Register<IMMPService, AppsFlyerMMPService>(Lifetime.Singleton).AsSelf();
+            builder.Register<IMMPService, AppsFlyerMMPService>(Lifetime.Singleton).AsSelf();
+            builder.Register<IAnalyticsService, FirebaseAnalyticsService>(Lifetime.Singleton).AsSelf();
+            
             // builder.RegisterInstance(new ClutchFeatureFlagService(FeatureKeys.AllKeys, FeatureKeys.PreAuthKeys))
             //     .As<IFeatureFlagService>()
             //     .AsSelf();

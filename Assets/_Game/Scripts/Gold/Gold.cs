@@ -40,6 +40,10 @@ namespace Gold
                  "(multiplier - 1) * baseReward on top of the base.")]
         [SerializeField, Min(1)] private int claimMultiplier = 5;
 
+        [Tooltip("Seconds the \"CLAIM Nx\" ad-bonus pop-up stays up before auto-dismissing (the player keeps " +
+                 "the base reward). Passed to the shared ClaimGoldMultiplierWithAdsOverlay as its close time.")]
+        [SerializeField, Min(0.1f)] private float claimPopupSeconds = 5f;
+
         [Title("Cooldown")]
         [Tooltip("Seconds the gold stays passive after collection before reactivating. GDD: 30 minutes.")]
         [SerializeField, Min(0)] private float cooldownSeconds = 1800f;
@@ -171,7 +175,7 @@ namespace Gold
 
             // Offer the "CLAIM Nx" bonus via rewarded ad. The bonus is the extra over the base.
             int bonus = baseReward * claimMultiplier - baseReward;
-            ClaimRequested?.Invoke(new GoldClaimRequest(baseReward, claimMultiplier, bonus, OnBonusClaimed));
+            ClaimRequested?.Invoke(new GoldClaimRequest(baseReward, claimMultiplier, bonus, claimPopupSeconds, OnBonusClaimed));
         }
 
         private void OnBonusClaimed(int bonus)

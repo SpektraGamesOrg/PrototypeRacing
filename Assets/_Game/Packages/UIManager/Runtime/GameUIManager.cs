@@ -446,7 +446,7 @@ namespace UIManager
                     }
                 }
 
-                string nameShouldBe = "Overlay_" + allOverlays[i].GetType().Name.Replace("Screen", "");
+                string nameShouldBe = "Overlay_" + allOverlays[i].GetType().Name.Replace("Overlay", "");
                 if (allOverlays[i].gameObject.name != nameShouldBe)
                 {
                     allOverlays[i].gameObject.name = nameShouldBe;
