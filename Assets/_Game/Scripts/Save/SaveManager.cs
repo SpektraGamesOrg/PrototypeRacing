@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Clutch;
 using UnityEngine;
 using Vehicles;
 
@@ -417,6 +418,49 @@ namespace Save
             {
                 Save();
             }
+        }
+
+        /// <summary>
+        /// Second-phase free grant, run AFTER Clutch resolves (see GameInitializer). Grants any vehicle
+        /// whose Clutch-resolved obtain type is <see cref="VehicleObtainType.Free"/> but that the player does
+        /// not own yet - so the product team can promote a car to Free remotely even when the serialized
+        /// <see cref="VehicleEntry.VehicleObtainType"/> still says otherwise. Phase one
+        /// (<see cref="EnsureStarterVehicle"/>) already runs synchronously at boot from the serialized data,
+        /// guaranteeing an owned car before this Clutch-dependent pass; this pass only ever ADDS ownership.
+        /// </summary>
+        public static void GrantClutchFreeVehicles(IClutchConfigService clutchConfig)
+        {
+            if (clutchConfig == null)
+                return;
+
+            VehicleContainer container = VehicleContainer.Instance;
+            if (!container || container.Vehicles.Count == 0)
+                return;
+
+            bool anyChange = false;
+
+            for (var i = 0; i < container.Vehicles.Count; i++)
+            {
+                VehicleEntry vehicle = container.Vehicles[i];
+                if (vehicle == null || IsOwned(vehicle.ID))
+                    continue;
+
+                ResolvedVehicleConfig resolved = clutchConfig.GetVehicleConfig(
+                    vehicle.ID, vehicle.VehicleObtainType, vehicle.VehicleObtainTargetAmount);
+
+                // Free is exclusive (enforced by the obtain-type drawer and the parser), so test equality.
+                if (resolved.ObtainType != VehicleObtainType.Free)
+                    continue;
+
+                AddOwned(vehicle.ID);
+                if (SelectedVehicle == VehicleID.None)
+                    SelectVehicle(vehicle.ID);
+
+                anyChange = true;
+            }
+
+            if (anyChange)
+                Save();
         }
 
         // ---------------------------------------------------------------------

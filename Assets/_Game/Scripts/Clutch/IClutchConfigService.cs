@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using _Game.Scripts.Utils.VContainer;
 using Cysharp.Threading.Tasks;
+using Vehicles;
 
 namespace Clutch
 {
@@ -29,7 +30,7 @@ namespace Clutch
         string GetRawJson(string flagKey);
 
         /// <summary>
-        /// The resolved flag parsed as a string-&gt;int map (the shape of VehiclePrices / AdConfig).
+        /// The resolved flag parsed as a string-&gt;int map (the shape of AdConfig).
         /// Returns an empty dictionary when the flag is absent or unparseable.
         /// </summary>
         IReadOnlyDictionary<string, int> GetIntMap(string flagKey);
@@ -39,5 +40,14 @@ namespace Clutch
         /// <paramref name="fallback"/> when missing.
         /// </summary>
         int GetInt(string flagKey, string entryKey, int fallback);
+
+        /// <summary>
+        /// Effective obtain config for a vehicle, resolving the Clutch "VehicleConfig" flag (keyed by the
+        /// vehicle's <see cref="VehicleID"/> enum name) over the supplied serialized fallbacks. When Clutch
+        /// has an entry for the vehicle, both its obtain type and value are authoritative; when it does not
+        /// (or the entry is malformed), the serialized <paramref name="fallbackType"/> /
+        /// <paramref name="fallbackAmount"/> are returned unchanged.
+        /// </summary>
+        ResolvedVehicleConfig GetVehicleConfig(VehicleID id, VehicleObtainType fallbackType, int fallbackAmount);
     }
 }

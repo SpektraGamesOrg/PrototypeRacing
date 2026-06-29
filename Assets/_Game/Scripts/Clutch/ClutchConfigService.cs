@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Save;
 using UnityEngine;
+using Vehicles;
 
 namespace Clutch
 {
@@ -25,6 +26,9 @@ namespace Clutch
         // Parsed string->int maps, memoized so repeated reads of the same flag don't reparse JSON.
         private readonly Dictionary<string, IReadOnlyDictionary<string, int>> _intMapCache =
             new Dictionary<string, IReadOnlyDictionary<string, int>>();
+
+        // Parsed VehicleConfig map (vehicle key -> entry), memoized; null until first read after init.
+        private Dictionary<string, VehicleConfigEntry> _vehicleConfigCache;
 
         public bool IsReady { get; private set; }
 
@@ -125,6 +129,7 @@ namespace Clutch
         private void Finish()
         {
             _intMapCache.Clear();
+            _vehicleConfigCache = null;
             IsReady = true;
             OnConfigUpdated?.Invoke();
         }
@@ -211,6 +216,59 @@ namespace Clutch
                 Debug.LogError($"[ClutchConfigService] Failed to parse '{flagKey}' as string->int map: {e.Message}");
                 return EmptyIntMap;
             }
+        }
+
+        // ---------------------------------------------------------------------
+        // VehicleConfig (per-vehicle obtain type + value)
+        // ---------------------------------------------------------------------
+
+        public ResolvedVehicleConfig GetVehicleConfig(VehicleID id, VehicleObtainType fallbackType, int fallbackAmount)
+        {
+            // Clutch keys are the VehicleID enum names (e.g. "GTR_R35"); see the fallback SO + dashboard.
+            string vehicleKey = id.ToString();
+
+            Dictionary<string, VehicleConfigEntry> map = GetVehicleConfigMap();
+            if (map != null &&
+                map.TryGetValue(vehicleKey, out VehicleConfigEntry entry) &&
+                entry != null)
+            {
+                // Clutch entry present: obtain type + value are authoritative. A malformed/empty
+                // obtain_type keeps the serialized type (value still applies).
+                VehicleObtainType obtainType = ObtainTypeParser.TryParse(entry.obtain_type, out VehicleObtainType parsed)
+                    ? parsed
+                    : fallbackType;
+                return new ResolvedVehicleConfig(obtainType, entry.value);
+            }
+
+            return new ResolvedVehicleConfig(fallbackType, fallbackAmount);
+        }
+
+        // Parses (and memoizes) the VehicleConfig flag into a vehicle-key -> entry map.
+        private Dictionary<string, VehicleConfigEntry> GetVehicleConfigMap()
+        {
+            if (_vehicleConfigCache != null)
+                return _vehicleConfigCache;
+
+            string json = GetRawJson(ClutchFlagKeys.VehicleConfig);
+            if (string.IsNullOrEmpty(json))
+            {
+                _vehicleConfigCache = new Dictionary<string, VehicleConfigEntry>();
+                return _vehicleConfigCache;
+            }
+
+            try
+            {
+                _vehicleConfigCache =
+                    JsonConvert.DeserializeObject<Dictionary<string, VehicleConfigEntry>>(json)
+                    ?? new Dictionary<string, VehicleConfigEntry>();
+            }
+            catch (JsonException e)
+            {
+                Debug.LogError($"[ClutchConfigService] Failed to parse '{ClutchFlagKeys.VehicleConfig}': {e.Message}");
+                _vehicleConfigCache = new Dictionary<string, VehicleConfigEntry>();
+            }
+
+            return _vehicleConfigCache;
         }
     }
 }

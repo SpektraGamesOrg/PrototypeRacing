@@ -157,10 +157,11 @@ namespace UI
         {
             VehicleID id = CurrentVehicle;
             VehicleEntry entry = GetEntry(id);
-            if (entry == null || SaveManager.IsOwned(id) || !Has(entry.VehicleObtainType, VehicleObtainType.ByGold))
+            ResolvedVehicleConfig config = Resolve(entry);
+            if (entry == null || SaveManager.IsOwned(id) || !Has(config.ObtainType, VehicleObtainType.ByGold))
                 return;
 
-            int price = TargetOf(entry);
+            int price = config.Amount;
             if (SaveManager.Gold < price)
             {
                 Debug.LogError($"[MainMenu] Not enough coins to buy {id}. Need {price}, have {SaveManager.Gold}.");
@@ -188,7 +189,8 @@ namespace UI
                 return;
 
             VehicleEntry entry = GetEntry(id);
-            if (entry == null || SaveManager.IsOwned(id) || !Has(entry.VehicleObtainType, VehicleObtainType.ByWatchAds))
+            ResolvedVehicleConfig config = Resolve(entry);
+            if (entry == null || SaveManager.IsOwned(id) || !Has(config.ObtainType, VehicleObtainType.ByWatchAds))
                 return;
 
             _processingAd = true;
@@ -198,7 +200,7 @@ namespace UI
                 if (!await ShowRewardedAdAsync())
                     return;
 
-                int target = TargetOf(entry);
+                int target = config.Amount;
                 int watched = SaveManager.GetVehicleWatchAdCount(id) + 1;
                 SaveManager.SetVehicleWatchAdCount(id, watched);
 
@@ -219,10 +221,11 @@ namespace UI
         {
             VehicleID id = CurrentVehicle;
             VehicleEntry entry = GetEntry(id);
-            if (entry == null || SaveManager.IsOwned(id) || !Has(entry.VehicleObtainType, VehicleObtainType.DistanceMilestoneKm))
+            ResolvedVehicleConfig config = Resolve(entry);
+            if (entry == null || SaveManager.IsOwned(id) || !Has(config.ObtainType, VehicleObtainType.DistanceMilestoneKm))
                 return;
 
-            if (SaveManager.DistanceDrivenKm < TargetOf(entry))
+            if (SaveManager.DistanceDrivenKm < config.Amount)
             {
                 Debug.LogError($"[MainMenu] Cannot claim {id}: distance milestone not reached.");
                 return;
@@ -311,8 +314,9 @@ namespace UI
         private void ConfigureBuyArea(VehicleID id)
         {
             VehicleEntry entry = GetEntry(id);
-            VehicleObtainType obtain = entry != null ? entry.VehicleObtainType : default;
-            int target = TargetOf(entry);
+            ResolvedVehicleConfig config = Resolve(entry);
+            VehicleObtainType obtain = config.ObtainType;
+            int target = config.Amount;
 
             // --- Obtain by gold: show the price and gate the button on the player's balance. ---
             bool byGold = Has(obtain, VehicleObtainType.ByGold);
@@ -403,25 +407,20 @@ namespace UI
             return VehicleContainer.Instance.GetVehicle(id);
         }
 
-        // The single configured target amount for an entry. Its meaning depends on the obtain type:
-        // gold price, number of ads to watch, or distance milestone in km (see VehicleObtainTargetAmount).
-        // For gold-priced vehicles the price can be overridden remotely by the Clutch "VehiclePrices" flag
-        // (keyed by VehicleEntry.ClutchPriceKey); any other obtain type, or a missing key/flag, uses the
-        // serialized amount.
-        private static int TargetOf(VehicleEntry entry)
+        // Effective obtain config for an entry, resolving the Clutch "VehicleConfig" flag (keyed by the
+        // VehicleID enum name) over the entry's serialized values. When Clutch has an entry for the vehicle,
+        // both its obtain type and value are authoritative; otherwise the serialized type/amount are used.
+        // Callers should resolve ONCE and read both ObtainType and Amount, so the obtain controls and the
+        // target stay consistent within a single refresh.
+        private static ResolvedVehicleConfig Resolve(VehicleEntry entry)
         {
             if (entry == null)
-                return 0;
+                return new ResolvedVehicleConfig(default, 0);
 
-            if (Has(entry.VehicleObtainType, VehicleObtainType.ByGold) &&
-                !string.IsNullOrEmpty(entry.ClutchPriceKey) &&
-                ServiceLocator.TryGetService(out IClutchConfigService clutchConfig))
-            {
-                return clutchConfig.GetInt(
-                    ClutchFlagKeys.VehiclePrices, entry.ClutchPriceKey, entry.VehicleObtainTargetAmount);
-            }
+            if (ServiceLocator.TryGetService(out IClutchConfigService clutchConfig))
+                return clutchConfig.GetVehicleConfig(entry.ID, entry.VehicleObtainType, entry.VehicleObtainTargetAmount);
 
-            return entry.VehicleObtainTargetAmount;
+            return new ResolvedVehicleConfig(entry.VehicleObtainType, entry.VehicleObtainTargetAmount);
         }
 
         // Allocation-free flag test (Enum.HasFlag boxes); VehicleObtainType is a [Flags] enum.

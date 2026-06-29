@@ -185,6 +185,11 @@ namespace Core
 
                     if (!clutchConfigService.IsReady)
                         Debug.LogError("[GameInitializer] Clutch config did not resolve; consumers will use cache/fallback.");
+
+                    // Phase-two free grant: the synchronous boot grant (SaveManager.Initialize) used the
+                    // serialized obtain types; now that Clutch has resolved, grant any car the remote config
+                    // promotes to Free, so product can flip a car free without an SO change.
+                    SaveManager.GrantClutchFreeVehicles(clutchConfigService);
                 }
                 else
                 {

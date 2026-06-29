@@ -21,7 +21,7 @@ namespace Clutch
         [Serializable]
         public class ClutchFlagFallback
         {
-            [Tooltip("Clutch flag key, e.g. \"VehiclePrices\" or \"AdConfig\".")]
+            [Tooltip("Clutch flag key, e.g. \"VehicleConfig\" or \"AdConfig\".")]
             public string key;
 
             [Tooltip("Fallback value as JSON, matching the exact shape Clutch returns for this flag.")]

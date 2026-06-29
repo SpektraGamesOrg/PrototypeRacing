@@ -8,7 +8,7 @@ namespace Clutch
     /// <summary>
     /// PlayerPrefs cache for resolved Clutch flag values. Everything lives in ONE combined JSON blob
     /// under <see cref="SaveKeys.ClutchConfig"/>, keyed by flag name:
-    /// <code>{ "VehiclePrices": "{...}", "AdConfig": "{...}" }</code>
+    /// <code>{ "VehicleConfig": "{...}", "AdConfig": "{...}" }</code>
     /// Each value is the flag's own JSON serialized to a string (Clutch returns native JSON; we keep it
     /// verbatim so consumers deserialize the exact shape). This is the user-storage layer in the
     /// scenarios: Clutch overwrites it on success; it is the source of truth when Clutch fails but a

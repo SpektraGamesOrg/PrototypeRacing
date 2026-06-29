@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: ClutchConfig
   m_EditorClassIdentifier: Assembly-CSharp::Clutch.ClutchConfig
   fallbacks:
-  - key: VehiclePrices
-    fallbackJson: '{"GTR_R35":1500,"MustangGT500":1500,"G63":1500,"M4":1500,"FType":1500,"Ferrari488":1500,"FerrariSF90":1500,"AstonMartinDBS":1500,"Huayra":1500,"Fenyr":1500}'
+  - key: VehicleConfig
+    fallbackJson: '{"Supra":{"value":0,"obtain_type":"Free"},"GTR_R35":{"value":1500,"obtain_type":"ByGold"},"RX7":{"value":1500,"obtain_type":"ByWatchAds"},"SilviaS15":{"value":1500,"obtain_type":"DistanceMilestoneKm"},"MustangGT500":{"value":1500,"obtain_type":"ByGold"},"G63":{"value":1500,"obtain_type":"ByGold|ByWatchAds"},"Challenger":{"value":1500,"obtain_type":"ByWatchAds|DistanceMilestoneKm"},"M4":{"value":1500,"obtain_type":"ByGold"},"FType":{"value":1500,"obtain_type":"ByGold"},"Ferrari488":{"value":1500,"obtain_type":"ByGold"},"FerrariSF90":{"value":1500,"obtain_type":"ByGold"},"AstonMartinDBS":{"value":1500,"obtain_type":"ByGold|DistanceMilestoneKm"},"Huayra":{"value":1500,"obtain_type":"ByGold"},"Fenyr":{"value":1500,"obtain_type":"ByGold"}}'
   - key: AdConfig
     fallbackJson: '{"interstitial_frequency":200}'

@@ -30,7 +30,7 @@ namespace Clutch
         /// </summary>
         /// <param name="baseUrl">Clutch API base URL (e.g. https://api.clutch.spektragames.com).</param>
         /// <param name="environmentId">Clutch environment id.</param>
-        /// <param name="keys">Flag keys to evaluate (e.g. "VehiclePrices", "AdConfig").</param>
+        /// <param name="keys">Flag keys to evaluate (e.g. "VehicleConfig", "AdConfig").</param>
         /// <param name="properties">Optional targeting attributes (camelCase) forwarded as "properties".</param>
         public static async UniTask<Dictionary<string, string>> EvaluatePublicAsync(
             string baseUrl,
