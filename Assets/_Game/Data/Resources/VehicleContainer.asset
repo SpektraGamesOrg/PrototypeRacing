@@ -25,6 +25,7 @@ MonoBehaviour:
       resourcesPath: R35
     <VehicleObtainType>k__BackingField: 1
     <VehicleObtainTargetAmount>k__BackingField: 1500
+    <ClutchPriceKey>k__BackingField: GTR_R35
   - <ID>k__BackingField: 3
     <MainBehaviour>k__BackingField:
       guid: 2150d2e91a5a841319918b13b8b8cd2d
@@ -43,12 +44,14 @@ MonoBehaviour:
       resourcesPath: Gt500
     <VehicleObtainType>k__BackingField: 1
     <VehicleObtainTargetAmount>k__BackingField: 1500
+    <ClutchPriceKey>k__BackingField: MustangGT500
   - <ID>k__BackingField: 6
     <MainBehaviour>k__BackingField:
       guid: 45041822b3d86453784c017de344a67a
       resourcesPath: G63
     <VehicleObtainType>k__BackingField: 3
     <VehicleObtainTargetAmount>k__BackingField: 1500
+    <ClutchPriceKey>k__BackingField: G63
   - <ID>k__BackingField: 7
     <MainBehaviour>k__BackingField:
       guid: 8160bafef8a294fe4a5bcf3682343955
@@ -61,39 +64,46 @@ MonoBehaviour:
       resourcesPath: M4
     <VehicleObtainType>k__BackingField: 1
     <VehicleObtainTargetAmount>k__BackingField: 1500
+    <ClutchPriceKey>k__BackingField: M4
   - <ID>k__BackingField: 10
     <MainBehaviour>k__BackingField:
       guid: 9ac5a244b614d4e3dacfae9a03baf0c0
       resourcesPath: F-Type
     <VehicleObtainType>k__BackingField: 1
     <VehicleObtainTargetAmount>k__BackingField: 1500
+    <ClutchPriceKey>k__BackingField: FType
   - <ID>k__BackingField: 11
     <MainBehaviour>k__BackingField:
       guid: 375d554edbeb0488c8dc46b31abc2fa3
       resourcesPath: f488
     <VehicleObtainType>k__BackingField: 1
     <VehicleObtainTargetAmount>k__BackingField: 1500
+    <ClutchPriceKey>k__BackingField: Ferrari488
   - <ID>k__BackingField: 12
     <MainBehaviour>k__BackingField:
       guid: b7af76e6e7513434c8cd3c3fd67e6bc3
       resourcesPath: Sf90
     <VehicleObtainType>k__BackingField: 1
     <VehicleObtainTargetAmount>k__BackingField: 1500
+    <ClutchPriceKey>k__BackingField: FerrariSF90
   - <ID>k__BackingField: 13
     <MainBehaviour>k__BackingField:
       guid: c92cec79a61b44bbc928b3deedbbcf53
       resourcesPath: DBS
     <VehicleObtainType>k__BackingField: 5
     <VehicleObtainTargetAmount>k__BackingField: 1500
+    <ClutchPriceKey>k__BackingField: AstonMartinDBS
   - <ID>k__BackingField: 14
     <MainBehaviour>k__BackingField:
       guid: b2562729d3b2142a3aaebfe4933dcb1e
       resourcesPath: Huayra
     <VehicleObtainType>k__BackingField: 1
     <VehicleObtainTargetAmount>k__BackingField: 1500
+    <ClutchPriceKey>k__BackingField: Huayra
   - <ID>k__BackingField: 15
     <MainBehaviour>k__BackingField:
       guid: ae319c4236ccf4d3ebf2a0e891b5db58
       resourcesPath: Fenyr
     <VehicleObtainType>k__BackingField: 1
     <VehicleObtainTargetAmount>k__BackingField: 1500
+    <ClutchPriceKey>k__BackingField: Fenyr

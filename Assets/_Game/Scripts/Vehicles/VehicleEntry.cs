@@ -23,6 +23,12 @@ namespace Vehicles
         [field: SerializeField, HideIf(nameof(IsFree))]
         public int VehicleObtainTargetAmount { get; private set; } = 1500;
 
+        // Clutch "VehiclePrices" flag key for this vehicle (e.g. "R35", "Supra"). When the remote flag
+        // contains this key its value overrides VehicleObtainTargetAmount as the gold price; otherwise the
+        // serialized target amount is used. Leave empty to always use the serialized amount.
+        [field: SerializeField, HideIf(nameof(IsFree))]
+        public string ClutchPriceKey { get; private set; } = "";
+
         // Free cars are auto-granted (see SaveManager.EnsureStarterVehicle) and have no unlock target,
         // so the target amount is hidden in the inspector when this entry is Free.
         private bool IsFree => (VehicleObtainType & VehicleObtainType.Free) != 0;

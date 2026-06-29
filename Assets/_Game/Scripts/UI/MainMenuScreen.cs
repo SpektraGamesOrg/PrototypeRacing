@@ -1,6 +1,7 @@
 using System;
 using _Game.Scripts.Utils.VContainer;
 using Ads;
+using Clutch;
 using Core;
 using Cysharp.Threading.Tasks;
 using Save;
@@ -404,9 +405,23 @@ namespace UI
 
         // The single configured target amount for an entry. Its meaning depends on the obtain type:
         // gold price, number of ads to watch, or distance milestone in km (see VehicleObtainTargetAmount).
+        // For gold-priced vehicles the price can be overridden remotely by the Clutch "VehiclePrices" flag
+        // (keyed by VehicleEntry.ClutchPriceKey); any other obtain type, or a missing key/flag, uses the
+        // serialized amount.
         private static int TargetOf(VehicleEntry entry)
         {
-            return entry != null ? entry.VehicleObtainTargetAmount : 0;
+            if (entry == null)
+                return 0;
+
+            if (Has(entry.VehicleObtainType, VehicleObtainType.ByGold) &&
+                !string.IsNullOrEmpty(entry.ClutchPriceKey) &&
+                ServiceLocator.TryGetService(out IClutchConfigService clutchConfig))
+            {
+                return clutchConfig.GetInt(
+                    ClutchFlagKeys.VehiclePrices, entry.ClutchPriceKey, entry.VehicleObtainTargetAmount);
+            }
+
+            return entry.VehicleObtainTargetAmount;
         }
 
         // Allocation-free flag test (Enum.HasFlag boxes); VehicleObtainType is a [Flags] enum.

@@ -3,6 +3,7 @@ using _Game.Scripts.Utils.VContainer;
 using Ads;
 using Analytics;
 using Analytics.AppsFlyer;
+using Clutch;
 using Firebase.Analytics;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -30,6 +31,7 @@ namespace Core
             builder.Register<IMMPService, AppsFlyerMMPService>(Lifetime.Singleton).AsSelf();
             builder.Register<IAnalyticsService, FirebaseAnalyticsService>(Lifetime.Singleton).AsSelf();
             builder.Register<IAdService, MaxAdService>(Lifetime.Singleton).AsSelf();
+            builder.Register<IClutchConfigService, ClutchConfigService>(Lifetime.Singleton).AsSelf();
 
            //TODO: Add AdGatingService
         }

@@ -25,5 +25,8 @@ namespace Save
 
         // Nitro
         public const string NitroCount      = "nitro_count"; // remaining free nitro charges (device-level)
+
+        // Clutch remote config
+        public const string ClutchConfig    = "clutch_config_cache"; // combined flag JSON blob (see ClutchConfigCache)
     }
 }

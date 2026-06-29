@@ -5,6 +5,7 @@ using _Game.Scripts.Utils.VContainer;
 using Ads;
 using Analytics;
 using Analytics.AppsFlyer;
+using Clutch;
 using Cysharp.Threading.Tasks;
 using Milestones;
 using Save;
@@ -168,6 +169,31 @@ namespace Core
             catch (Exception e)
             {
                 Debug.LogError(e.ToString());
+            }
+
+            // Clutch remote config. Resolves feature flags (vehicle prices, ad config) from Clutch with a
+            // PlayerPrefs cache and a fallback SO, so a value is always available even offline. The service
+            // owns its own timeout and resolves to cache/fallback within budget, so this await never blocks
+            // boot on a hung request and the config is fully resolved before the main menu reads it.
+            try
+            {
+                if (ServiceLocator.TryGetService(out IClutchConfigService clutchConfigService))
+                {
+                    // InitializeAsync owns its own 5s timeout and always resolves to cache/fallback
+                    // within budget, so IsReady is true (cache authoritative) before this returns.
+                    await clutchConfigService.InitializeAsync();
+
+                    if (!clutchConfigService.IsReady)
+                        Debug.LogError("[GameInitializer] Clutch config did not resolve; consumers will use cache/fallback.");
+                }
+                else
+                {
+                    Debug.LogError("[GameInitializer] IClutchConfigService not found in scope.");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[GameInitializer] Clutch config init failed: {e.Message}");
             }
 
             // Applovin Max
