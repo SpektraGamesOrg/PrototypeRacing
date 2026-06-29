@@ -12,7 +12,11 @@ Material:
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
+  - LIGHTMAP_ON
+  - LIGHTMAP_SHADOW_MIXING
+  - SHADOWS_SHADOWMASK
   - _MAIN_LIGHT_SHADOWS
+  - _MAIN_LIGHT_SHADOWS_CASCADE
   m_InvalidKeywords: []
   m_LightmapFlags: 1
   m_EnableInstancingVariants: 0
@@ -112,6 +116,7 @@ Material:
     - _GlossyReflections: 1
     - _MAIN_LIGHT_SHADOWS: 1
     - _MAIN_LIGHT_SHADOWS_CASCADE: 1
+    - _MaxLight: 1
     - _Metallic: 0
     - _Mode: 3
     - _OcclusionStrength: 1

@@ -12,7 +12,11 @@ Material:
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
+  - LIGHTMAP_ON
+  - LIGHTMAP_SHADOW_MIXING
+  - SHADOWS_SHADOWMASK
   - _MAIN_LIGHT_SHADOWS
+  - _MAIN_LIGHT_SHADOWS_CASCADE
   m_InvalidKeywords: []
   m_LightmapFlags: 1
   m_EnableInstancingVariants: 0
@@ -84,6 +88,9 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - LIGHTMAP: 1
+    - LIGHTMAP_SHADOW_MIXING: 1
+    - SHADOWS_SHADOWMASK: 1
     - _AddPrecomputedVelocity: 0
     - _AlphaClip: 0
     - _AlphaToMask: 0
@@ -104,6 +111,7 @@ Material:
     - _Glossiness: 0.84
     - _GlossyReflections: 1
     - _MAIN_LIGHT_SHADOWS: 1
+    - _MAIN_LIGHT_SHADOWS_CASCADE: 1
     - _MaxLight: 1
     - _Metallic: 0.22
     - _Mode: 0
