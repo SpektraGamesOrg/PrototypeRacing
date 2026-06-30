@@ -57,6 +57,9 @@ namespace Clutch
             request.downloadHandler = new DownloadHandlerBuffer();
             request.SetRequestHeader("Content-Type", "application/json");
             request.SetRequestHeader("Accept", "application/json");
+            // REQUIRED: the Clutch edge/WAF returns 403 for requests with no User-Agent. Set one
+            // explicitly (UnityWebRequest does not always send a UA the edge accepts).
+            request.SetRequestHeader("User-Agent", "ClutchSDK-Unity/1.0");
             // No Authorization header on purpose: public flags only.
             request.timeout = TimeoutSeconds;
 

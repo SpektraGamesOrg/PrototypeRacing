@@ -189,6 +189,9 @@ namespace Clutch
             };
             if (!string.IsNullOrEmpty(apiKey))
                 request.Headers.Add("X-API-Key", apiKey);
+            // REQUIRED: the Clutch edge/WAF returns 403 for requests with no User-Agent. HttpClient sends
+            // none by default, so set one explicitly (mirrors HRP's ClutchSDK "ClutchSDK-Unity/1.0").
+            request.Headers.Add("User-Agent", "ClutchSDK-Unity/1.0");
 
             using HttpClient client = new HttpClient { Timeout = TimeSpan.FromSeconds(EditorFetchTimeoutSeconds) };
             HttpResponseMessage response = client.SendAsync(request).GetAwaiter().GetResult();
