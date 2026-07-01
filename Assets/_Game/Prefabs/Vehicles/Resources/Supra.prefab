@@ -12144,10 +12144,10 @@ MonoBehaviour:
   nitroActive: 0
   flame: {fileID: 2383395001339407164}
   lensFlareURP: {fileID: 0}
-  defFlameLightIntensity: 1
+  defFlameLightIntensity: 0.15
   flareBrightness: 1
   flameTime: 0.5
-  flameColor: {r: 1, g: 0.29411766, b: 0, a: 1}
+  flameColor: {r: 1, g: 0.45490196, b: 0, a: 1}
   boostFlameColor: {r: 0, g: 1, b: 1, a: 1}
   previewFlames: 0
   minEmission: 5
@@ -24683,10 +24683,10 @@ MonoBehaviour:
   nitroActive: 0
   flame: {fileID: 312109923865930653}
   lensFlareURP: {fileID: 0}
-  defFlameLightIntensity: 1
+  defFlameLightIntensity: 0.15
   flareBrightness: 1
   flameTime: 0.5
-  flameColor: {r: 1, g: 0.2901961, b: 0, a: 1}
+  flameColor: {r: 1, g: 0.45336083, b: 0, a: 1}
   boostFlameColor: {r: 0, g: 1, b: 1, a: 1}
   previewFlames: 0
   minEmission: 5
@@ -37309,7 +37309,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 1, z: -0, w: -0.00000016391276}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.1856, y: 1.1856, z: 1.1856}
+  m_LocalScale: {x: 1.4161992, y: 1.4161992, z: 1.4161992}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7403590026563856870}
@@ -37506,7 +37506,7 @@ ParticleSystem:
       serializedVersion: 2
       minMaxState: 0
       minColor: {r: 1, g: 1, b: 1, a: 1}
-      maxColor: {r: 1, g: 0.2901961, b: 0, a: 1}
+      maxColor: {r: 1, g: 0.45490196, b: 0, a: 1}
       maxGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 1}
@@ -37570,7 +37570,7 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 0.33872807
+      scalar: 0.53
       minScalar: 1
       maxCurve:
         serializedVersion: 2
@@ -42142,7 +42142,7 @@ Light:
   serializedVersion: 13
   m_Type: 2
   m_Color: {r: 1, g: 0.6000001, b: 0, a: 1}
-  m_Intensity: 0.3
+  m_Intensity: 0.15
   m_Range: 2
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -44405,7 +44405,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 1, z: -0, w: -0.00000016391276}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.1856, y: 1.1856, z: 1.1856}
+  m_LocalScale: {x: 1.4161992, y: 1.4161992, z: 1.4161992}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8936449328928159163}
@@ -44602,7 +44602,7 @@ ParticleSystem:
       serializedVersion: 2
       minMaxState: 0
       minColor: {r: 1, g: 1, b: 1, a: 1}
-      maxColor: {r: 1, g: 0.2908951, b: 0, a: 1}
+      maxColor: {r: 1, g: 0.45490196, b: 0, a: 1}
       maxGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 1}
@@ -44666,7 +44666,7 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 0.33872807
+      scalar: 0.53
       minScalar: 1
       maxCurve:
         serializedVersion: 2
@@ -49238,7 +49238,7 @@ Light:
   serializedVersion: 13
   m_Type: 2
   m_Color: {r: 1, g: 0.6000001, b: 0, a: 1}
-  m_Intensity: 0.3
+  m_Intensity: 0.15
   m_Range: 2
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
