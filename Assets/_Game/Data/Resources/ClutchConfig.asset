@@ -40,3 +40,6 @@ MonoBehaviour:
     fallbackJson: "{\n  \"claim_popup_seconds\": 5\n}"
   - key: CurrencyConfig
     fallbackJson: "{\n  \"default_gold\": 150\n}"
+  - key: EventsConfig
+    fallbackJson: "{\n  \"watch_and_earn_gold\": 5000,\n  \"win_ad_multiplier\":
+      3,\n  \"fail_reward_divider\": 3\n}"

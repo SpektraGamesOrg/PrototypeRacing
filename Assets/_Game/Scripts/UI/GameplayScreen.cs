@@ -133,6 +133,21 @@ namespace UI
             base.OnHidden(immediate);
         }
 
+        /// <summary>
+        /// Shows or hides the whole free-roam HUD without changing the active screen. Used by
+        /// <see cref="Events.EventManager"/> to clear the HUD for the duration of an event run (GDD: only minimal
+        /// event UI is shown during a level), then restore it. Drives the screen's CanvasGroup directly, so event
+        /// overlays (shown separately) stay on top.
+        /// </summary>
+        public void SetHudVisible(bool visible)
+        {
+            if (!CanvasGroup)
+                return;
+
+            CanvasGroup.alpha = visible ? 1f : 0f;
+            CanvasGroup.blocksRaycasts = visible;
+        }
+
         // ---------------------------------------------------------------------
         // Button handlers
         // ---------------------------------------------------------------------

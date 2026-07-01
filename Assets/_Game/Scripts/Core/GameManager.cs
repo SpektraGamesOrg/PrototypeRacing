@@ -20,7 +20,6 @@ namespace Core
     /// </summary>
     public sealed class GameManager : SingletonComponent<GameManager>
     {
-        [Header("Vehicle")]
         [Tooltip("World-space pose used when the selected vehicle is spawned for gameplay.")]
         [SerializeField] private Transform vehicleSpawnPoint;
 
@@ -127,29 +126,26 @@ namespace Core
         /// (the event design wants no traffic during Jump Challenge / Time Trial); enabling restores the normal
         /// density and lets traffic repopulate.
         /// </summary>
+        // Big enough to cover the whole drivable map from the origin (radius, in metres). ClearTrafficOnArea
+        // removes every active vehicle whose distance to the center is under this, so this clears them all.
+        private const float TrafficClearRadius = 10_000_000f;
+
         public void SetTrafficActive(bool active)
         {
-            if (!gleyTrafficComponent)
-                return;
-
             if (active)
             {
-                API.SetTrafficDensity(gleyTrafficComponent.nrOfVehicles);
+                // Restore the normal density so Gley repopulates traffic around the player again.
+                int density = gleyTrafficComponent ? gleyTrafficComponent.nrOfVehicles : 0;
+                API.SetTrafficDensity(density);
                 return;
             }
 
+            // Disable: setting the density to 0 only stops NEW spawns - existing cars keep driving. So also
+            // clear every currently-active vehicle via Gley's own area-clear (activeSelf-checked, index-based
+            // removal), which is the reliable path. A map-covering radius removes them all regardless of where
+            // the level (or the player) sits in the world.
             API.SetTrafficDensity(0);
-
-            VehicleComponent[] vehicles = API.GetAllVehicles();
-            if (vehicles == null)
-                return;
-
-            for (int i = 0; i < vehicles.Length; i++)
-            {
-                VehicleComponent vc = vehicles[i];
-                if (vc)
-                    API.RemoveVehicle(vc.gameObject);
-            }
+            API.ClearTrafficOnArea(Vector3.zero, TrafficClearRadius);
         }
 
         protected override void OnDestroy()

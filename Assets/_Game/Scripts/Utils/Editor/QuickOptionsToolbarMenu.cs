@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using Clutch;
 using Save;
 using Sirenix.OdinValidator.Editor;
 using SpektraGames.SpektraUtilities.Runtime;
@@ -55,6 +56,12 @@ namespace Utils.Editor.QuickOptionsToolbarMenu
             GenericMenu menu = new GenericMenu();
 
             menu.AddItem(new GUIContent("Vehicle Container"), false, () => { Selection.activeObject = VehicleContainer.Instance; });
+            menu.AddItem(new GUIContent("Clutch Config"), false, () => { Selection.activeObject = ClutchConfig.Instance; });
+            menu.AddItem(new GUIContent("Event Object Container"), false, () => { Selection.activeObject = Events.EventObjectContainer.Instance; });
+
+            menu.AddSeparator(string.Empty);
+            menu.AddItem(new GUIContent("Open Level Designer"), false, Events.Editor.LevelDesignerWindow.ShowWindow);
+            menu.AddSeparator(string.Empty);
 
             menu.AddItem(new GUIContent("Run Custom Odin Validator"), false, RunOdinCustomValidator);
 
