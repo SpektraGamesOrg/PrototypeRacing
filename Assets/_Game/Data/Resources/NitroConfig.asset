@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f39c244b78795423aba7ca11b160542e, type: 3}
+  m_Name: NitroConfig
+  m_EditorClassIdentifier: Assembly-CSharp::Vehicles.NitroConfig
+  nitroDuration: 5
+  groundThrustAccel: 12
+  airThrustAccel: 16
+  maxBoostSpeed: 90
+  maxSpeedFalloff: 10
+  pitchRate: 5.5
+  yawRate: 2
+  rollRate: 2
+  angularResponse: 20
+  maxAirAngularSpeed: 10
+  takeoffPitchRampTime: 0.1
+  enableRoll: 0
+  invertPitch: 0
+  landingDamp: 8

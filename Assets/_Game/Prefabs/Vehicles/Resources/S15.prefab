@@ -3591,8 +3591,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Vehicles.NitroBehaviour
   mainVehicleBehaviour: {fileID: 7325439861583851814}
   controller: {fileID: 4086271425527388819}
+  body: {fileID: 8610039743974546447}
   nitroDuration: 5
-  boostAmount: 1
+  groundThrustAccel: 12
+  airThrustAccel: 16
+  maxBoostSpeed: 90
+  maxSpeedFalloff: 10
+  pitchRate: 5.5
+  yawRate: 5.5
+  rollRate: 5.5
+  angularResponse: 25
+  maxAirAngularSpeed: 8
+  takeoffPitchRampTime: 0.1
+  enableRoll: 0
+  invertPitch: 0
+  landingDamp: 8
 --- !u!1 &3182020374730869870
 GameObject:
   m_ObjectHideFlags: 0
