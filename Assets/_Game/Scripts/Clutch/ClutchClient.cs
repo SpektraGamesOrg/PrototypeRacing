@@ -109,6 +109,53 @@ namespace Clutch
             return ParseFeatures(responseText);
         }
 
+        /// <summary>
+        /// PERSISTS user properties so they are stored on the Clutch user (visible in the dashboard and used
+        /// for audience targeting). Unlike the evaluate-batch "properties" field - which is a per-request
+        /// override that Clutch discards - this writes them via POST /v1/client/environments/{envId}/properties
+        /// (Bearer auth). Throws on transport error / non-2xx; callers treat any throw as best-effort telemetry.
+        /// </summary>
+        public static async UniTask SendPropertiesAsync(
+            string baseUrl,
+            string environmentId,
+            string accessToken,
+            string userId,
+            JObject properties,
+            CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrEmpty(baseUrl) || string.IsNullOrEmpty(environmentId))
+                throw new InvalidOperationException("Clutch base URL / environment id is not configured.");
+            if (string.IsNullOrEmpty(accessToken))
+                throw new InvalidOperationException("Clutch SendProperties requires an access token.");
+            if (properties == null || properties.Count == 0)
+                return;
+
+            string url = $"{baseUrl}/v1/client/environments/{environmentId}/properties";
+
+            JObject body = new JObject
+            {
+                ["user_id"] = userId,
+                ["id"] = Guid.NewGuid().ToString(),
+                ["timestamp"] = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+                ["properties"] = properties,
+            };
+            byte[] payload = Encoding.UTF8.GetBytes(body.ToString(Formatting.None));
+
+            using UnityWebRequest request = new UnityWebRequest(url, UnityWebRequest.kHttpVerbPOST);
+            request.uploadHandler = new UploadHandlerRaw(payload);
+            request.downloadHandler = new DownloadHandlerBuffer();
+            request.SetRequestHeader("Content-Type", "application/json");
+            request.SetRequestHeader("Accept", "application/json");
+            request.SetRequestHeader("User-Agent", "ClutchSDK-Unity/1.0");
+            request.SetRequestHeader("Authorization", "Bearer " + accessToken);
+            request.timeout = TimeoutSeconds;
+
+            await request.SendWebRequest().WithCancellation(cancellationToken);
+
+            if (request.result != UnityWebRequest.Result.Success)
+                throw new Exception($"Clutch properties update failed: {request.responseCode} {request.error}");
+        }
+
         // Reads the "features" object ({ "<key>": <raw json value> }) and serializes each value to a
         // JSON string. Objects/arrays/scalars are all preserved verbatim so callers can deserialize the
         // exact shape Clutch returned.

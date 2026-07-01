@@ -70,6 +70,15 @@ namespace Clutch
                         config.BaseUrl, config.EnvironmentId, userId, timeoutCts.Token);
 
                     JObject properties = BuildProperties();
+
+                    // Persist the properties so they're stored on the Clutch user (visible in the dashboard,
+                    // used for audience targeting). Fire-and-forget best-effort: it must never block or fail
+                    // the config fetch, so it runs detached with its own error handling and is NOT tied to
+                    // the init timeout token. Pass a clone - the detached task and the evaluate call below
+                    // both use the properties object, and JObject is not safe to share across the two.
+                    PersistPropertiesAsync(config.BaseUrl, config.EnvironmentId, ClutchAuth.AccessToken, userId,
+                        (JObject)properties.DeepClone()).Forget();
+
                     fetched = await ClutchClient.EvaluateAuthenticatedAsync(
                         config.BaseUrl, config.EnvironmentId, ClutchAuth.AccessToken, userId, keys, properties, timeoutCts.Token);
                 }
@@ -145,6 +154,24 @@ namespace Clutch
             _vehicleConfigCache = null;
             IsReady = true;
             OnConfigUpdated?.Invoke();
+        }
+
+        // Fire-and-forget persist of user properties. Best-effort telemetry: any failure is logged and
+        // swallowed so it never affects config resolution or boot. Uses its own 10s timeout, independent of
+        // the init timeout (which the flag fetch owns).
+        private static async UniTaskVoid PersistPropertiesAsync(
+            string baseUrl, string environmentId, string accessToken, string userId, JObject properties)
+        {
+            try
+            {
+                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+                await ClutchClient.SendPropertiesAsync(baseUrl, environmentId, accessToken, userId, properties, cts.Token);
+                Debug.Log($"[ClutchConfigService] Persisted {properties.Count} user propertie(s) to Clutch.");
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[ClutchConfigService] Failed to persist user properties (non-blocking): {e.Message}");
+            }
         }
 
         // Targeting attributes forwarded to Clutch (camelCase, per the project's Clutch schema). lastActive
