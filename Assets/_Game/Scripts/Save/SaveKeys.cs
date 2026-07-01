@@ -26,6 +26,9 @@ namespace Save
         // Nitro
         public const string NitroCount      = "nitro_count"; // remaining free nitro charges (device-level)
 
+        // Save durability
+        public const string SaveCounter     = "save_counter"; // monotonic counter bumped on every Save(); read by the editor-only Save System Forensics tool to detect a PlayerPrefs rollback
+
         // Clutch remote config
         public const string ClutchConfig    = "clutch_config_cache"; // combined flag JSON blob (see ClutchConfigCache)
 

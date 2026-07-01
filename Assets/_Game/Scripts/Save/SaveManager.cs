@@ -373,18 +373,6 @@ namespace Save
         /// </summary>
         public static void Initialize()
         {
-            // Diagnostic: log what actually loaded from prefs at boot. If progress ever "resets", this shows
-            // whether the data was already gone at startup (lost before boot - a flush/platform issue) vs.
-            // still present here (then something clears it during the session). user_id is self-healing (its
-            // getter re-creates it), so a NEW guid here means the whole store was wiped; a SAME guid with
-            // missing coins/vehicles means only those keys were lost.
-            bool hadUser = !string.IsNullOrEmpty(PlayerPrefs.GetString(SaveKeys.UserId, string.Empty));
-            bool hadCoins = PlayerPrefs.HasKey(SaveKeys.Gold);
-            bool hadVehicles = !string.IsNullOrEmpty(PlayerPrefs.GetString(SaveKeys.Vehicles, string.Empty));
-            Debug.Log($"[SaveManager] Boot load: user_id={(hadUser ? "present" : "MISSING")}, " +
-                      $"coins={(hadCoins ? PlayerPrefs.GetInt(SaveKeys.Gold).ToString() : "MISSING")}, " +
-                      $"vehicles={(hadVehicles ? "present" : "MISSING")}");
-
             string userId = UserId; // To generate user id
             EnsureStarterVehicle();
         }
@@ -481,10 +469,14 @@ namespace Save
         // ---------------------------------------------------------------------
 
         /// <summary>
-        /// Flushes all staged changes to disk.
+        /// Flushes all staged changes to disk. Also bumps a monotonic save version counter: it only ever
+        /// increases, so a value that later reads LOWER proves PlayerPrefs rolled back. It is read by the
+        /// editor-only Save System Forensics tool to DETECT the reset bug; it does not recover any data.
         /// </summary>
         public static void Save()
         {
+            int counter = PlayerPrefs.GetInt(SaveKeys.SaveCounter, 0) + 1;
+            PlayerPrefs.SetInt(SaveKeys.SaveCounter, counter);
             PlayerPrefs.Save();
         }
 
