@@ -87,8 +87,8 @@ MonoBehaviour:
   TPSLockY: 1
   TPSLockZ: 0
   TPSFreeFall: 1
-  TPSDynamic: 1
-  useTopCameraMode: 1
+  TPSDynamic: 0
+  useTopCameraMode: 0
   useHoodCameraMode: 1
   useOrbitInTPSCameraMode: 1
   useOrbitInHoodCameraMode: 1
@@ -104,20 +104,20 @@ MonoBehaviour:
   topCameraAngle: {x: 45, y: 45, z: 0}
   topCameraDistance: 100
   maximumZDistanceOffset: 10
-  TPSDistance: 6
-  TPSHeight: 2
+  TPSDistance: 5.7
+  TPSHeight: 1.35
   TPSRotationDamping: 0.6
   TPSTiltMaximum: 15
   TPSTiltMultiplier: 0.5
   TPSYaw: 0
   TPSPitch: 8
-  TPSAutoFocus: 1
+  TPSAutoFocus: 0
   TPSAutoReverse: 1
   TPSCollision: 1
   TPSOffset: {x: 0, y: 0, z: 0.25}
   TPSStartRotation: {x: 0, y: 0, z: 0}
   TPSMinimumFOV: 50
-  TPSMaximumFOV: 70
+  TPSMaximumFOV: 80
   hoodCameraFOV: 60
   wheelCameraFOV: 60
   minimumOrtSize: 7.5
