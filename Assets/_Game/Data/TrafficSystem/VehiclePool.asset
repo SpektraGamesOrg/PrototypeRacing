@@ -27,13 +27,13 @@ MonoBehaviour:
     ignore: 0
   - vehiclePrefab: {fileID: 2473178064294694045, guid: 5ab924755eda5cb48aafee449853611b, type: 3}
     percent: 6
-    ignore: 1
+    ignore: 0
   - vehiclePrefab: {fileID: 5859250986567729722, guid: 3a7585059989ac240bec396e9a992a39, type: 3}
     percent: 6
     ignore: 0
   - vehiclePrefab: {fileID: 943585119788125467, guid: 71eefff75e9abd648b080cc200b63db3, type: 3}
     percent: 6
-    ignore: 1
+    ignore: 0
   - vehiclePrefab: {fileID: 7903893986249896478, guid: 39cc39ec00bb3da499d531f7c08f5edb, type: 3}
     percent: 6
     ignore: 0
@@ -57,4 +57,4 @@ MonoBehaviour:
     ignore: 0
   - vehiclePrefab: {fileID: 4419960079562620849, guid: 02ca562bf5094fb43a9132be7a8d100e, type: 3}
     percent: 3
-    ignore: 1
+    ignore: 0
