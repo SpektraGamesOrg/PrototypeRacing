@@ -86,8 +86,12 @@ namespace Vehicles
             }
         }
 
-        /// <summary>Whole seconds left in the current boost window (for the on-button countdown label).</summary>
-        public int SecondsRemaining => Mathf.CeilToInt(Mathf.Max(0f, _timeRemaining));
+        /// <summary>
+        /// Whole seconds left in the current boost window, for the on-button countdown. Counts down
+        /// 5 -> 4 -> 3 -> 2 -> 1 for a 5s window and never shows 0 while active (the label is hidden the
+        /// moment the boost ends). Returns 0 only when no boost is running.
+        /// </summary>
+        public int SecondsRemaining => IsActive ? Mathf.Max(1, Mathf.CeilToInt(_timeRemaining)) : 0;
 
         // The shared nitro tuning, resolved lazily so any accessor is safe regardless of call order. Falls
         // back to a fresh NitroConfig (authored defaults) and logs once if the asset is missing from

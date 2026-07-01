@@ -33,17 +33,23 @@ namespace UI
         private TMP_Text nitroCountText;
 
         [SerializeField]
-        [Tooltip("The NOS_icon image whose tint reflects nitro state: white when usable, the active color " +
-                 "while boosting, and the inactive (limit-reached) color when the count is 0.")]
+        [Tooltip("The NOS_icon image whose tint reflects nitro state: white when usable / boosting, and the " +
+                 "inactive (limit-reached) color when the count is 0. Stays its default color during a boost.")]
         private Image nitroIconImage;
-
-        [SerializeField]
-        [Tooltip("NOS_icon tint while a boost is active.")]
-        private Color nitroActiveColor = new Color(0x73 / 255f, 0xDE / 255f, 0xFF / 255f, 1f); // #73DEFF
 
         [SerializeField]
         [Tooltip("NOS_icon tint when out of charges and not boosting (limit reached / inactive).")]
         private Color nitroInactiveColor = new Color(0x7B / 255f, 0x7B / 255f, 0x7B / 255f, 1f); // #7B7B7B
+
+        [SerializeField]
+        [Tooltip("Filled image (NosActiveState) shown only while boosting; drains 1 -> 0 over the boost " +
+                 "duration to show time remaining. Disabled when idle.")]
+        private Image nitroActiveFill;
+
+        [SerializeField]
+        [Tooltip("Text_NosDuration: whole-second countdown shown while boosting (5 -> 4 -> 3 -> 2 -> 1, " +
+                 "never 0). Lives under NosActiveState so it is only visible during the boost.")]
+        private TMP_Text nitroDurationText;
 
         [SerializeField]
         [Tooltip("Child rewarded-ad icon on the nitro button. Enabled when the free nitro count hits 0; " +
@@ -225,8 +231,8 @@ namespace UI
         private void OnNitroCountChanged(int newCount) => RefreshNitroVisual();
 
         // Idle visual: count is always shown (including "0"), the NOS icon is white when usable or the
-        // inactive (limit) color at 0, and the rewarded-ad icon shows at 0. The active-boost visual is
-        // driven in Update while a boost window is open.
+        // inactive (limit) color at 0, the active-boost fill is hidden, and the rewarded-ad icon shows at 0.
+        // The active-boost fill is driven in Update while a boost window is open.
         private void RefreshNitroVisual()
         {
             _nitroBoostActive = false;
@@ -247,14 +253,23 @@ namespace UI
             if (nitroCountText)
                 nitroCountText.text = count.ToString();
 
-            // White when there are charges to spend; the inactive (limit) color when there are none.
+            // Icon stays its default color while usable/boosting; only the out-of-charges (limit) state dims
+            // it. The active boost is conveyed by the drain fill, not by recolouring the icon.
             if (nitroIconImage)
                 nitroIconImage.color = outOfNitro ? nitroInactiveColor : Color.white;
+
+            // The active-boost drain fill is only visible while boosting.
+            if (nitroActiveFill && nitroActiveFill.gameObject.activeSelf)
+            {
+                nitroActiveFill.fillAmount = 1f;
+                nitroActiveFill.gameObject.SetActive(false);
+            }
         }
 
-        // Drives the active-boost visual: the NOS icon turns the active color, the button is locked, and the
-        // rewarded icon shows for the duration. Touches UI only while the HUD is shown, so there is no
-        // per-frame work once the boost ends.
+        // Drives the active-boost visual: shows the NosActiveState fill and drains it 1 -> 0 over the boost,
+        // locks the button, and hides the rewarded icon. The NOS icon keeps its default color (the fill is
+        // the boost indicator). Touches UI only while the HUD is shown, so there is no per-frame work once
+        // the boost ends.
         private void Update()
         {
             if (!ShowingOrShown)
@@ -265,21 +280,30 @@ namespace UI
 
             if (!active)
             {
-                // Restore the idle count/icon/interactable the first frame after a boost ends.
+                // Restore the idle count/icon/fill/interactable the first frame after a boost ends.
                 if (_nitroBoostActive)
                     RefreshNitroVisual();
                 return;
             }
 
-            // Entering the boost: block re-taps, tint the icon active, and hide the rewarded icon.
+            // Entering the boost: block re-taps, show the drain fill, and hide the rewarded icon.
             if (!_nitroBoostActive)
             {
                 _nitroBoostActive = true;
                 if (nitroButton) nitroButton.interactable = false;
-                if (nitroIconImage) nitroIconImage.color = nitroActiveColor;
+                if (nitroActiveFill && !nitroActiveFill.gameObject.activeSelf)
+                    nitroActiveFill.gameObject.SetActive(true);
                 if (nitroRewardedIconObject && nitroRewardedIconObject.activeSelf)
                     nitroRewardedIconObject.SetActive(false);
             }
+
+            // Drain the fill from 1 (just activated) to 0 (window ends) over the boost duration.
+            if (nitroActiveFill)
+                nitroActiveFill.fillAmount = nitro.NormalizedTimeRemaining;
+
+            // Whole-second countdown: 5 -> 4 -> 3 -> 2 -> 1 (never 0 while active).
+            if (nitroDurationText)
+                nitroDurationText.text = nitro.SecondsRemaining.ToString();
         }
 
         // ---------------------------------------------------------------------
