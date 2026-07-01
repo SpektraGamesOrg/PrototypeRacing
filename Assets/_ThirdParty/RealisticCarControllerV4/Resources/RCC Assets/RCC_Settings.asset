@@ -94,7 +94,7 @@ MonoBehaviour:
     forwardExtremumValue: 1
     forwardAsymptoteSlip: 0.8
     forwardAsymptoteValue: 0.75
-    sidewaysExtremumSlip: 0.2
+    sidewaysExtremumSlip: 0.35
     sidewaysExtremumValue: 1
     sidewaysAsymptoteSlip: 0.5
     sidewaysAsymptoteValue: 0.75
@@ -174,8 +174,8 @@ MonoBehaviour:
     sidewaysAsymptoteSlip: 0.25
     sidewaysAsymptoteValue: 0.75
   - behaviorName: Drift
-    steeringHelper: 1
-    tractionHelper: 1
+    steeringHelper: 0
+    tractionHelper: 0
     angularDragHelper: 0
     counterSteering: 1
     limitSteering: 0
@@ -184,7 +184,7 @@ MonoBehaviour:
     ESP: 0
     TCS: 0
     applyExternalWheelFrictions: 1
-    applyRelativeTorque: 1
+    applyRelativeTorque: 0
     steeringType: 0
     steeringCurve:
       serializedVersion: 2
@@ -231,13 +231,13 @@ MonoBehaviour:
     angularDrag: 0.5
     angularDragHelperMinimum: 0.1
     angularDragHelperMaximum: 0.1
-    forwardExtremumSlip: 0.325
+    forwardExtremumSlip: 0.2
     forwardExtremumValue: 1
-    forwardAsymptoteSlip: 1
+    forwardAsymptoteSlip: 0.2
     forwardAsymptoteValue: 1
-    sidewaysExtremumSlip: 0.25
-    sidewaysExtremumValue: 1
-    sidewaysAsymptoteSlip: 0.5
+    sidewaysExtremumSlip: 0.2
+    sidewaysExtremumValue: 0.2
+    sidewaysAsymptoteSlip: 0.2
     sidewaysAsymptoteValue: 1
   - behaviorName: Semi Arcade
     steeringHelper: 1

@@ -1409,27 +1409,27 @@ MonoBehaviour:
     m_Curve:
     - serializedVersion: 3
       time: 800
-      value: 150
-      inSlope: 0.031914894
-      outSlope: 0.031914894
+      value: 355
+      inSlope: 0.075531915
+      outSlope: 0.075531915
       tangentMode: 0
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 5500
-      value: 300
-      inSlope: -0.017375888
-      outSlope: -0.017375888
+      value: 710
+      inSlope: -0.04112293
+      outSlope: -0.04112293
       tangentMode: 0
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 7000
-      value: 200
-      inSlope: -0.06666667
-      outSlope: -0.06666667
+      value: 473.33334
+      inSlope: -0.15777777
+      outSlope: -0.15777777
       tangentMode: 0
       weightedMode: 0
       inWeight: 0.33333334
@@ -1438,7 +1438,7 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   autoGenerateEngineRPMCurve: 1
-  maxEngineTorque: 300
+  maxEngineTorque: 710
   maxEngineTorqueAtRPM: 5500
   minEngineRPM: 800
   maxEngineRPM: 7000
@@ -1487,10 +1487,10 @@ MonoBehaviour:
   totalGears: 6
   currentGear: 0
   NGear: 0
-  finalRatio: 3.23
+  finalRatio: 3.38
   gearShiftingDelay: 0.35
   gearShiftingThreshold: 0.75
-  clutchInertia: 0.25
+  clutchInertia: 0.1
   gearShiftUpRPM: 6500
   gearShiftDownRPM: 3500
   changingGear: 0
