@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6bd9c5bb2698c445784a56d755b774a7, type: 3}
+  m_Name: EventObjectContainer
+  m_EditorClassIdentifier: Assembly-CSharp::Events.EventObjectContainer
+  presets:
+  - {fileID: 9215083744194634501, guid: 55068f7eefc1240c4887bb61196490a8, type: 3}
+  - {fileID: 1371549353865266699, guid: 4141ac4e3411141d9ba1ef916af409f8, type: 3}
+  - {fileID: 7532796450482998251, guid: 7a34423a3a86b4951a969a7972052376, type: 3}
+  - {fileID: 4410107363054780904, guid: 27f8f35b532304ec8b067ef85523f8b8, type: 3}
+  scanFolder: Assets/_Game/Prefabs/EventObjects

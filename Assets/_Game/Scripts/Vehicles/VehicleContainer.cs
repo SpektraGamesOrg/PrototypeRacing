@@ -20,7 +20,7 @@ namespace Vehicles
     /// Usage:
     ///     GameObject prefab = await VehicleContainer.Instance.LoadPrefabAsync(VehicleNameType.GTR_R35);
     /// </summary>
-    [CreateAssetMenu(fileName = "VehicleContainer", menuName = "DRIVE01/Vehicle Container")]
+    [CreateAssetMenu(fileName = "VehicleContainer", menuName = "EventSystem/Vehicle Container")]
     public class VehicleContainer : SingletonScriptableObject<VehicleContainer>
     {
         [SerializeField] private List<VehicleEntry> vehicles = new List<VehicleEntry>();

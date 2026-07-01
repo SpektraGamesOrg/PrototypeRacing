@@ -136,6 +136,14 @@ namespace Clutch
 #if UNITY_EDITOR
         private const int EditorFetchTimeoutSeconds = 15;
 
+        // Any Inspector / SerializedObject edit (the raw TextArea, "Format JSON", or the JSON editor window
+        // writing via SerializedObject) invalidates the parsed VehicleConfig memo so the next read re-parses
+        // the updated JSON instead of serving a stale map.
+        private void OnValidate()
+        {
+            _vehicleConfigFallback = null;
+        }
+
         /// <summary>
         /// Editor-only: writes (or replaces) a flag's fallback JSON. Caller is responsible for
         /// SetDirty/SaveAssets.

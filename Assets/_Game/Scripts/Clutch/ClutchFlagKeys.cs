@@ -38,8 +38,14 @@ namespace Clutch
         /// </summary>
         public const string CurrencyConfig = "CurrencyConfig";
 
+        /// <summary>
+        /// In-game event tuning (see <see cref="global::Events.EventsConfig"/>): the Watch &amp; Earn gold, the
+        /// win 3X rewarded-ad multiplier, and the fail-reward divider.
+        /// </summary>
+        public const string EventsConfig = "EventsConfig";
+
         /// <summary>All keys requested from Clutch in one evaluate-batch call.</summary>
         public static readonly string[] All =
-            { VehicleConfig, AdConfig, MilestonesConfig, FreeGoldConfig, CurrencyConfig };
+            { VehicleConfig, AdConfig, MilestonesConfig, FreeGoldConfig, CurrencyConfig, EventsConfig };
     }
 }

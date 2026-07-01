@@ -29,12 +29,12 @@ namespace UI
         [SerializeField] private TMP_Text rewardText;
         [SerializeField] private Button claimButton;
 
-        [Tooltip("Shared pop-up close time (seconds). Drives both this pop-up's auto-claim AND the multiplier " +
-                 "upsell's countdown so they close together. If nothing is pressed in this time the base reward " +
-                 "is auto-claimed.")]
-        [SerializeField, Min(0.1f)] private float popupCloseSeconds = 6f;
-
         private float _timeLeft;
+
+        // Shared pop-up close time (seconds) captured for this round from the milestone service
+        // (MilestonesConfig, remote-tunable). Drives both this pop-up's auto-claim AND the multiplier upsell's
+        // countdown so they close together. If nothing is pressed in this time the base reward is auto-claimed.
+        private float _closeSeconds;
 
         // Set once the milestone has been granted this round so no second path can double-grant or double-close.
         private bool _resolved;
@@ -93,7 +93,9 @@ namespace UI
         // HUD is up, something is pending, and we are not already showing / closing one.
         private void HandlePendingChanged()
         {
-            if (IsBusy || !IsGameplayActive || !DistanceMilestoneManager.HasPending)
+            // Never pop over a running Jump Challenge / Time Trial - the event owns the screen while isolated.
+            if (IsBusy || !IsGameplayActive || !DistanceMilestoneManager.HasPending ||
+                Events.EventManager.IsEventBlockingHud)
                 return;
 
             Show();
@@ -105,7 +107,8 @@ namespace UI
 
             _resolved = false;
             _awaitingAd = false;
-            _timeLeft = popupCloseSeconds;
+            _closeSeconds = DistanceMilestoneManager.PopupCloseSeconds;
+            _timeLeft = _closeSeconds;
 
             DistanceMilestoneInfo milestone = DistanceMilestoneManager.NextPending;
             if (rewardText)
@@ -134,16 +137,15 @@ namespace UI
                 return;
             }
             
+            // Expected, by-design skip on the shared single-instance overlay: another flow (e.g. a gold pickup's
+            // "CLAIM Nx") is already using it, so we simply don't show our own upsell - the two never conflict.
+            // Not an error, so it must not log one (would spam the console and mask real errors).
             if (overlay.IsBusy)
-            {
-                Debug.LogError("ClaimGoldMultiplierWithAdsOverlay is busy");
                 return;
-            }
-            
 
             var offer = new GoldMultiplierAdOffer(
                 multiplier: DistanceMilestoneManager.RewardAdMultiplier,
-                closeSeconds: popupCloseSeconds,
+                closeSeconds: _closeSeconds,
                 onRewarded: () => Resolve(useAdBonus: true),
                 onAdFailed: () => Resolve(useAdBonus: false),
                 onExpired: null,                       // our own countdown auto-claims the base at the same time
