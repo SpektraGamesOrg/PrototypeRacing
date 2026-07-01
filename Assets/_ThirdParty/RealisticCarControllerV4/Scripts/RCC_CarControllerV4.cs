@@ -1987,7 +1987,26 @@ public class RCC_CarControllerV4 : RCC_Core {
         }
 
         driftingNow = Mathf.Abs(rearSidewaysSlip) > .25f;
-        driftAngle = rearSidewaysSlip * 1f;
+
+        // --- Custom drift feel ported from PMM2 (RCC V3) ---
+        // Forward-momentum boost while drifting under throttle, applied only when the drift
+        // behavior preset is active (same gate RCC V4 uses for external wheel frictions).
+        // Equivalent to PMM2's: speed.ReMap(0, 150, 0, 5f) * Min(brakeInput > 0 ? 0 : 0.3f, throttleInput).
+        if (driftingNow && !overrideBehavior && Settings.selectedBehaviorType != null &&
+            Settings.selectedBehaviorType.applyExternalWheelFrictions) {
+
+            float driftBoostForce = Mathf.Clamp01(speed / 150f) * 5f *
+                                    Mathf.Min(brakeInput > 0f ? 0f : 0.3f, throttleInput);
+
+            Rigid.AddRelativeForce(Vector3.forward * driftBoostForce, ForceMode.Acceleration);
+
+        }
+
+        // driftAngle: PMM2 uses a 0.75 scale with a minimum-speed gate (RCC V4 default was * 1f).
+        if (driftingNow && speed > 10f)
+            driftAngle = rearSidewaysSlip * .75f;
+        else
+            driftAngle = 0f;
 
     }
 
