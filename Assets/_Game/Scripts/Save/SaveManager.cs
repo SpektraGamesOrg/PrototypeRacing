@@ -480,7 +480,9 @@ namespace Save
         /// </summary>
         public static void ResetAll()
         {
-            //Debug.LogError("[SaveManager] ResetAll called.");
+            // Loud + stack-traced on purpose: this wipes ALL PlayerPrefs (coins, vehicles, Clutch cache,
+            // tokens). If saved data ever "resets on next open", this log tells you exactly who called it.
+            Debug.LogError($"[SaveManager] ResetAll() wiping ALL PlayerPrefs.\n{System.Environment.StackTrace}");
             PlayerPrefs.DeleteAll();
             PlayerPrefs.Save();
             OnSaveReset?.Invoke();

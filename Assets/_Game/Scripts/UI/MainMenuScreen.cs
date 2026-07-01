@@ -379,6 +379,15 @@ namespace UI
             SaveManager.OnDistanceDrivenChanged += HandleSaveValueChanged;
             SaveManager.OnSaveReset -= HandleSaveReset;
             SaveManager.OnSaveReset += HandleSaveReset;
+
+            // Prices come from the Clutch config (with cache/SO fallback). If Clutch resolves AFTER this
+            // screen is already shown, re-run the refresh so displayed prices switch from the fallback to
+            // the resolved values instead of staying on the VehicleContainer defaults.
+            if (ServiceLocator.TryGetService(out IClutchConfigService clutchConfig))
+            {
+                clutchConfig.OnConfigUpdated -= HandleClutchConfigUpdated;
+                clutchConfig.OnConfigUpdated += HandleClutchConfigUpdated;
+            }
         }
 
         private void UnsubscribeFromSaveEvents()
@@ -386,12 +395,19 @@ namespace UI
             SaveManager.OnCoinsChanged -= HandleSaveValueChanged;
             SaveManager.OnDistanceDrivenChanged -= HandleSaveValueChanged;
             SaveManager.OnSaveReset -= HandleSaveReset;
+
+            if (ServiceLocator.TryGetService(out IClutchConfigService clutchConfig))
+                clutchConfig.OnConfigUpdated -= HandleClutchConfigUpdated;
         }
 
         // Gold and distance both feed the buy area (affordability, milestone progress), so any change
         // re-runs the same full refresh for the car currently on screen.
         private void HandleSaveValueChanged(int _) => Refresh(CurrentVehicle);
         private void HandleSaveReset() => Refresh(CurrentVehicle);
+
+        // Clutch config resolved (or refreshed): re-read prices so the buy area reflects the resolved
+        // Clutch/cache values rather than the VehicleContainer fallback shown before resolution completed.
+        private void HandleClutchConfigUpdated() => Refresh(CurrentVehicle);
 
         // ---------------------------------------------------------------------
         // Helpers

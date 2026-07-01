@@ -103,6 +103,7 @@ namespace Clutch
                 }
 
                 Debug.Log($"[ClutchConfigService] Fetched {fetched.Count} flag(s) from Clutch and cached to prefs.");
+                ClutchConfigCache.Save();
             }
             else
             {
@@ -114,7 +115,6 @@ namespace Clutch
 
             // Flush the cache to disk NOW so a subsequent offline launch always finds it. This is the write
             // that makes "online once, then offline" reuse the real Clutch values instead of the SO fallback.
-            ClutchConfigCache.Save();
             Finish();
         }
 
