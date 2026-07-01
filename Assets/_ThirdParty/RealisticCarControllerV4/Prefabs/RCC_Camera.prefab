@@ -117,7 +117,7 @@ MonoBehaviour:
   TPSOffset: {x: 0, y: 0, z: 0.25}
   TPSStartRotation: {x: 0, y: 0, z: 0}
   TPSMinimumFOV: 50
-  TPSMaximumFOV: 80
+  TPSMaximumFOV: 60
   hoodCameraFOV: 60
   wheelCameraFOV: 60
   minimumOrtSize: 7.5
