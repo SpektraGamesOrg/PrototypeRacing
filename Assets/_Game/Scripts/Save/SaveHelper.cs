@@ -109,6 +109,16 @@ namespace Save
             Milestones.DistanceMilestoneManager.ClaimNextPendingWithAdBonus();
         }
 
+        // Copies the current user id to the system clipboard - the ReadOnly UserId field above can't be
+        // selected/copied directly in the Inspector.
+        [Button]
+        private void CopyUserId()
+        {
+            string userId = SaveManager.UserId;
+            GUIUtility.systemCopyBuffer = userId;
+            Debug.Log($"[SaveHelper] Copied user id to clipboard: {userId}");
+        }
+
         [Button]
         private void AddCurrency()
         {

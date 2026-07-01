@@ -1,11 +1,25 @@
 using System.ComponentModel;
 using Milestones;
 using Save;
+using UnityEngine;
 
 // ReSharper disable once CheckNamespace
 public partial class SROptions
 {
     private const string GeneralCategory = "General";
+
+    // Read-only: the generated device user id used for Clutch auth/targeting. Shown so it can be read;
+    // use "Copy User Id" to put it on the clipboard.
+    [Category(GeneralCategory)]
+    public string UserId => SaveManager.UserId;
+
+    // Copies the user id to the system clipboard (SRDebugger read-only fields aren't easily selectable).
+    [Category(GeneralCategory)]
+    public void CopyUserId()
+    {
+        GUIUtility.systemCopyBuffer = SaveManager.UserId;
+        Debug.Log($"[SROptions] Copied user id to clipboard: {SaveManager.UserId}");
+    }
 
     [Category(GeneralCategory)]
     public void AddCurrency()
