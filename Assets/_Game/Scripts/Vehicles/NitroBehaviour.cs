@@ -37,6 +37,10 @@ namespace Vehicles
     [DefaultExecutionOrder(10000)] // After RCC_CarControllerV4 so isGrounded/inputs are fresh when we add forces.
     public class NitroBehaviour : VehicleBehaviourBase
     {
+        [Tooltip("Exhaust to signal while boosting. Wired by MainVehicleBehaviour.Validate / EditorAutoWire.")]
+        [SerializeField]
+        private RCC_Exhaust[] exhausts = null;
+
         [Title("References")]
         [Tooltip("Controller read for isGrounded and the air-control inputs (steer/throttle/brake). " +
                  "Wired by MainVehicleBehaviour.Validate.")]
@@ -166,6 +170,10 @@ namespace Vehicles
         // physics calls - zero allocations, so there is no GC while boosting.
         private void FixedUpdate()
         {
+            SetExhaustNitro(IsActive);
+
+          
+
             if (!IsActive)
                 return;
 
@@ -200,7 +208,14 @@ namespace Vehicles
                 Debug.Log($"[NitroBehaviour] Nitro boost ended on '{name}'.");
             }
         }
-
+        private void SetExhaustNitro(bool active)
+        {
+            if (exhausts == null)
+                return;
+            for (int i = 0; i < exhausts.Length; i++)
+                if (exhausts[i])
+                    exhausts[i].nitroActive = active;
+        }
         // Forces RCC's TPS camera to track the vehicle's nose while airborne + boosting (RCC otherwise freezes
         // the camera's rotation in the air via TPSFreeFall), then restores its prior free-fall behaviour.
         // Writes TPSFreeFall only on a transition edge (never per-frame), caches the LIVE value at acquire so
@@ -321,6 +336,8 @@ namespace Vehicles
         // override (covers despawn / pool / scene exit while airborne mid-boost).
         private void OnDisable()
         {
+            SetExhaustNitro(false);
+
             if (_cameraNoseFollowOwned)
             {
                 if (RCC_Camera.Instance)

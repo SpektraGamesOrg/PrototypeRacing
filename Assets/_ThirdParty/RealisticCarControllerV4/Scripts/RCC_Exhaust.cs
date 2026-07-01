@@ -23,7 +23,9 @@ public class RCC_Exhaust : RCC_Core {
     /// Primary ParticleSystem for the smoke effect.
     /// </summary>
     private ParticleSystem particle;
-
+    [Header("Nitro")]
+   
+    public bool nitroActive = false;
     /// <summary>
     /// Emission module of the smoke ParticleSystem for controlling emission rates.
     /// </summary>
@@ -286,7 +288,7 @@ public class RCC_Exhaust : RCC_Core {
             // 2) Boost input is high (>= 0.75), or
             // 3) previewFlames is enabled in the editor.
             if (((CarController.useExhaustFlame && CarController.engineRPM >= 5000 && CarController.engineRPM <= 5500 && CarController.throttleInput <= .25f && flameTime <= .5f)
-                || CarController.boostInput >= .75f)
+                || nitroActive)
                 || previewFlames) {
 
                 flameTime += Time.deltaTime;
@@ -297,11 +299,14 @@ public class RCC_Exhaust : RCC_Core {
                     flameLight.intensity = flameSource.pitch * defFlameLightIntensity * Random.Range(.25f, 1f);
 
                 // If boosting, use the boostFlameColor; otherwise, use the normal flame color.
-                if (CarController.boostInput >= .75f && flame) {
+                if (nitroActive && flame)
+                {
                     main.startColor = boostFlameColor;
                     if (flameLight)
                         flameLight.color = main.startColor.color;
-                } else {
+                }
+                else
+                {
                     main.startColor = flameColor;
                     if (flameLight)
                         flameLight.color = main.startColor.color;
