@@ -1978,10 +1978,10 @@ WheelCollider:
   m_Center: {x: 0, y: 0, z: 0}
   m_Radius: 0.31406784
   m_SuspensionSpring:
-    spring: 45000
-    damper: 3000
+    spring: 90000
+    damper: 5000
     targetPosition: 0.5
-  m_SuspensionDistance: 0.2
+  m_SuspensionDistance: 0.28
   m_ForceAppPointDistance: 0.05
   m_Mass: 40
   m_WheelDampingRate: 1
@@ -2349,7 +2349,7 @@ Transform:
   m_GameObject: {fileID: 2617253861344763815}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.24394035, z: 0.12438965}
+  m_LocalPosition: {x: 0, y: -0.45, z: 0.12438965}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5010,10 +5010,10 @@ WheelCollider:
   m_Center: {x: 0, y: 0, z: 0}
   m_Radius: 0.31406784
   m_SuspensionSpring:
-    spring: 45000
-    damper: 3000
+    spring: 90000
+    damper: 5000
     targetPosition: 0.5
-  m_SuspensionDistance: 0.2
+  m_SuspensionDistance: 0.28
   m_ForceAppPointDistance: 0.05
   m_Mass: 40
   m_WheelDampingRate: 1
@@ -7597,10 +7597,10 @@ WheelCollider:
   m_Center: {x: 0, y: 0, z: 0}
   m_Radius: 0.31406784
   m_SuspensionSpring:
-    spring: 45000
-    damper: 3000
+    spring: 90000
+    damper: 5000
     targetPosition: 0.5
-  m_SuspensionDistance: 0.2
+  m_SuspensionDistance: 0.28
   m_ForceAppPointDistance: 0.05
   m_Mass: 40
   m_WheelDampingRate: 1
@@ -8508,10 +8508,10 @@ WheelCollider:
   m_Center: {x: 0, y: 0, z: 0}
   m_Radius: 0.31406784
   m_SuspensionSpring:
-    spring: 45000
-    damper: 3000
+    spring: 90000
+    damper: 5000
     targetPosition: 0.5
-  m_SuspensionDistance: 0.2
+  m_SuspensionDistance: 0.28
   m_ForceAppPointDistance: 0.05
   m_Mass: 40
   m_WheelDampingRate: 1

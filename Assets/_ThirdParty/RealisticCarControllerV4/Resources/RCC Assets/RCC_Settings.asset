@@ -235,9 +235,9 @@ MonoBehaviour:
     forwardExtremumValue: 1
     forwardAsymptoteSlip: 1
     forwardAsymptoteValue: 1
-    sidewaysExtremumSlip: 0.375
+    sidewaysExtremumSlip: 0.25
     sidewaysExtremumValue: 1
-    sidewaysAsymptoteSlip: 1
+    sidewaysAsymptoteSlip: 0.5
     sidewaysAsymptoteValue: 1
   - behaviorName: Semi Arcade
     steeringHelper: 1
