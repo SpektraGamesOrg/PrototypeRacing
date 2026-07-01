@@ -4709,13 +4709,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66b98cf643678c845b2a8ee2683501bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nitro: {fileID: 0}
+  nitroActive: 0
   flame: {fileID: 2486890894475668312}
   lensFlareURP: {fileID: 0}
-  defFlameLightIntensity: 1
+  defFlameLightIntensity: 0.15
   flareBrightness: 1
-  flameTime: 1
-  flameColor: {r: 1, g: 0.6000001, b: 0, a: 1}
+  flameTime: 0.5
+  flameColor: {r: 1, g: 0.45336083, b: 0, a: 1}
   boostFlameColor: {r: 0, g: 1, b: 1, a: 1}
   previewFlames: 0
   minEmission: 5
@@ -4734,6 +4734,10 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1697350247028532463, guid: 3a90821a03752b94089570cddbc92038, type: 3}
       propertyPath: playOnAwake
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2146345446357516055, guid: 3a90821a03752b94089570cddbc92038, type: 3}
+      propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3783861519347057786, guid: 3a90821a03752b94089570cddbc92038, type: 3}
@@ -4756,13 +4760,41 @@ PrefabInstance:
       propertyPath: playOnAwake
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 7567971568888472685, guid: 3a90821a03752b94089570cddbc92038, type: 3}
+      propertyPath: ColorModule.enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7567971568888472685, guid: 3a90821a03752b94089570cddbc92038, type: 3}
+      propertyPath: InitialModule.startSize.scalar
+      value: 0.53
+      objectReference: {fileID: 0}
+    - target: {fileID: 7567971568888472685, guid: 3a90821a03752b94089570cddbc92038, type: 3}
+      propertyPath: InitialModule.startColor.maxColor.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7567971568888472685, guid: 3a90821a03752b94089570cddbc92038, type: 3}
+      propertyPath: InitialModule.startColor.maxColor.g
+      value: 0.45490196
+      objectReference: {fileID: 0}
     - target: {fileID: 7588822671145140762, guid: 3a90821a03752b94089570cddbc92038, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7632080431711959893, guid: 3a90821a03752b94089570cddbc92038, type: 3}
       propertyPath: m_Name
       value: ExhaustFireShort
+      objectReference: {fileID: 0}
+    - target: {fileID: 7852774676208341774, guid: 3a90821a03752b94089570cddbc92038, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.416199
+      objectReference: {fileID: 0}
+    - target: {fileID: 7852774676208341774, guid: 3a90821a03752b94089570cddbc92038, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.416199
+      objectReference: {fileID: 0}
+    - target: {fileID: 7852774676208341774, guid: 3a90821a03752b94089570cddbc92038, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.416199
       objectReference: {fileID: 0}
     - target: {fileID: 7852774676208341774, guid: 3a90821a03752b94089570cddbc92038, type: 3}
       propertyPath: m_LocalPosition.x
@@ -4807,6 +4839,8 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 1779866588208221773, guid: 3a90821a03752b94089570cddbc92038, type: 3}
+    - {fileID: 7588822671145140762, guid: 3a90821a03752b94089570cddbc92038, type: 3}
+    - {fileID: 2146345446357516055, guid: 3a90821a03752b94089570cddbc92038, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 7632080431711959893, guid: 3a90821a03752b94089570cddbc92038, type: 3}
@@ -4832,7 +4866,7 @@ Light:
   serializedVersion: 13
   m_Type: 2
   m_Color: {r: 1, g: 0.6000001, b: 0, a: 1}
-  m_Intensity: 0.5
+  m_Intensity: 0.15
   m_Range: 2
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
